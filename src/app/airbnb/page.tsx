@@ -31,9 +31,27 @@ export default function AirbnbLanding() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-            <a href="#workflow" className="hover:text-white transition-colors">How it Works</a>
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
+            <button 
+              type="button"
+              onClick={() => document.getElementById('workflow')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              How it Works
+            </button>
+            <button 
+              type="button"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Features
+            </button>
+            <button 
+              type="button"
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Pricing
+            </button>
           </nav>
 
           <div className="flex items-center gap-4">
