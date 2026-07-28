@@ -1,0 +1,456 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check } from 'lucide-react';
+import DemoVideoPlayer from './components/DemoVideoPlayer';
+
+export default function AirbnbLanding() {
+  const [isAnnual, setIsAnnual] = useState(true);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-neutral-950 text-white selection:bg-rose-500 selection:text-white overflow-hidden relative">
+      {/* Decorative background glows */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-rose-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+
+      {/* Header */}
+      <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+            <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
+              <ShieldCheck className="h-6 w-6 text-white" />
+            </div>
+            <span className="font-bold text-xl tracking-tight bg-linear-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
+              TurnProofs
+            </span>
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="#workflow" className="hover:text-white transition-colors">How it Works</a>
+            <a href="#preview" className="hover:text-white transition-colors">Certificate</a>
+          </nav>
+
+          <div className="flex items-center gap-4">
+            <Link 
+              href="/airbnb/login" 
+              className="text-sm font-medium hover:text-rose-400 transition-colors"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/airbnb/login"
+              className="px-4 py-2 rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-sm font-semibold transition-all shadow-md shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02]"
+            >
+              Get Started Free
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative pt-24 pb-20 px-6 max-w-7xl mx-auto text-center">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-rose-400 mb-8 animate-pulse">
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>The Ultimate Airbnb Dispute Resolution Tool</span>
+        </div>
+
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
+          Dispute-Proof Cleaning Proofs For Short-Term Rentals
+        </h1>
+
+        <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+          Verify checklists, track cleaner GPS coordinates, collect photo proofs, and export beautiful PDF certificates to resolve guest cleanliness claims instantly.
+        </p>
+
+        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/airbnb/login"
+            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-lg transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/50 hover:scale-[1.03] flex items-center justify-center gap-2 group"
+          >
+            <span>Host Control Center</span>
+            <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Link>
+          <Link
+            href="/airbnb/login?demo=true"
+            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 font-semibold text-lg transition-all flex items-center justify-center gap-2"
+          >
+            <span>Try Cleaner Demo</span>
+          </Link>
+        </div>
+
+        {/* Dashboard Preview Box */}
+        <div className="mt-16 relative mx-auto max-w-5xl rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4 backdrop-blur-md shadow-2xl">
+          <div className="absolute -inset-0.5 bg-linear-to-r from-rose-500/20 to-orange-500/20 rounded-2xl blur-md -z-10" />
+          <div className="flex items-center gap-2 pb-3 mb-3 border-b border-neutral-800">
+            <div className="h-3 w-3 rounded-full bg-red-500/80" />
+            <div className="h-3 w-3 rounded-full bg-amber-500/80" />
+            <div className="h-3 w-3 rounded-full bg-green-500/80" />
+            <span className="text-xs text-neutral-500 ml-2 font-mono">turnproofs-dashboard-mockup.dmg</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left p-2">
+            <div className="p-5 rounded-xl bg-neutral-950/80 border border-neutral-800/80">
+              <span className="text-xs font-semibold text-rose-400 tracking-wider uppercase block mb-1">Step 1: Assign Checklists</span>
+              <h4 className="font-bold text-lg text-white mb-2">Build Detailed Checklists</h4>
+              <p className="text-sm text-neutral-400">Hosts create checklists. Select tasks that require high-resolution photos (e.g., making the bed, checking fridge cleaning).</p>
+            </div>
+            <div className="p-5 rounded-xl bg-neutral-950/80 border border-neutral-800/80">
+              <span className="text-xs font-semibold text-amber-400 tracking-wider uppercase block mb-1">Step 2: Geolocation Check</span>
+              <h4 className="font-bold text-lg text-white mb-2">Track GPS Coordinates</h4>
+              <p className="text-sm text-neutral-400">Cleaners click to start/finish with zero login. The system logs exact coordinates to verify they cleaned on-site.</p>
+            </div>
+            <div className="p-5 rounded-xl bg-neutral-950/80 border border-neutral-800/80">
+              <span className="text-xs font-semibold text-emerald-400 tracking-wider uppercase block mb-1">Step 3: Export Support Certs</span>
+              <h4 className="font-bold text-lg text-white mb-2">Export Professional Reports</h4>
+              <p className="text-sm text-neutral-400">Generate a branded PDF report showing timestamps, cleaner information, photo grid, and Google Maps verification link.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="features" className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+            Everything you need to secure your payout
+          </h2>
+          <p className="mt-4 text-neutral-400">
+            Airbnb support requests hard evidence to deny refund requests. TurnProofs arms you with unshakeable compliance certificates.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-rose-500/50 hover:bg-neutral-900/60 transition-all group">
+            <div className="h-12 w-12 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform mb-6">
+              <MapPin className="h-6 w-6" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">GPS Verification</h3>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Cleaners submit start & stop locations via HTML5 Geolocation to prove exact presence on site.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-orange-500/50 hover:bg-neutral-900/60 transition-all group">
+            <div className="h-12 w-12 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform mb-6">
+              <Camera className="h-6 w-6" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Camera Evidence</h3>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Require photos for high-traffic tasks. Cleaners take pictures directly on site via mobile browser camera integration.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-amber-500/50 hover:bg-neutral-900/60 transition-all group">
+            <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform mb-6">
+              <FileText className="h-6 w-6" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Official PDF Export</h3>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Branded, printable certification reports structured specifically to submit to Airbnb Support agents.
+            </p>
+          </div>
+
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-emerald-500/50 hover:bg-neutral-900/60 transition-all group">
+            <div className="h-12 w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform mb-6">
+              <CheckCircle2 className="h-6 w-6" />
+            </div>
+            <h3 className="font-bold text-lg mb-2">Zero-Install App</h3>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              No cleaner sign-ups or app downloads. Cleaners just load the magic QR link and check off tasks.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Host Voice / Testimonial Section */}
+      <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+            Loved by Hosts & Professional Cleaners
+          </h2>
+          <p className="mt-4 text-neutral-400">
+            See how TurnProofs helps solve the phone storage problem and protects hosts from fake refund claims.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-rose-500/20 transition-all flex flex-col justify-between">
+            <p className="text-sm text-neutral-300 italic leading-relaxed">
+              "My host uses Breezeway so none of the pictures take any storage on my phone... as a cleaner this is becoming very common for hosts to ask. TurnProofs is even better because I don't have to download any app!"
+            </p>
+            <div className="mt-6 pt-4 border-t border-neutral-900">
+              <h5 className="font-bold text-sm text-white">Monique R.</h5>
+              <p className="text-xs text-rose-400 mt-0.5">Professional Cleaner</p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-orange-500/20 transition-all flex flex-col justify-between">
+            <p className="text-sm text-neutral-300 italic leading-relaxed">
+              "We used to save photos in folders by property and check-in date on Google Drive so they're easy to retrieve if Airbnb asks. TurnProofs automatically sorts everything and generates a single-click verification URL. It saves us hours."
+            </p>
+            <div className="mt-6 pt-4 border-t border-neutral-900">
+              <h5 className="font-bold text-sm text-white">Primal Home Solutions</h5>
+              <p className="text-xs text-orange-400 mt-0.5">Superhost, 4 Properties</p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+            <p className="text-sm text-neutral-300 italic leading-relaxed">
+              "I had a guest plant trash and claim a refund. Airbnb denied my review removal twice because loose screenshots in threads get rejected. Official Clean Verification Certificates with GPS plots are the only proof Support accepts."
+            </p>
+            <div className="mt-6 pt-4 border-t border-neutral-900">
+              <h5 className="font-bold text-sm text-white">Donna L.</h5>
+              <p className="text-xs text-amber-400 mt-0.5">Host, Florida Coast</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Demo Walkthrough Section */}
+      <section className="py-20 border-t border-neutral-900 bg-neutral-950/60 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold mb-4">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>60-Second Interactive Product Tour</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+            See How TurnProofs Works in Real Time
+          </h2>
+          <p className="mt-4 text-neutral-400 text-sm sm:text-base">
+            Watch how cleaners scan door QR codes, check off room accordions, and generate dispute-proof PDF certificates in under a minute.
+          </p>
+        </div>
+
+        {/* Interactive Walkthrough Demo Video Player */}
+        <DemoVideoPlayer />
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-12">
+          <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+            Simple, Transparent Portfolio Pricing
+          </h2>
+          <p className="mt-4 text-neutral-400 text-sm sm:text-base">
+            No expensive per-clean fees or forced app downloads. Select the tier tailored to your property portfolio.
+          </p>
+
+          {/* Annual vs Monthly Toggle */}
+          <div className="mt-8 flex items-center justify-center gap-3 select-none">
+            <button
+              type="button"
+              onClick={() => setIsAnnual(false)}
+              className={`text-xs font-semibold cursor-pointer transition-all ${!isAnnual ? 'text-white font-bold scale-105' : 'text-neutral-500 hover:text-neutral-300'}`}
+            >
+              Monthly Billing
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAnnual(!isAnnual)}
+              aria-label="Toggle annual billing"
+              className="w-14 h-7 bg-neutral-900 border border-neutral-800 rounded-full p-1 transition-colors relative cursor-pointer shrink-0"
+            >
+              <div className={`w-5 h-5 bg-rose-500 rounded-full transition-transform ${isAnnual ? 'translate-x-7' : 'translate-x-0'}`} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAnnual(true)}
+              className={`flex items-center gap-1.5 cursor-pointer transition-all ${isAnnual ? 'text-white font-bold scale-105' : 'text-neutral-500 hover:text-neutral-300'}`}
+            >
+              <span className="text-xs font-semibold">Annual Billing</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-bold text-emerald-400 uppercase tracking-wider">
+                15% OFF
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          {/* Free Trial Tier */}
+          <div className="p-6 rounded-2xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between relative group hover:border-neutral-700 transition-all">
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-lg text-neutral-200">Free Trial</h3>
+                <span className="px-2.5 py-1 rounded-full bg-neutral-800 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">14 Days</span>
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-3xl font-extrabold text-white">$0</span>
+                <span className="text-neutral-500 text-sm">/ 14 days</span>
+              </div>
+              <p className="text-[11px] text-neutral-500 mb-6">Test TurnProofs risk-free on your first property.</p>
+              <ul className="space-y-3 text-xs text-neutral-400 mb-8">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span className="text-neutral-200 font-medium">1 Managed Property Max</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span>0-App Cleaner Mobile Terminal</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span>GPS Geolocation Logging</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span>Dispute Audit PDF Certificates</span>
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/airbnb/login"
+              className="w-full py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 font-bold text-xs text-center transition-all block cursor-pointer"
+            >
+              Start Free Trial
+            </Link>
+          </div>
+
+          {/* Starter Plan (1-3 Properties) */}
+          <div className="p-6 rounded-2xl bg-neutral-900/60 border border-rose-500/40 flex flex-col justify-between relative group hover:border-rose-500 transition-all shadow-lg shadow-rose-500/5">
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-lg text-neutral-200">Starter Plan</h3>
+                <span className="px-2.5 py-1 rounded-full bg-rose-500/10 text-[10px] font-bold text-rose-400 uppercase tracking-wider">1-3 Properties</span>
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$16.99' : '$19.99'}</span>
+                <span className="text-neutral-500 text-sm">/ month</span>
+              </div>
+              <p className="text-[11px] text-neutral-500 mb-6">{isAnnual ? 'Billed annually ($203/yr)' : 'Billed monthly'}</p>
+              <ul className="space-y-3 text-xs text-neutral-400 mb-8">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span className="text-neutral-200 font-bold">1 to 3 Managed Properties</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span>Unlimited Cleaners ($0 per seat)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span>Custom Room Task Checklists</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <span>Photo Compliance Verification</span>
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/airbnb/login"
+              className="w-full py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-center transition-all block shadow-md shadow-rose-500/10 cursor-pointer"
+            >
+              Get Starter Plan
+            </Link>
+          </div>
+
+          {/* Pro Plan (4-9 Properties) */}
+          <div className="p-6 rounded-2xl bg-neutral-900/60 border border-amber-500/50 flex flex-col justify-between relative group hover:border-amber-500 transition-all shadow-lg shadow-amber-500/5">
+            <div className="absolute -top-3 right-6 px-2.5 py-0.5 rounded-full bg-linear-to-r from-rose-500 to-amber-500 text-[8px] font-extrabold text-white uppercase tracking-wider">
+              Most Popular
+            </div>
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-lg text-neutral-200">Pro Plan</h3>
+                <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-[10px] font-bold text-amber-400 uppercase tracking-wider">4-9 Properties</span>
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$24.99' : '$29.99'}</span>
+                <span className="text-neutral-500 text-sm">/ month</span>
+              </div>
+              <p className="text-[11px] text-neutral-500 mb-6">{isAnnual ? 'Billed annually ($299/yr)' : 'Billed monthly'}</p>
+              <ul className="space-y-3 text-xs text-neutral-400 mb-8">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-amber-500 shrink-0" />
+                  <span className="text-neutral-200 font-bold">4 to 9 Managed Properties</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-amber-500 shrink-0" />
+                  <span>Supply Inventory Level Alerts</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-amber-500 shrink-0" />
+                  <span>Cleaner Email PDF Copy Dispatch</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-amber-500 shrink-0" />
+                  <span>Priority Support Response</span>
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/airbnb/login"
+              className="w-full py-2.5 rounded-xl bg-neutral-950 border border-amber-500/40 hover:border-amber-500 font-bold text-xs text-center transition-all block cursor-pointer"
+            >
+              Unlock Pro Plan
+            </Link>
+          </div>
+
+          {/* Commercial / Property Manager Plan */}
+          <div className="p-6 rounded-2xl bg-neutral-900/60 border border-emerald-500/50 flex flex-col justify-between relative group hover:border-emerald-500 transition-all shadow-lg shadow-emerald-500/5">
+            <div className="absolute -top-3 right-6 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[8px] font-extrabold text-black uppercase tracking-wider">
+              Commercial
+            </div>
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-bold text-lg text-neutral-200">Commercial</h3>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Buildings</span>
+              </div>
+              <div className="flex items-baseline gap-1 mb-1">
+                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$75.99' : '$89.99'}</span>
+                <span className="text-neutral-500 text-sm">/ mo (1 Bldg)</span>
+              </div>
+              <p className="text-[10px] text-emerald-400 font-semibold mb-6">Multi-Building (&gt;1 Bldg): {isAnnual ? '$109.99' : '$129.99'}/mo</p>
+              <ul className="space-y-3 text-xs text-neutral-400 mb-8">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <span className="text-neutral-200 font-bold">1 Building ($89.99) or Multi ($129.99)</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <span>Auto-Email PDF Reports to Managers</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <span>Audit Subcontracted Cleaners</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <span>Door QR Code Sign Generator</span>
+                </li>
+              </ul>
+            </div>
+            <Link
+              href="/airbnb/login"
+              className="w-full py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold text-xs text-center text-black font-extrabold transition-all block shadow-md shadow-emerald-500/10 cursor-pointer"
+            >
+              Get Commercial Plan
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
+      {/* Footer */}
+      <footer className="border-t border-neutral-900 py-12 px-6 bg-neutral-950 text-center text-neutral-500 text-sm">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-rose-500" />
+            <span className="font-bold text-white">TurnProofs</span>
+          </div>
+          <p>© {new Date().getFullYear()} TurnProofs. Built for hosts & property managers.</p>
+          <div className="flex items-center gap-6 text-xs text-neutral-400 font-medium">
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
