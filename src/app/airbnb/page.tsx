@@ -31,9 +31,9 @@ export default function AirbnbLanding() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#workflow" className="hover:text-white transition-colors">How it Works</a>
-            <a href="#preview" className="hover:text-white transition-colors">Certificate</a>
+            <a href="#features" className="hover:text-white transition-colors">Features</a>
+            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -213,7 +213,7 @@ export default function AirbnbLanding() {
       </section>
 
       {/* Video Demo Walkthrough Section */}
-      <section className="py-20 border-t border-neutral-900 bg-neutral-950/60 max-w-7xl mx-auto px-6">
+      <section id="workflow" className="py-20 border-t border-neutral-900 bg-neutral-950/60 max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold mb-4">
             <Sparkles className="h-3.5 w-3.5" />
@@ -232,7 +232,7 @@ export default function AirbnbLanding() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
+      <section id="pricing" className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-12">
           <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
             Simple, Transparent Portfolio Pricing
