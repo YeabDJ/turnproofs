@@ -33,6 +33,32 @@ function LoginContent() {
     }
   }, [searchParams]);
 
+  // Listen for physical keyboard number typing (0-9, Backspace, Delete, Escape)
+  useEffect(() => {
+    if (mode !== 'pin') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is typing inside an input/textarea
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+        return;
+      }
+
+      if (/^[0-9]$/.test(e.key)) {
+        e.preventDefault();
+        handleKeyPress(e.key);
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        handleBackspace();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        handleClear();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mode, pin, resetStep, sentCode, enteredCode, email]);
+
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
