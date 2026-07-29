@@ -35,11 +35,11 @@ function LoginContent() {
 
   // Listen for physical keyboard number typing (0-9, Backspace, Delete, Escape)
   useEffect(() => {
-    if (mode !== 'pin') return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if user is typing inside an input/textarea
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) {
+      if (mode !== 'pin') return;
+
+      const activeEl = document.activeElement;
+      if (activeEl && activeEl.tagName === 'INPUT' && (activeEl as HTMLInputElement).type === 'email') {
         return;
       }
 
@@ -48,16 +48,16 @@ function LoginContent() {
         handleKeyPress(e.key);
       } else if (e.key === 'Backspace') {
         e.preventDefault();
-        handleBackspace();
+        setPin((prev) => prev.slice(0, -1));
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        handleClear();
+        setPin('');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, pin, resetStep, sentCode, enteredCode, email]);
+  }, [mode, resetStep, sentCode, enteredCode, email]);
 
   const handleEmailSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,14 +105,35 @@ function LoginContent() {
   };
 
   const handleKeyPress = (num: string) => {
-    if (pin.length < 6) {
-      const newVal = pin + num;
-      setPin(newVal);
+    setPin((prev) => {
+      if (prev.length >= 6) return prev;
+      const newVal = prev + num;
       setError('');
       
       // Auto-submit when PIN reaches 6 digits
       if (newVal.length === 6) {
-        if (resetStep === 'verify_code') {
+        setTimeout(() => {
+          if (resetStep === 'verify_code') {
+            if (newVal === sentCode) {
+              setEnteredCode(newVal);
+              setResetStep('new_pin');
+              setPin('');
+              setError('');
+              setInfoMessage('Security Code Verified! Enter your NEW 6-digit passcode PIN.');
+            } else {
+              setError('Incorrect 6-digit security code. Please check your email.');
+              setPin('');
+            }
+          } else if (resetStep === 'new_pin') {
+            submitNewPin(newVal);
+          } else {
+            submitAuth(newVal);
+          }
+        }, 10);
+      }
+      return newVal;
+    });
+  };
           if (newVal === sentCode) {
             setEnteredCode(newVal);
             setResetStep('new_pin');
