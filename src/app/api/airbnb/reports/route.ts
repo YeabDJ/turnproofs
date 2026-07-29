@@ -34,6 +34,94 @@ async function simulateAutoEmailReport(propertyId: string, reportId: string, cle
   }
 }
 
+async function sendResendAlertEmail({
+  toEmails,
+  alertType,
+  propertyName,
+  cleanerName,
+  description,
+  photos
+}: {
+  toEmails: string[];
+  alertType: string;
+  propertyName: string;
+  cleanerName: string;
+  description: string;
+  photos: string[];
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[RESEND API KEY MISSING] Cannot dispatch alert email');
+    return;
+  }
+  const isDamage = alertType === 'damage';
+  const subject = isDamage 
+    ? `🚨 TurnProofs Urgent Alert: Broken Item / Property Damage Reported!`
+    : `🎒 TurnProofs Alert: Guest Lost & Found Item Logged!`;
+
+  const photoHtml = photos.length > 0
+    ? `<div style="margin-top: 15px;">
+        <p style="font-weight: bold; font-size: 12px; color: #4b5563; text-transform: uppercase;">Attached Photo Evidence (${photos.length}):</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+          ${photos.map(p => `<a href="${p}" target="_blank"><img src="${p}" style="height: 120px; width: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #d1d5db;" /></a>`).join('')}
+        </div>
+      </div>`
+    : '';
+
+  const html = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
+      <div style="border-bottom: 2px solid ${isDamage ? '#ef4444' : '#f59e0b'}; padding-bottom: 16px; margin-bottom: 20px;">
+        <span style="background: ${isDamage ? '#fee2e2' : '#fef3c7'}; color: ${isDamage ? '#991b1b' : '#92400e'}; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
+          ${isDamage ? '⚠️ Immediate Action Required' : '🎒 Guest Belongings Logged'}
+        </span>
+        <h1 style="font-size: 20px; font-weight: 800; color: #111827; margin: 12px 0 4px 0;">
+          ${isDamage ? '🚨 Property Damage / Broken Item Alert' : '🎒 Guest Lost & Found Report'}
+        </h1>
+        <p style="font-size: 13px; color: #6b7280; margin: 0;">Dispatched BEFORE checkout from cleaner mobile terminal</p>
+      </div>
+
+      <div style="background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+        <p style="margin: 0 0 8px 0; font-size: 13px; color: #374151;"><strong>Property:</strong> ${propertyName}</p>
+        <p style="margin: 0 0 8px 0; font-size: 13px; color: #374151;"><strong>Cleaner:</strong> ${cleanerName}</p>
+        <p style="margin: 0; font-size: 13px; color: #374151;"><strong>Reported at:</strong> ${new Date().toLocaleString()}</p>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <p style="font-size: 12px; font-weight: bold; color: #4b5563; text-transform: uppercase; margin-bottom: 6px;">Details & Notes:</p>
+        <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; font-size: 14px; color: #111827; line-height: 1.5; font-weight: 500;">
+          ${description}
+        </div>
+      </div>
+
+      ${photoHtml}
+
+      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f3f4f6; text-align: center;">
+        <p style="font-size: 11px; color: #9ca3af; margin: 0;">TurnProofs Automated Mobile Verification & Host Dispatch System</p>
+      </div>
+    </div>
+  `;
+
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'TurnProofs <onboarding@resend.dev>',
+        to: toEmails.length > 0 ? toEmails : ['yeabidj@gmail.com'],
+        subject,
+        html
+      })
+    });
+    const resData = await res.json();
+    console.log('[RESEND ALERT EMAIL SENT]:', res.status, resData);
+  } catch (err) {
+    console.error('Failed to send Resend alert email:', err);
+  }
+}
+
 // GET historical reports for host
 export async function GET(request: NextRequest) {
   try {
@@ -107,19 +195,35 @@ export async function POST(request: NextRequest) {
       
       const { data: property } = await supabaseAdmin
         .from('airbnb_properties')
-        .select('name, cover_image_url')
+        .select('name, cover_image_url, host_id')
         .eq('id', property_id)
         .maybeSingle();
 
-      const recipientEmails: string[] = [];
+      const recipientEmails: string[] = ['yeabidj@gmail.com'];
       if (property && property.cover_image_url?.includes('|||')) {
         const custom = property.cover_image_url.split('|||')[1];
         if (custom) {
           custom.split(',').forEach((e: string) => {
-            if (e.trim()) recipientEmails.push(e.trim());
+            if (e.trim() && !recipientEmails.includes(e.trim())) {
+              recipientEmails.push(e.trim());
+            }
           });
         }
       }
+
+      if (property && property.host_id) {
+        const { data: hostObj } = await supabaseAdmin
+          .from('airbnb_hosts')
+          .select('email')
+          .eq('id', property.host_id)
+          .maybeSingle();
+
+        if (hostObj && hostObj.email && !recipientEmails.includes(hostObj.email)) {
+          recipientEmails.push(hostObj.email);
+        }
+      }
+
+      const photosList = photoUrl ? photoUrl.split('|||').filter(Boolean) : [];
 
       console.log(`\n==================================================`);
       console.log(`🚨 [INSTANT URGENT ALERT DISPATCHED BEFORE CHECKOUT]`);
@@ -127,13 +231,23 @@ export async function POST(request: NextRequest) {
       console.log(`Property: "${property?.name || 'Vacation Unit'}"`);
       console.log(`Cleaner: "${cleaner_name}"`);
       console.log(`Details: "${description}"`);
-      console.log(`Photo Log: ${photoUrl || 'None attached'}`);
-      console.log(`Recipients: ${recipientEmails.length > 0 ? recipientEmails.join(', ') : 'Host Direct Email & support@turnproofs.com'}`);
+      console.log(`Photos: ${photosList.length} attached`);
+      console.log(`Recipients: ${recipientEmails.join(', ')}`);
       console.log(`==================================================\n`);
+
+      // Dispatch real email via Resend API!
+      await sendResendAlertEmail({
+        toEmails: recipientEmails,
+        alertType: alertType || 'lost_found',
+        propertyName: property?.name || 'Vacation Rental Unit',
+        cleanerName: cleaner_name || 'Cleaner',
+        description: description || 'No details provided.',
+        photos: photosList
+      });
 
       return NextResponse.json({
         success: true,
-        message: 'Urgent alert dispatched to host immediately before cleaning completion.'
+        message: 'Urgent alert dispatched to host email immediately.'
       });
     }
 
