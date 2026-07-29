@@ -199,7 +199,7 @@ export async function POST(request: NextRequest) {
         .eq('id', property_id)
         .maybeSingle();
 
-      const recipientEmails: string[] = ['yeabidj@gmail.com'];
+      const recipientEmails: string[] = ['support@turnproofs.com'];
       if (property && property.cover_image_url?.includes('|||')) {
         const custom = property.cover_image_url.split('|||')[1];
         if (custom) {
