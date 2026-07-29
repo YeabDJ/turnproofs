@@ -88,6 +88,10 @@ export default function DashboardClient() {
   // Copy URL indicator
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  // Commercial Tier Upgrade state
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgradingTier, setUpgradingTier] = useState(false);
+
   // Modals & Form states
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
   const [newPropName, setNewPropName] = useState('');
@@ -942,15 +946,38 @@ export default function DashboardClient() {
               <div>
                 <label className="flex items-center justify-between text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">
                   <span>Auto-Email Reports to Facility Managers</span>
-                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-extrabold tracking-wider">Commercial Feature</span>
+                  {host?.subscription_tier === 'commercial' ? (
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-extrabold tracking-wider">
+                      ✓ Commercial Unlocked
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-extrabold tracking-wider flex items-center gap-1">
+                      🔒 Commercial Plan Only
+                    </span>
+                  )}
                 </label>
-                <input
-                  type="text"
-                  placeholder="e.g. manager@building.com, inspector@company.com"
-                  value={newPropEmails}
-                  onChange={(e) => setNewPropEmails(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm text-white"
-                />
+
+                {host?.subscription_tier === 'commercial' ? (
+                  <input
+                    type="text"
+                    placeholder="e.g. manager@building.com, inspector@company.com"
+                    value={newPropEmails}
+                    onChange={(e) => setNewPropEmails(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm text-white"
+                  />
+                ) : (
+                  <div
+                    onClick={() => setShowUpgradeModal(true)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950/90 border border-amber-500/30 hover:border-amber-500/60 rounded-xl flex items-center justify-between text-xs cursor-pointer transition-all shadow-sm"
+                  >
+                    <span className="text-neutral-400 font-medium italic truncate max-w-[260px]">
+                      🔒 Locked for Commercial Tier Subscribers ($89.99/mo)
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-extrabold text-[10px] shrink-0">
+                      Upgrade Tier ⚡
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -1381,6 +1408,100 @@ export default function DashboardClient() {
         </div>
       )}
 
+
+      {/* COMMERCIAL PLAN UPGRADE MODAL */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border border-emerald-500/50 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
+            <button
+              onClick={() => setShowUpgradeModal(false)}
+              className="absolute top-4 right-4 text-neutral-400 hover:text-white p-1.5 rounded-full bg-neutral-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
+              <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold text-[9px] uppercase tracking-wider">
+                  Commercial Feature
+                </span>
+                <h3 className="font-extrabold text-lg text-white mt-0.5">
+                  Upgrade to Commercial Tier
+                </h3>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 text-center space-y-1">
+                <span className="text-3xl font-black text-white">$89.99</span>
+                <span className="text-xs text-neutral-400 font-semibold"> / month</span>
+                <p className="text-xs text-emerald-400 font-bold pt-1">Commercial Facility Audit & Manager Dispatches</p>
+              </div>
+
+              <ul className="space-y-2 text-xs text-neutral-300">
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <span>Auto-Email PDF Reports to Facility Managers & Inspectors</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <span>Audit Subcontracted Cleaners with Unlimited Records</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <span>Dedicated Commercial Zone Checklist Builder</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowUpgradeModal(false)}
+                className="flex-1 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-neutral-400 hover:text-white"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={upgradingTier}
+                onClick={async () => {
+                  setUpgradingTier(true);
+                  try {
+                    const res = await fetch('/api/airbnb/auth', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        action: 'upgrade_tier',
+                        email: host?.email,
+                        tier: 'commercial'
+                      })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                      setHost((prev: any) => ({ ...prev, subscription_tier: 'commercial' }));
+                      alert('🎉 Congratulations! You have successfully upgraded to Commercial Tier!');
+                      setShowUpgradeModal(false);
+                    } else {
+                      alert('Upgrade failed: ' + (data.error || 'Unknown error'));
+                    }
+                  } catch (e) {
+                    alert('Network error during upgrade');
+                  } finally {
+                    setUpgradingTier(false);
+                  }
+                }}
+                className="flex-1 py-3 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-extrabold text-xs text-black transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
+              >
+                {upgradingTier ? 'Upgrading...' : '⚡ Unlock Commercial Plan ($89.99)'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

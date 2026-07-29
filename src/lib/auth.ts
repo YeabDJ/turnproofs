@@ -6,6 +6,7 @@ export interface Host {
   email: string;
   pin_code: string;
   business_name: string | null;
+  subscription_tier: 'standard' | 'commercial';
   created_at: string;
 }
 
@@ -23,5 +24,14 @@ export async function getAuthenticatedHost(): Promise<Host | null> {
   if (error || !host) {
     return null;
   }
-  return host as Host;
+
+  const rawBusiness = host.business_name || '';
+  const isCommercial = rawBusiness.includes('|||commercial');
+  const cleanBusinessName = rawBusiness.replace('|||commercial', '').trim();
+
+  return {
+    ...host,
+    business_name: cleanBusinessName,
+    subscription_tier: isCommercial ? 'commercial' : 'standard'
+  } as Host;
 }

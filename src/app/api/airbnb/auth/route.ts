@@ -142,6 +142,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
     }
 
+    // ACTION: Upgrade Host Subscription Tier to Commercial ($89.99/mo)
+    if (action === 'upgrade_tier') {
+      if (!host) {
+        return NextResponse.json({ success: false, error: 'Host account not found.' }, { status: 404 });
+      }
+
+      const currentBusiness = (host.business_name || '').replace('|||commercial', '').trim();
+      const newBusiness = `${currentBusiness}|||commercial`;
+
+      const { data: updatedHost, error: updateErr } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .update({ business_name: newBusiness })
+        .eq('id', host.id)
+        .select('*')
+        .single();
+
+      if (updateErr) {
+        return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        host: {
+          ...updatedHost,
+          business_name: currentBusiness,
+          subscription_tier: 'commercial'
+        },
+        message: 'Successfully upgraded to TurnProofs COMMERCIAL Tier!'
+      });
+    }
+
     // ACTION: Send Security Verification Code to Email
     if (action === 'request_reset_code') {
       if (!host) {
