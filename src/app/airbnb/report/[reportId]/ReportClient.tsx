@@ -89,6 +89,35 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [submittingTouchup, setSubmittingTouchup] = useState(false);
   const [touchupSuccess, setTouchupSuccess] = useState(false);
 
+  // Translation state for Spanish cleaner notes
+  const [translatedNotes, setTranslatedNotes] = useState<string | null>(null);
+  const [isTranslatingNotes, setIsTranslatingNotes] = useState(false);
+  const [showEnglishNotes, setShowEnglishNotes] = useState(false);
+
+  async function handleTranslateNotes(text: string) {
+    if (translatedNotes) {
+      setShowEnglishNotes(!showEnglishNotes);
+      return;
+    }
+    setIsTranslatingNotes(true);
+    try {
+      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=es|en`);
+      const data = await res.json();
+      if (data && data.responseData && data.responseData.translatedText) {
+        setTranslatedNotes(data.responseData.translatedText);
+        setShowEnglishNotes(true);
+      } else {
+        setTranslatedNotes(text);
+        setShowEnglishNotes(true);
+      }
+    } catch (e) {
+      setTranslatedNotes(text);
+      setShowEnglishNotes(true);
+    } finally {
+      setIsTranslatingNotes(false);
+    }
+  }
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -642,9 +671,32 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           {/* Cleaner Notes Section */}
           {notesText && (
             <div className="py-8 space-y-3">
-              <h3 className="print-text-dark font-bold text-base text-neutral-200">Cleaner Notes</h3>
-              <div className="print-badge p-5 rounded-2xl bg-neutral-950 border border-neutral-800">
-                <p className="text-sm leading-relaxed text-neutral-400 print-text-muted whitespace-pre-wrap">{notesText}</p>
+              <div className="flex items-center justify-between">
+                <h3 className="print-text-dark font-bold text-base text-neutral-200">Cleaner Notes</h3>
+                <button
+                  type="button"
+                  onClick={() => handleTranslateNotes(notesText)}
+                  className="no-print px-3 py-1 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 text-xs font-bold text-rose-400 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                >
+                  {isTranslatingNotes ? (
+                    <span>Translating...</span>
+                  ) : showEnglishNotes ? (
+                    <span>🌐 Show Original Note</span>
+                  ) : (
+                    <span>🌐 Translate Note to English</span>
+                  )}
+                </button>
+              </div>
+
+              <div className="print-badge p-5 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-2">
+                <p className="text-sm leading-relaxed text-neutral-300 print-text-muted whitespace-pre-wrap">
+                  {showEnglishNotes && translatedNotes ? translatedNotes : notesText}
+                </p>
+                {showEnglishNotes && (
+                  <span className="inline-block text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                    ✓ Translated to English
+                  </span>
+                )}
               </div>
             </div>
           )}
