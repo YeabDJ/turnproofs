@@ -20,7 +20,7 @@ import {
   Copy,
   X
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { supabase, uploadFileToSupabase } from '@/lib/supabase';
 
 interface Cleaner {
   id: string;
@@ -208,7 +208,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   // Instant Red Flag / Lost & Found Alert Modal State
   const [instantModalType, setInstantModalType] = useState<'damage' | 'lost_found' | null>(null);
   const [instantDesc, setInstantDesc] = useState('');
-  const [instantPhotoUrl, setInstantPhotoUrl] = useState('');
+  const [instantPhotos, setInstantPhotos] = useState<string[]>([]);
   const [uploadingInstantPhoto, setUploadingInstantPhoto] = useState(false);
   const [sendingInstantAlert, setSendingInstantAlert] = useState(false);
   const [instantAlertSuccess, setInstantAlertSuccess] = useState(false);
@@ -554,23 +554,10 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
       const fileName = `${propertyId}_${taskId}_${Date.now()}.${fileExt}`;
       const filePath = `proofs/${fileName}`;
 
-      // 2. Upload file directly to Supabase Public Bucket
-      const { data, error } = await supabase.storage
-        .from('airbnb-proofs')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
+      // 2. Upload file directly to Supabase Public Bucket via REST API
+      const photoUrl = await uploadFileToSupabase(file, filePath);
 
-      if (error) {
-        throw error;
-      }
-
-      // 3. Construct Public URL
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-      const photoUrl = `${supabaseUrl}/storage/v1/object/public/airbnb-proofs/${filePath}`;
-
-      // 4. Update task state - auto checks the checkbox
+      // 3. Update task state - auto checks the checkbox
       setTaskStates(prev => ({
         ...prev,
         [taskId]: {
@@ -614,17 +601,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         const fileName = `additional_${propertyId}_${Date.now()}_${i}.${fileExt}`;
         const filePath = `proofs/${fileName}`;
 
-        const { error } = await supabase.storage
-          .from('airbnb-proofs')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: true
-          });
-
-        if (error) throw error;
-
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-        const photoUrl = `${supabaseUrl}/storage/v1/object/public/airbnb-proofs/${filePath}`;
+        const photoUrl = await uploadFileToSupabase(file, filePath);
         urls.push(photoUrl);
       }
       setAdditionalPhotos(prev => [...prev, ...urls]);
@@ -1453,60 +1430,76 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
               />
             </div>
 
-            {/* Photo Upload Option */}
-            <div className="space-y-1.5">
+            {/* Photo Upload Option (Multiple Photos Supported) */}
+            <div className="space-y-2">
               <label className="block text-xs font-bold text-neutral-300">
-                {lang === 'en' ? 'Attach Photo Evidence (Optional):' : 'Adjuntar Evidencia Fotográfica (Opcional):'}
+                {lang === 'en' ? 'Attach Photo Evidence (Multiple Allowed):' : 'Adjuntar Fotos de Prueba (Múltiples permitidas):'}
               </label>
-              
-              {instantPhotoUrl ? (
-                <div className="relative h-28 w-full rounded-xl overflow-hidden border border-emerald-500/50">
-                  <img src={instantPhotoUrl} alt="Instant Alert" className="h-full w-full object-cover" />
-                  <button
-                    onClick={() => setInstantPhotoUrl('')}
-                    className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/80 text-white flex items-center justify-center text-xs font-bold"
-                  >
-                    ✕
-                  </button>
+
+              {/* Grid of uploaded photos */}
+              {instantPhotos.length > 0 && (
+                <div className="grid grid-cols-3 gap-2">
+                  {instantPhotos.map((url, i) => (
+                    <div key={i} className="relative h-20 w-full rounded-xl overflow-hidden border border-emerald-500/50 group">
+                      <img src={url} alt="Proof" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setInstantPhotos(prev => prev.filter((_, idx) => idx !== i))}
+                        className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/80 text-white flex items-center justify-center text-[10px] font-bold hover:bg-red-600 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ) : (
-                <label className="h-20 w-full rounded-xl bg-neutral-950 border border-dashed border-neutral-800 hover:border-rose-500/50 flex flex-col items-center justify-center cursor-pointer transition-colors">
-                  {uploadingInstantPhoto ? (
-                    <Loader2 className="h-5 w-5 text-rose-500 animate-spin" />
-                  ) : (
-                    <>
-                      <Camera className="h-5 w-5 text-neutral-500 mb-1" />
-                      <span className="text-[10px] text-neutral-400 font-bold uppercase">
-                        {lang === 'en' ? 'Snap Photo of Damage / Lost Item' : 'Tomar Foto del Daño / Objeto'}
-                      </span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        capture="environment"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          setUploadingInstantPhoto(true);
-                          try {
-                            const fileExt = file.name.split('.').pop() || 'jpg';
-                            const filePath = `alerts/${propertyId}_${Date.now()}.${fileExt}`;
-                            const { error } = await supabase.storage.from('airbnb-proofs').upload(filePath, file);
-                            if (error) throw error;
-                            const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-                            setInstantPhotoUrl(`${supabaseUrl}/storage/v1/object/public/airbnb-proofs/${filePath}`);
-                          } catch (err) {
-                            console.error(err);
-                            alert('Photo upload failed');
-                          } finally {
-                            setUploadingInstantPhoto(false);
-                          }
-                        }}
-                        className="hidden"
-                      />
-                    </>
-                  )}
-                </label>
               )}
+
+              {/* Upload trigger button */}
+              <label className="h-16 w-full rounded-xl bg-neutral-950 border border-dashed border-neutral-800 hover:border-rose-500/50 flex items-center justify-center gap-2 cursor-pointer transition-colors px-3">
+                {uploadingInstantPhoto ? (
+                  <div className="flex items-center gap-2 text-rose-400 text-xs font-bold">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Uploading photo proof...</span>
+                  </div>
+                ) : (
+                  <>
+                    <Camera className="h-4 w-4 text-rose-400 shrink-0" />
+                    <span className="text-xs text-neutral-300 font-bold">
+                      {instantPhotos.length > 0 
+                        ? (lang === 'en' ? '+ Add Another Photo' : '+ Añadir Otra Foto')
+                        : (lang === 'en' ? '📷 Snap Photo of Damage / Lost Item' : '📷 Tomar Foto del Daño / Objeto')
+                      }
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={async (e) => {
+                        const files = e.target.files;
+                        if (!files || files.length === 0) return;
+                        setUploadingInstantPhoto(true);
+                        try {
+                          const urls: string[] = [];
+                          for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            const fileExt = file.name.split('.').pop() || 'jpg';
+                            const filePath = `alerts/${propertyId}_${Date.now()}_${i}.${fileExt}`;
+                            const publicUrl = await uploadFileToSupabase(file, filePath);
+                            urls.push(publicUrl);
+                          }
+                          setInstantPhotos(prev => [...prev, ...urls]);
+                        } catch (err: any) {
+                          console.error(err);
+                          alert('Photo upload failed: ' + (err.message || 'Error'));
+                        } finally {
+                          setUploadingInstantPhoto(false);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </>
+                )}
+              </label>
             </div>
 
             {/* Instant Success Banner */}
@@ -1533,7 +1526,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                         alertType: instantModalType,
                         cleaner_name: selectedCleaner === 'custom' ? customCleanerName : selectedCleaner,
                         description: instantDesc,
-                        photoUrl: instantPhotoUrl
+                        photoUrl: instantPhotos.join('|||')
                       })
                     });
                     const data = await res.json();
@@ -1542,6 +1535,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                       setTimeout(() => {
                         setInstantModalType(null);
                         setInstantAlertSuccess(false);
+                        setInstantPhotos([]);
                       }, 2000);
                     }
                   } catch (err) {

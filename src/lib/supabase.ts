@@ -218,5 +218,42 @@ class SupabaseRestHelper {
   }
 }
 
+export async function uploadFileToSupabase(file: File | Blob, filePath: string): Promise<string> {
+  const uploadUrl = `${VALID_SUPABASE_URL}/storage/v1/object/airbnb-proofs/${filePath}`;
+  const res = await fetch(uploadUrl, {
+    method: 'POST',
+    headers: {
+      'apikey': VALID_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${VALID_SERVICE_ROLE_KEY}`,
+      'Content-Type': (file as File).type || 'image/jpeg',
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+
+  if (!res.ok) {
+    const json = await res.json().catch(() => ({}));
+    throw new Error(json.error || json.message || 'Storage upload failed');
+  }
+
+  return `${VALID_SUPABASE_URL}/storage/v1/object/public/airbnb-proofs/${filePath}`;
+}
+
+const storageHelper = {
+  from: (bucket: string) => ({
+    upload: async (filePath: string, file: File | Blob) => {
+      try {
+        const publicUrl = await uploadFileToSupabase(file, filePath);
+        return { data: { path: filePath, publicUrl }, error: null };
+      } catch (err: any) {
+        return { data: null, error: { message: err.message || 'Upload failed' } };
+      }
+    }
+  })
+};
+
 export const supabaseAdmin = new SupabaseRestHelper(VALID_SUPABASE_URL, VALID_SERVICE_ROLE_KEY) as any;
 export const supabase = new SupabaseRestHelper(VALID_SUPABASE_URL, VALID_SERVICE_ROLE_KEY) as any;
+
+supabaseAdmin.storage = storageHelper;
+supabase.storage = storageHelper;
