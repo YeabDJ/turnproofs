@@ -24,6 +24,22 @@ function LoginContent() {
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
 
+  // Check if host is already authenticated & auto-redirect to dashboard
+  useEffect(() => {
+    async function checkExistingAuth() {
+      try {
+        const res = await fetch('/api/airbnb/auth');
+        const data = await res.json();
+        if (res.ok && data.success && data.host) {
+          router.push('/airbnb/dashboard');
+        }
+      } catch (e) {
+        // Not authenticated
+      }
+    }
+    checkExistingAuth();
+  }, [router]);
+
   // Handle URL parameters (e.g. demo credentials)
   useEffect(() => {
     const isDemo = searchParams.get('demo') === 'true';

@@ -458,7 +458,7 @@ export default function DashboardClient() {
       {/* Navigation Header */}
       <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+          <Link href="/airbnb/dashboard" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
             <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-md shadow-rose-500/10">
               <ShieldCheck className="h-5 w-5 text-white" />
             </div>
@@ -478,8 +478,11 @@ export default function DashboardClient() {
             </button>
 
             <div className="text-right hidden sm:block">
-              <p className="text-xs text-neutral-500 font-semibold uppercase tracking-wider">{lang === 'en' ? 'Business Center' : 'Centro de Negocios'}</p>
-              <p className="text-sm font-semibold text-neutral-200">{host?.business_name}</p>
+              <p className="text-[11px] font-extrabold uppercase tracking-wider text-rose-400 flex items-center justify-end gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="font-mono text-neutral-100">{host?.email || 'Logged In'}</span>
+              </p>
+              <p className="text-[11px] text-neutral-400 font-medium truncate max-w-[180px]">{host?.business_name || 'TurnProofs Host'}</p>
             </div>
             <button
               onClick={handleLogout}

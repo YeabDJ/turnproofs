@@ -7,9 +7,20 @@ import DemoVideoPlayer from './components/DemoVideoPlayer';
 
 export default function AirbnbLanding() {
   const [isAnnual, setIsAnnual] = useState(true);
+  const [authHost, setAuthHost] = useState<any>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/airbnb/auth');
+        const data = await res.json();
+        if (res.ok && data.success && data.host) {
+          setAuthHost(data.host);
+        }
+      } catch (e) {}
+    }
+    checkAuth();
   }, []);
 
   return (
@@ -55,18 +66,31 @@ export default function AirbnbLanding() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Link 
-              href="/airbnb/login" 
-              className="text-sm font-medium hover:text-rose-400 transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/airbnb/login"
-              className="px-4 py-2 rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-sm font-semibold transition-all shadow-md shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02]"
-            >
-              Get Started Free
-            </Link>
+            {authHost ? (
+              <Link 
+                href="/airbnb/dashboard" 
+                className="px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-bold transition-all shadow-md shadow-rose-500/20 flex items-center gap-2"
+              >
+                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span>Dashboard ({authHost.email})</span>
+                <ChevronRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <>
+                <Link 
+                  href="/airbnb/login" 
+                  className="text-sm font-medium hover:text-rose-400 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/airbnb/login"
+                  className="px-4 py-2 rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-sm font-semibold transition-all shadow-md shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02]"
+                >
+                  Get Started Free
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
