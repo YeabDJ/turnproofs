@@ -222,8 +222,15 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   const [newSupplyName, setNewSupplyName] = useState('');
   const [showAddSupplyInput, setShowAddSupplyInput] = useState(false);
 
-  // Load initial data
+  // Load initial data & restore saved cleaner email
   useEffect(() => {
+    try {
+      const savedEmail = localStorage.getItem('turnproofs_saved_cleaner_email');
+      if (savedEmail) {
+        setCleanerEmail(savedEmail);
+      }
+    } catch (e) {}
+
     async function loadData() {
       try {
         // Fetch property details (public)
@@ -360,13 +367,17 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         paperTowels,
         maintenanceAlert,
         maintenanceDesc,
-        hostMessage
+        hostMessage,
+        cleanerEmail
       };
       localStorage.setItem(`turnproofs_autosave_${propertyId}`, JSON.stringify(sessionState));
+      if (cleanerEmail) {
+        localStorage.setItem('turnproofs_saved_cleaner_email', cleanerEmail);
+      }
     } catch (e) {
       console.error('Failed to auto-save session progress', e);
     }
-  }, [started, selectedCleaner, customCleanerName, startTime, startCoords, taskStates, notes, additionalPhotos, lang, toiletPaper, soap, trashBags, paperTowels, maintenanceAlert, maintenanceDesc, hostMessage, propertyId]);
+  }, [started, selectedCleaner, customCleanerName, startTime, startCoords, taskStates, notes, additionalPhotos, lang, toiletPaper, soap, trashBags, paperTowels, maintenanceAlert, maintenanceDesc, hostMessage, cleanerEmail, propertyId]);
 
   // Collaborative Polling: Sync task states and team lists in real time
   useEffect(() => {
@@ -1413,7 +1424,12 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                 type="email"
                 placeholder={t.cleanerEmailPlaceholder}
                 value={cleanerEmail}
-                onChange={(e) => setCleanerEmail(e.target.value)}
+                onChange={(e) => {
+                  setCleanerEmail(e.target.value);
+                  try {
+                    localStorage.setItem('turnproofs_saved_cleaner_email', e.target.value);
+                  } catch (err) {}
+                }}
                 className="w-full p-3.5 bg-neutral-900 border border-neutral-800 focus:border-rose-500 rounded-2xl outline-none text-sm text-white transition-all"
               />
             </div>
