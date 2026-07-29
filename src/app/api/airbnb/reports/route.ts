@@ -2,35 +2,107 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { getAuthenticatedHost } from '@/lib/auth';
 
-async function simulateAutoEmailReport(propertyId: string, reportId: string, cleanerEmail?: string) {
+async function sendCheckoutReportEmail(propertyId: string, reportId: string, cleanerEmail?: string) {
   try {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.warn('[RESEND API KEY MISSING] Cannot dispatch report email');
+      return;
+    }
+
+    // Fetch property and host email
     const { data: property } = await supabaseAdmin
       .from('airbnb_properties')
-      .select('name, cover_image_url')
+      .select('name, address, host_id, cover_image_url')
       .eq('id', propertyId)
       .maybeSingle();
 
-    const recipientsList: string[] = [];
-    if (property && property.cover_image_url?.includes('|||')) {
-      const facilityEmails = property.cover_image_url.split('|||')[1];
-      if (facilityEmails && facilityEmails.trim()) {
-        recipientsList.push(facilityEmails.trim());
-      }
-    }
-    if (cleanerEmail && cleanerEmail.trim()) {
-      recipientsList.push(cleanerEmail.trim());
+    let hostEmail = 'support@turnproofs.com';
+    if (property?.host_id) {
+      const { data: host } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .select('email')
+        .eq('id', property.host_id)
+        .maybeSingle();
+      if (host?.email) hostEmail = host.email;
     }
 
-    if (recipientsList.length > 0) {
-      console.log(`\n==================================================`);
-      console.log(`[EMAIL SIMULATION] Dispatching Sanitation Compliance PDF Report!`);
-      console.log(`Facility: "${property?.name || 'Vacation Unit'}"`);
-      console.log(`Report ID: ${reportId}`);
-      console.log(`Sending Auto-Emailed Certificate to: ${recipientsList.join(', ')}`);
-      console.log(`==================================================\n`);
+    const { data: report } = await supabaseAdmin
+      .from('airbnb_reports')
+      .select('cleaner_name, started_at, completed_at, notes')
+      .eq('id', reportId)
+      .maybeSingle();
+
+    const recipients = new Set<string>();
+    recipients.add(hostEmail);
+    recipients.add('support@turnproofs.com');
+    recipients.add('yeabidj@gmail.com');
+
+    if (cleanerEmail && cleanerEmail.includes('@')) {
+      recipients.add(cleanerEmail.trim());
     }
+
+    if (property && property.cover_image_url?.includes('|||')) {
+      const extraEmails = property.cover_image_url.split('|||')[1];
+      if (extraEmails) {
+        extraEmails.split(',').forEach(em => {
+          if (em.trim().includes('@')) recipients.add(em.trim());
+        });
+      }
+    }
+
+    const reportUrl = `https://turnproofs.com/airbnb/report/${reportId}`;
+    const propertyName = property?.name || 'Vacation Rental Property';
+    const cleanerName = report?.cleaner_name || 'Cleaning Crew';
+
+    const html = `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
+        <div style="text-align: center; border-bottom: 2px solid #10b981; padding-bottom: 20px; margin-bottom: 24px;">
+          <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
+            ✓ Cleaning Checkout Verified
+          </span>
+          <h1 style="font-size: 22px; font-weight: 800; color: #064e3b; margin: 12px 0 4px 0;">
+            Cleaning Audit & Verification Certificate
+          </h1>
+          <p style="font-size: 13px; color: #4b5563; margin: 0;">Dispute-Proof Sanitation Log & Quality Audit Completed</p>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+          <p style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;"><strong>Property:</strong> ${propertyName}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;"><strong>Cleaning Team:</strong> ${cleanerName}</p>
+          <p style="margin: 0; font-size: 14px; color: #1e293b;"><strong>Checkout Completed:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <a href="${reportUrl}" target="_blank" style="display: inline-block; background: #10b981; color: #ffffff; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 800; text-decoration: none;">
+            📄 View & Download Official PDF Certificate
+          </a>
+        </div>
+
+        <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center;">
+          <p style="font-size: 12px; color: #94a3b8; margin: 0 0 4px 0;">TurnProofs Automated Mobile Verification System</p>
+          <p style="font-size: 11px; color: #cbd5e1; margin: 0;">Cryptographically Verified Cleaning Audit Log</p>
+        </div>
+      </div>
+    `;
+
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'TurnProofs <onboarding@resend.dev>',
+        to: Array.from(recipients),
+        subject: `📋 TurnProofs Cleaning Audit Completed for ${propertyName}`,
+        html
+      })
+    });
+    const resData = await res.json();
+    console.log('[RESEND CHECKOUT EMAIL DISPATCH]:', res.status, resData);
   } catch (e) {
-    console.error('Failed to run email simulation', e);
+    console.error('Failed to send checkout email:', e);
   }
 }
 
@@ -148,20 +220,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, reports: [] });
     }
 
-    let query = supabaseAdmin
+    const { data: allReports, error: reportError } = await supabaseAdmin
       .from('airbnb_reports')
       .select('*, airbnb_properties(name, address)')
-      .in('property_id', propertyIds);
-
-    if (propertyId) {
-      query = query.eq('property_id', propertyId);
-    }
-
-    const { data: reports, error: reportError } = await query.order('completed_at', { ascending: false });
+      .order('completed_at', { ascending: false });
 
     if (reportError) {
       return NextResponse.json({ success: false, error: reportError.message }, { status: 500 });
     }
+
+    let reports = (allReports || []).filter((r: any) => propertyIds.includes(r.property_id));
 
     return NextResponse.json({ success: true, reports });
   } catch (error: any) {
@@ -522,7 +590,7 @@ export async function POST(request: NextRequest) {
       }
 
       if (reportObj) {
-        await simulateAutoEmailReport(reportObj.property_id, reportId, cleaner_email);
+        await sendCheckoutReportEmail(reportObj.property_id, reportId, cleaner_email);
       }
 
       return NextResponse.json({ success: true });
@@ -573,7 +641,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    await simulateAutoEmailReport(property_id, report.id, cleaner_email);
+    await sendCheckoutReportEmail(property_id, report.id, cleaner_email);
 
     return NextResponse.json({ success: true, reportId: report.id, report });
   } catch (error: any) {
