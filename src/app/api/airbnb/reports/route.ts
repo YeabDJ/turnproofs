@@ -45,7 +45,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
     if (property && property.cover_image_url?.includes('|||')) {
       const extraEmails = property.cover_image_url.split('|||')[1];
       if (extraEmails) {
-        extraEmails.split(',').forEach(em => {
+        extraEmails.split(',').forEach((em: string) => {
           if (em.trim().includes('@')) recipients.add(em.trim());
         });
       }
