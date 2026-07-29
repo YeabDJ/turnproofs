@@ -11,6 +11,7 @@ import {
   Download,
   ExternalLink, 
   CheckCircle, 
+  Check,
   Camera, 
   ChevronLeft,
   X,
