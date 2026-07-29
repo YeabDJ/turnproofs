@@ -86,7 +86,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <onboarding@resend.dev>';
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <info@eqcdmv.com>';
 
     for (const recipient of Array.from(recipients)) {
       try {

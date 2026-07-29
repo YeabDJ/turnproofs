@@ -55,7 +55,7 @@ async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: 
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'TurnProofs <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || 'TurnProofs <info@eqcdmv.com>',
         to: [toEmail],
         subject: '🎉 Welcome to TurnProofs & Thanks for Joining!',
         html
@@ -95,7 +95,7 @@ async function sendOtpEmail(toEmail: string, otpCode: string) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'TurnProofs <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM_EMAIL || 'TurnProofs <info@eqcdmv.com>',
         to: [toEmail],
         subject: `🔑 ${otpCode} is your TurnProofs Security Passcode Code`,
         html
