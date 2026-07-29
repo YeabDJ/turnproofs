@@ -500,45 +500,48 @@ export default function DashboardClient() {
         {/* Pricing Plan Status Banner */}
         <div className="mb-6 p-4 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <span className={`flex h-2.5 w-2.5 rounded-full animate-pulse shrink-0 ${
-              properties.length <= 1 ? 'bg-rose-500' : properties.length <= 5 ? 'bg-orange-500' : 'bg-amber-500'
-            }`} />
+            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <div>
               <p className="text-sm font-semibold text-neutral-200">
                 {properties.length <= 1 
-                  ? `Plan Status: Free Tier (1 property limit). Portfolio: ${properties.length}/1 units.` 
-                  : properties.length <= 5
-                  ? `Plan Status: Pro Plan ($9/mo, up to 5 properties). Portfolio: ${properties.length}/5 units.`
-                  : `Plan Status: Elite Mode ($29.99/mo, Unlimited properties). Portfolio: ${properties.length} units.`
+                  ? `Plan Status: 14-Day Free Trial (Full Access). Portfolio: ${properties.length} property.` 
+                  : properties.length <= 3
+                  ? `Plan Status: Growth Tier ($18.99/mo). Portfolio: ${properties.length} properties ($6.33/unit).`
+                  : properties.length <= 8
+                  ? `Plan Status: Elite Tier ($29.99/mo). Portfolio: ${properties.length} properties.`
+                  : `Plan Status: Elite Scaling ($${(29.99 + (properties.length - 8) * 4.99).toFixed(2)}/mo). Portfolio: ${properties.length} units ($29.99 + ${properties.length - 8} × $4.99/mo).`
                 }
               </p>
               <p className="text-xs text-neutral-400">
-                {properties.length <= 1 
-                  ? "Upgrade to Pro ($9/mo) for up to 5 properties, or unlock Elite Mode ($29.99/mo) for unlimited properties." 
-                  : properties.length <= 5
-                  ? "Unlock Elite Mode ($29.99/mo) to manage unlimited properties and unlock Twilio/HubSpot integrations."
-                  : "Elite Mode active. Unlimited properties, Twilio SMS Alerts, and HubSpot CRM integrations unlocked."
-                }
+                ⚡ 14-Day Full Access Free Trial Active. No credit card required upfront. Choose a plan anytime to unlock automated receipt emails & facility modes.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {properties.length <= 1 && (
-              <button
-                onClick={() => alert("Simulating Upgrade Payment flow ($9/mo)... Thank you for upgrading to Pro Plan!")}
-                className="px-3.5 py-2 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-neutral-750 text-xs font-bold transition-all cursor-pointer text-neutral-300"
-              >
-                Upgrade to Pro ($9)
-              </button>
-            )}
-            {properties.length <= 5 && (
-              <button
-                onClick={() => alert("Simulating Upgrade Payment flow ($29.99/mo)... Thank you for unlocking Elite Mode!")}
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-650 text-xs font-extrabold transition-all shadow-md shadow-amber-500/10 cursor-pointer text-white"
-              >
-                Unlock Elite Mode ($29.99)
-              </button>
-            )}
+            <button
+              onClick={async () => {
+                try {
+                  const targetPlan = properties.length <= 1 ? 'pro' : properties.length <= 3 ? 'growth' : 'elite';
+                  const res = await fetch('/api/airbnb/stripe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan: targetPlan, propertiesCount: properties.length })
+                  });
+                  const data = await res.json();
+                  if (data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                  } else if (data.demo) {
+                    alert(`[PAYMENT CHECKOUT ACCESSED]\n\nPlan: ${data.planName}\nAmount: $${data.amount}/mo\n\n${data.message}`);
+                  }
+                } catch (e) {
+                  alert("Unable to open checkout portal.");
+                }
+              }}
+              className="px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-extrabold transition-all shadow-md shadow-rose-500/10 cursor-pointer text-white flex items-center gap-1.5"
+            >
+              <span>Manage Plan & Card ($9 - $29.99/mo)</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
 

@@ -8,6 +8,15 @@ import DemoVideoPlayer from './components/DemoVideoPlayer';
 export default function AirbnbLanding() {
   const [isAnnual, setIsAnnual] = useState(true);
   const [authHost, setAuthHost] = useState<any>(null);
+  const [calcUnits, setCalcUnits] = useState(3);
+
+  const calcPrice = calcUnits === 1 
+    ? (isAnnual ? '$7.65' : '$9.00') 
+    : calcUnits <= 3 
+    ? (isAnnual ? '$16.14' : '$18.99') 
+    : calcUnits <= 8 
+    ? (isAnnual ? '$25.49' : '$29.99') 
+    : (isAnnual ? `$${((29.99 + (calcUnits - 8) * 4.99) * 0.85).toFixed(2)}` : `$${(29.99 + (calcUnits - 8) * 4.99).toFixed(2)}`);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -313,35 +322,63 @@ export default function AirbnbLanding() {
           </div>
         </div>
 
+        {/* Interactive Unit Calculator */}
+        <div className="max-w-xl mx-auto mb-12 p-6 rounded-2xl bg-neutral-900/80 border border-neutral-800 shadow-xl backdrop-blur-md text-center">
+          <p className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">⚡ Interactive Pricing Calculator</p>
+          <h3 className="text-xl font-extrabold text-white mb-4">How many properties do you manage?</h3>
+          
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <input
+              type="range"
+              min="1"
+              max="25"
+              value={calcUnits}
+              onChange={(e) => setCalcUnits(parseInt(e.target.value, 10))}
+              className="w-full h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
+            />
+            <span className="px-3.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-extrabold text-sm shrink-0 min-w-[70px]">
+              {calcUnits} {calcUnits === 1 ? 'Unit' : 'Units'}
+            </span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800/80 flex items-center justify-between">
+            <span className="text-xs text-neutral-400 font-semibold">Your Estimated Monthly Rate:</span>
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-extrabold text-white">{calcPrice}</span>
+              <span className="text-xs text-neutral-500">/ month</span>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Free Trial Tier */}
+          {/* Free 14-Day Trial */}
           <div className="p-6 rounded-2xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between relative group hover:border-neutral-700 transition-all">
             <div>
               <div className="flex justify-between items-center mb-6">
                 <h3 className="font-bold text-lg text-neutral-200">Free Trial</h3>
-                <span className="px-2.5 py-1 rounded-full bg-neutral-800 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">14 Days</span>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">14 Days</span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-3xl font-extrabold text-white">$0</span>
                 <span className="text-neutral-500 text-sm">/ 14 days</span>
               </div>
-              <p className="text-[11px] text-neutral-500 mb-6">Test TurnProofs risk-free on your first property.</p>
+              <p className="text-[11px] text-neutral-400 mb-6">No credit card required upfront. Full feature access for 14 days.</p>
               <ul className="space-y-3 text-xs text-neutral-400 mb-8">
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span className="text-neutral-200 font-medium">1 Managed Property Max</span>
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <span className="text-neutral-200 font-semibold">14-Day Full Access</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
+                  <span>No Credit Card Required</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
                   <span>0-App Cleaner Mobile Terminal</span>
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
+                  <Check className="h-4 w-4 text-emerald-500 shrink-0" />
                   <span>GPS Geolocation Logging</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span>Dispute Audit PDF Certificates</span>
                 </li>
               </ul>
             </div>
@@ -349,38 +386,38 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 font-bold text-xs text-center transition-all block cursor-pointer"
             >
-              Start Free Trial
+              Start 14-Day Trial
             </Link>
           </div>
 
-          {/* Starter Plan (1-3 Properties) */}
+          {/* Pro Plan ($9/mo for 1 Property) */}
           <div className="p-6 rounded-2xl bg-neutral-900/60 border border-rose-500/40 flex flex-col justify-between relative group hover:border-rose-500 transition-all shadow-lg shadow-rose-500/5">
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-lg text-neutral-200">Starter Plan</h3>
-                <span className="px-2.5 py-1 rounded-full bg-rose-500/10 text-[10px] font-bold text-rose-400 uppercase tracking-wider">1-3 Properties</span>
+                <h3 className="font-bold text-lg text-neutral-200">Pro</h3>
+                <span className="px-2.5 py-1 rounded-full bg-rose-500/10 text-[10px] font-bold text-rose-400 uppercase tracking-wider">1 Property</span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$16.99' : '$19.99'}</span>
+                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$7.65' : '$9.00'}</span>
                 <span className="text-neutral-500 text-sm">/ month</span>
               </div>
-              <p className="text-[11px] text-neutral-500 mb-6">{isAnnual ? 'Billed annually ($203/yr)' : 'Billed monthly'}</p>
+              <p className="text-[11px] text-neutral-500 mb-6">{isAnnual ? 'Billed annually ($91.80/yr)' : 'Billed monthly'}</p>
               <ul className="space-y-3 text-xs text-neutral-400 mb-8">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span className="text-neutral-200 font-bold">1 to 3 Managed Properties</span>
+                  <span className="text-neutral-200 font-bold">1 Managed Property</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span>Unlimited Cleaners ($0 per seat)</span>
+                  <span>Unlimited Cleaner Seats ($0)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span>Custom Room Task Checklists</span>
+                  <span>Automated Cleaner Receipts</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-rose-500 shrink-0" />
-                  <span>Photo Compliance Verification</span>
+                  <span>Photo Audit PDF Certificates</span>
                 </li>
               </ul>
             </div>
@@ -388,41 +425,41 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-center transition-all block shadow-md shadow-rose-500/10 cursor-pointer"
             >
-              Get Starter Plan
+              Get Pro Plan ($9)
             </Link>
           </div>
 
-          {/* Pro Plan (4-9 Properties) */}
+          {/* Growth Plan ($18.99/mo for 2-3 Properties) */}
           <div className="p-6 rounded-2xl bg-neutral-900/60 border border-amber-500/50 flex flex-col justify-between relative group hover:border-amber-500 transition-all shadow-lg shadow-amber-500/5">
             <div className="absolute -top-3 right-6 px-2.5 py-0.5 rounded-full bg-linear-to-r from-rose-500 to-amber-500 text-[8px] font-extrabold text-white uppercase tracking-wider">
-              Most Popular
+              Popular Choice
             </div>
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-lg text-neutral-200">Pro Plan</h3>
-                <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-[10px] font-bold text-amber-400 uppercase tracking-wider">4-9 Properties</span>
+                <h3 className="font-bold text-lg text-neutral-200">Growth</h3>
+                <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-[10px] font-bold text-amber-400 uppercase tracking-wider">2-3 Properties</span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">
-                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$24.99' : '$29.99'}</span>
+                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$16.14' : '$18.99'}</span>
                 <span className="text-neutral-500 text-sm">/ month</span>
               </div>
-              <p className="text-[11px] text-neutral-500 mb-6">{isAnnual ? 'Billed annually ($299/yr)' : 'Billed monthly'}</p>
+              <p className="text-[11px] text-neutral-500 mb-6">{isAnnual ? 'Billed annually ($193.68/yr)' : 'Billed monthly ($6.33/unit)'}</p>
               <ul className="space-y-3 text-xs text-neutral-400 mb-8">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span className="text-neutral-200 font-bold">4 to 9 Managed Properties</span>
+                  <span className="text-neutral-200 font-bold">2 to 3 Managed Properties</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span>Supply Inventory Level Alerts</span>
+                  <span>Supply Inventory Stock Alerts</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span>Cleaner Email PDF Copy Dispatch</span>
+                  <span>Host Touch-Up Request Workflow</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-amber-500 shrink-0" />
-                  <span>Priority Support Response</span>
+                  <span>Instant Damage Photo Alerts</span>
                 </li>
               </ul>
             </div>
@@ -430,41 +467,41 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2.5 rounded-xl bg-neutral-950 border border-amber-500/40 hover:border-amber-500 font-bold text-xs text-center transition-all block cursor-pointer"
             >
-              Unlock Pro Plan
+              Unlock Growth ($18.99)
             </Link>
           </div>
 
-          {/* Commercial / Property Manager Plan */}
+          {/* Elite Plan ($29.99/mo for 4-8 + $4.99/add'l) */}
           <div className="p-6 rounded-2xl bg-neutral-900/60 border border-emerald-500/50 flex flex-col justify-between relative group hover:border-emerald-500 transition-all shadow-lg shadow-emerald-500/5">
             <div className="absolute -top-3 right-6 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[8px] font-extrabold text-black uppercase tracking-wider">
-              Commercial
+              Scaling Portfolios
             </div>
             <div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-lg text-neutral-200">Commercial</h3>
-                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Buildings</span>
+                <h3 className="font-bold text-lg text-neutral-200">Elite</h3>
+                <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">4-8+ Properties</span>
               </div>
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$75.99' : '$89.99'}</span>
-                <span className="text-neutral-500 text-sm">/ mo (1 Bldg)</span>
+                <span className="text-3xl font-extrabold text-white">{isAnnual ? '$25.49' : '$29.99'}</span>
+                <span className="text-neutral-500 text-sm">/ mo (4-8 units)</span>
               </div>
-              <p className="text-[10px] text-emerald-400 font-semibold mb-6">Multi-Building (&gt;1 Bldg): {isAnnual ? '$109.99' : '$129.99'}/mo</p>
+              <p className="text-[10px] text-emerald-400 font-semibold mb-6">+$4.99/mo for each property beyond 8</p>
               <ul className="space-y-3 text-xs text-neutral-400 mb-8">
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                  <span className="text-neutral-200 font-bold">1 Building ($89.99) or Multi ($129.99)</span>
+                  <span className="text-neutral-200 font-bold">4-8+ Properties (Auto-Scaling)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                  <span>Auto-Email PDF Reports to Managers</span>
+                  <span>Unlimited Cleaners & QR Codes</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                  <span>Audit Subcontracted Cleaners</span>
+                  <span>Commercial Facility Mode ($89.99/bldg)</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-emerald-500 shrink-0" />
-                  <span>Door QR Code Sign Generator</span>
+                  <span>Auto-Email Facility Managers</span>
                 </li>
               </ul>
             </div>
@@ -472,7 +509,7 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold text-xs text-center text-black font-extrabold transition-all block shadow-md shadow-emerald-500/10 cursor-pointer"
             >
-              Get Commercial Plan
+              Get Elite Plan ($29.99)
             </Link>
           </div>
         </div>
