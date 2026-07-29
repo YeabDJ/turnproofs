@@ -793,12 +793,34 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
           {submittedReportId && (
             <a
               href={`/airbnb/report/${submittedReportId}`}
-              className="w-full py-3.5 px-4 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-center shadow-md shadow-rose-500/10 flex items-center justify-center gap-2"
+              className="w-full py-3.5 px-4 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-center shadow-md shadow-rose-500/10 flex items-center justify-center gap-2 cursor-pointer"
             >
               <FileText className="h-4 w-4" />
-              <span>View Verification Certificate</span>
+              <span>{lang === 'en' ? 'View Verification Certificate' : 'Ver Certificado de Verificación'}</span>
             </a>
           )}
+
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm(lang === 'en' ? 'Start a fresh cleaning turnover session for a new guest booking?' : '¿Iniciar una nueva sesión de limpieza para una nueva reserva?')) {
+                localStorage.removeItem(`turnproofs_autosave_${propertyId}`);
+                setSuccess(false);
+                setSubmittedReportId(null);
+                setStarted(false);
+                setWalkthroughDone(false);
+                setElapsedTime('00:00');
+                setStartTime(null);
+                setNotes('');
+                setAdditionalPhotos([]);
+                setTaskStates({});
+              }
+            }}
+            className="w-full py-3 px-4 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+          >
+            <span>✨ {lang === 'en' ? 'Start New Guest Turnover' : 'Iniciar Nueva Limpieza'}</span>
+          </button>
+        </div>
         </div>
 
         <div className="text-center text-xs text-neutral-600 pb-4 font-semibold">

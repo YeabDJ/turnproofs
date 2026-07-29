@@ -81,6 +81,13 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [uploadingRetouchPhoto, setUploadingRetouchPhoto] = useState(false);
   const [submittingRetouch, setSubmittingRetouch] = useState(false);
 
+  // Host Touchup Request State
+  const [showTouchupModal, setShowTouchupModal] = useState(false);
+  const [selectedTouchupTasks, setSelectedTouchupTasks] = useState<string[]>([]);
+  const [customTouchupNotes, setCustomTouchupNotes] = useState('');
+  const [submittingTouchup, setSubmittingTouchup] = useState(false);
+  const [touchupSuccess, setTouchupSuccess] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -187,6 +194,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   let maintenanceAlert = false;
   let maintenanceDesc = '';
   let retouches: Array<{ id: string; timestamp: string; author: string; text: string; photoUrl: string | null }> = [];
+  let touchupRequest: any = null;
   let supplies: Record<string, 'full' | 'low' | 'out'> = { toiletPaper: 'full', soap: 'full', trashBags: 'full', paperTowels: 'full' };
   
   let customSupplies: Array<{ name: string; level: 'full' | 'low' | 'out' }> = [];
@@ -200,6 +208,9 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       maintenanceAlert = !!parsed.maintenanceAlert;
       maintenanceDesc = parsed.maintenanceDesc || '';
       retouches = parsed.retouches || [];
+      if (parsed.touchupRequest) {
+        touchupRequest = parsed.touchupRequest;
+      }
       if (parsed.supplies) {
         supplies = { ...supplies, ...parsed.supplies };
         customSupplies = parsed.supplies.customSupplies || [];
@@ -277,6 +288,15 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           </button>
           
           <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setShowTouchupModal(true)}
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <AlertCircle className="h-4 w-4 text-amber-400" />
+              <span>{lang === 'en' ? '🔍 Request Touch-Up' : '🔍 Solicitar Retoque'}</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setShowRetouchModal(true)}
@@ -665,6 +685,41 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             </div>
           )}
 
+          {/* Host Touch-Up Request Banner */}
+          {touchupRequest && (
+            <div className="py-6 border-t border-amber-500/30 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5 text-amber-400" />
+                  <h3 className="print-text-dark font-extrabold text-base text-amber-300">
+                    {lang === 'en' ? '🔍 Host Quality Control Touch-Up Request' : '🔍 Solicitud de Retoque del Anfitrión'}
+                  </h3>
+                </div>
+                <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  {touchupRequest.status || 'pending'}
+                </span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-500/30 space-y-2">
+                {touchupRequest.items?.length > 0 && (
+                  <>
+                    <p className="text-xs font-bold text-amber-200">Requested Items:</p>
+                    <ul className="list-disc pl-5 text-xs text-neutral-300 space-y-1">
+                      {(touchupRequest.items || []).map((it: string, i: number) => (
+                        <li key={i}>{it}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {touchupRequest.notes && (
+                  <p className="text-xs text-amber-300/90 font-medium italic mt-2">
+                    Host Notes: "{touchupRequest.notes}"
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Quality Control Retouch Addendum Section */}
           {retouches.length > 0 && (
             <div className="py-8 border-t border-emerald-500/30 space-y-4">
@@ -826,6 +881,135 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-extrabold text-xs text-white transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
               >
                 {submittingRetouch ? 'Saving...' : (lang === 'en' ? 'Save Resolution Addendum' : 'Guardar Resolución')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* HOST TOUCH-UP REQUEST MODAL */}
+      {showTouchupModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 no-print animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-6 space-y-5 shadow-2xl relative">
+            <button
+              onClick={() => setShowTouchupModal(false)}
+              className="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded-full bg-neutral-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
+              <div className="h-10 w-10 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <AlertCircle className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-white">
+                  {lang === 'en' ? '🔍 Request Quality Touch-Up' : '🔍 Solicitar Retoque de Calidad'}
+                </h3>
+                <p className="text-xs text-neutral-400">
+                  {lang === 'en' ? 'Select items that need a quick touch-up or type custom instructions.' : 'Seleccione los elementos que necesitan retoque.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Checklist tasks selector */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-neutral-300 uppercase tracking-wider">
+                {lang === 'en' ? 'Select Room Tasks Needing Touch-Up:' : 'Seleccione Tareas:'}
+              </label>
+              <div className="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+                {tasks.map(t => {
+                  const isSelected = selectedTouchupTasks.includes(t.task_name);
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedTouchupTasks(prev => prev.filter(x => x !== t.task_name));
+                        } else {
+                          setSelectedTouchupTasks(prev => [...prev, t.task_name]);
+                        }
+                      }}
+                      className={`w-full p-2.5 rounded-xl border text-left text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
+                        isSelected 
+                          ? 'bg-amber-500/15 border-amber-500/40 text-amber-300' 
+                          : 'bg-neutral-950 border-neutral-800 text-neutral-400 hover:border-neutral-700'
+                      }`}
+                    >
+                      <span>{t.task_name}</span>
+                      {isSelected && <Check className="h-4 w-4 text-amber-400 shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom Host Notes */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-neutral-300">
+                {lang === 'en' ? 'Custom Touch-Up Notes / Instructions:' : 'Notas de Retoque:'}
+              </label>
+              <textarea
+                rows={2}
+                placeholder={lang === 'en' ? 'e.g. Please re-wipe bathroom mirror and add 2 extra towels.' : 'ej. Por favor vuelva a limpiar el espejo.'}
+                value={customTouchupNotes}
+                onChange={(e) => setCustomTouchupNotes(e.target.value)}
+                className="w-full p-3 bg-neutral-950 border border-neutral-800 focus:border-amber-500 rounded-xl outline-none text-xs text-white resize-none"
+              />
+            </div>
+
+            {touchupSuccess && (
+              <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold text-center">
+                ⚡ Touch-Up Request Sent to Cleaner!
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowTouchupModal(false)}
+                className="flex-1 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-neutral-400 hover:text-white"
+              >
+                {lang === 'en' ? 'Cancel' : 'Cancelar'}
+              </button>
+              <button
+                type="button"
+                disabled={submittingTouchup || (selectedTouchupTasks.length === 0 && !customTouchupNotes.trim())}
+                onClick={async () => {
+                  setSubmittingTouchup(true);
+                  try {
+                    const res = await fetch('/api/airbnb/reports', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        action: 'request_touchup',
+                        reportId: reportId,
+                        touchup_items: selectedTouchupTasks,
+                        host_notes: customTouchupNotes
+                      })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                      setTouchupSuccess(true);
+                      setTimeout(() => {
+                        setShowTouchupModal(false);
+                        setTouchupSuccess(false);
+                        setSelectedTouchupTasks([]);
+                        setCustomTouchupNotes('');
+                      }, 1500);
+                    } else {
+                      alert('Failed: ' + (data.error || 'Error'));
+                    }
+                  } catch (e) {
+                    alert('Network error requesting touch-up');
+                  } finally {
+                    setSubmittingTouchup(false);
+                  }
+                }}
+                className="flex-1 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 font-extrabold text-xs text-white transition-all shadow-md shadow-amber-500/20 disabled:opacity-50 cursor-pointer"
+              >
+                {submittingTouchup ? 'Sending...' : (lang === 'en' ? '⚡ Send Touch-Up Request' : '⚡ Enviar Solicitud')}
               </button>
             </div>
           </div>
