@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: propError.message }, { status: 500 });
     }
 
-    const propertyIds = properties.map(p => p.id);
+    const propertyIds = (properties || []).map((p: any) => p.id);
     if (propertyIds.length === 0) {
       return NextResponse.json({ success: true, reports: [] });
     }
