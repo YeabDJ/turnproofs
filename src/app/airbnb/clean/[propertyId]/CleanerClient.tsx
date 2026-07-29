@@ -217,6 +217,11 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   const [additionalPhotos, setAdditionalPhotos] = useState<string[]>([]);
   const [uploadingAdditional, setUploadingAdditional] = useState(false);
 
+  // Custom Supply Items State
+  const [customSupplies, setCustomSupplies] = useState<Array<{ name: string; level: 'full' | 'low' | 'out' }>>([]);
+  const [newSupplyName, setNewSupplyName] = useState('');
+  const [showAddSupplyInput, setShowAddSupplyInput] = useState(false);
+
   // Load initial data
   useEffect(() => {
     async function loadData() {
@@ -677,7 +682,8 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         toiletPaper,
         soap,
         trashBags,
-        paperTowels
+        paperTowels,
+        customSupplies
       }
     });
 
@@ -1232,7 +1238,43 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
             {/* Supply Inventory Levels Tracker */}
             <div className="p-5 rounded-2xl bg-neutral-900/40 border border-neutral-850 space-y-4 backdrop-blur-md">
-              <h4 className="text-xs font-bold text-neutral-305 text-neutral-300 uppercase tracking-wider">{t.supplyStock}</h4>
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold text-neutral-300 uppercase tracking-wider">{t.supplyStock}</h4>
+                <button
+                  type="button"
+                  onClick={() => setShowAddSupplyInput(!showAddSupplyInput)}
+                  className="text-[10px] font-bold text-rose-400 hover:text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 px-2.5 py-1 rounded-lg border border-rose-500/20 transition-all cursor-pointer"
+                >
+                  {showAddSupplyInput ? '✕ Cancel' : (lang === 'en' ? '+ Add Supply Item' : '+ Añadir Suministro')}
+                </button>
+              </div>
+
+              {/* Add Custom Supply Item Input */}
+              {showAddSupplyInput && (
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-neutral-950 border border-neutral-800 animate-fadeIn">
+                  <input
+                    type="text"
+                    placeholder={lang === 'en' ? 'e.g. Coffee Pods, Sponge, Laundry Detergent' : 'ej. Cápsulas de café, Esponja'}
+                    value={newSupplyName}
+                    onChange={(e) => setNewSupplyName(e.target.value)}
+                    className="flex-1 bg-transparent text-xs text-white outline-none px-2"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (newSupplyName.trim()) {
+                        setCustomSupplies(prev => [...prev, { name: newSupplyName.trim(), level: 'low' }]);
+                        setNewSupplyName('');
+                        setShowAddSupplyInput(false);
+                      }
+                    }}
+                    disabled={!newSupplyName.trim()}
+                    className="px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 font-extrabold text-[10px] text-white disabled:opacity-50 transition-all cursor-pointer"
+                  >
+                    {lang === 'en' ? 'Add' : 'Añadir'}
+                  </button>
+                </div>
+              )}
               
               <div className="space-y-3.5">
                 {[
@@ -1255,6 +1297,44 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                           onClick={() => (item.setter as any)(opt.val)}
                           className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase transition-all cursor-pointer ${
                             item.state === opt.val
+                              ? `${opt.color} border shadow-xs`
+                              : 'text-neutral-500 hover:text-neutral-350'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Custom Cleaner Added Supply Items */}
+                {customSupplies.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between gap-4 pt-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-rose-300 font-bold">{item.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setCustomSupplies(prev => prev.filter((_, i) => i !== idx))}
+                        className="text-[10px] text-neutral-500 hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="flex bg-neutral-950 p-0.5 rounded-xl border border-neutral-800 shrink-0">
+                      {[
+                        { val: 'full', label: t.full, color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
+                        { val: 'low', label: t.low, color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
+                        { val: 'out', label: t.out, color: 'text-red-400 bg-red-500/10 border-red-500/20' }
+                      ].map((opt) => (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => {
+                            setCustomSupplies(prev => prev.map((s, i) => i === idx ? { ...s, level: opt.val as any } : s));
+                          }}
+                          className={`px-3 py-1 rounded-lg text-[9px] font-bold uppercase transition-all cursor-pointer ${
+                            item.level === opt.val
                               ? `${opt.color} border shadow-xs`
                               : 'text-neutral-500 hover:text-neutral-350'
                           }`}

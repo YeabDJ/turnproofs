@@ -189,6 +189,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   let retouches: Array<{ id: string; timestamp: string; author: string; text: string; photoUrl: string | null }> = [];
   let supplies: Record<string, 'full' | 'low' | 'out'> = { toiletPaper: 'full', soap: 'full', trashBags: 'full', paperTowels: 'full' };
   
+  let customSupplies: Array<{ name: string; level: 'full' | 'low' | 'out' }> = [];
+  
   if (report.notes && report.notes.trim().startsWith('{')) {
     try {
       const parsed = JSON.parse(report.notes);
@@ -200,6 +202,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       retouches = parsed.retouches || [];
       if (parsed.supplies) {
         supplies = { ...supplies, ...parsed.supplies };
+        customSupplies = parsed.supplies.customSupplies || [];
       }
     } catch (e) {
       console.error('Failed to parse report notes JSON', e);
@@ -469,7 +472,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   { name: 'Toilet Paper', val: supplies.toiletPaper },
                   { name: 'Hand Soap', val: supplies.soap },
                   { name: 'Trash Liners', val: supplies.trashBags },
-                  { name: 'Paper Towels', val: supplies.paperTowels }
+                  { name: 'Paper Towels', val: supplies.paperTowels },
+                  ...customSupplies.map(c => ({ name: c.name, val: c.level }))
                 ].map((item, index) => {
                   const badgeColor = 
                     item.val === 'full' 
@@ -480,8 +484,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   
                   return (
                     <div key={index} className="print-badge p-3 rounded-xl bg-neutral-950 border border-neutral-800/85 flex items-center justify-between gap-2">
-                      <span className="text-xs font-semibold text-neutral-400">{item.name}</span>
-                      <span className={`px-2 py-0.5 border rounded-md text-[9px] font-extrabold uppercase tracking-wide ${badgeColor}`}>
+                      <span className="text-xs font-semibold text-neutral-400 truncate">{item.name}</span>
+                      <span className={`px-2 py-0.5 border rounded-md text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${badgeColor}`}>
                         {item.val || 'full'}
                       </span>
                     </div>
