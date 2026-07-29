@@ -56,7 +56,7 @@ export default function DemoVideoPlayer() {
   return (
     <div className="max-w-4xl mx-auto rounded-3xl bg-neutral-900 border border-neutral-800 p-3 sm:p-5 shadow-2xl shadow-rose-500/5 relative overflow-hidden group">
       {/* Video Screen Window */}
-      <div className="aspect-video w-full rounded-2xl overflow-hidden bg-neutral-950 relative border border-neutral-850 flex flex-col justify-between p-4 sm:p-6 select-none">
+      <div className="min-h-[320px] sm:min-h-[380px] w-full rounded-2xl overflow-hidden bg-neutral-950 relative border border-neutral-850 flex flex-col justify-between p-4 sm:p-6 select-none">
         
         {/* Top Header Status Badge */}
         <div className="flex items-center justify-between z-10 w-full">
