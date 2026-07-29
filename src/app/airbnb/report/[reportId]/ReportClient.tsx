@@ -74,6 +74,13 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   // Modal photo preview
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
+  // Retouch addendum state
+  const [showRetouchModal, setShowRetouchModal] = useState(false);
+  const [retouchText, setRetouchText] = useState('');
+  const [retouchPhotoUrl, setRetouchPhotoUrl] = useState('');
+  const [uploadingRetouchPhoto, setUploadingRetouchPhoto] = useState(false);
+  const [submittingRetouch, setSubmittingRetouch] = useState(false);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -100,6 +107,45 @@ export default function ReportClient({ reportId }: { reportId: string }) {
 
     fetchReportDetails();
   }, [reportId]);
+
+  const handleSubmitRetouch = async () => {
+    if (!retouchText.trim()) {
+      alert(lang === 'en' ? 'Please describe what was re-cleaned or retouched.' : 'Describa lo que se volvió a limpiar.');
+      return;
+    }
+    setSubmittingRetouch(true);
+    try {
+      const res = await fetch('/api/airbnb/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add_retouch_update',
+          reportId: reportId,
+          author: lang === 'en' ? 'Quality Control Resolution' : 'Resolución de Control de Calidad',
+          text: retouchText.trim(),
+          photoUrl: retouchPhotoUrl || null
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setShowRetouchModal(false);
+        setRetouchText('');
+        setRetouchPhotoUrl('');
+        // Refresh certificate to show newly appended resolution addendum!
+        const refRes = await fetch(`/api/airbnb/reports/${reportId}`);
+        const refData = await refRes.json();
+        if (refData.success) {
+          setReport(refData.report);
+        }
+      } else {
+        alert('Failed to save update: ' + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert('Network error submitting update.');
+    } finally {
+      setSubmittingRetouch(false);
+    }
+  };
 
   const handlePrint = () => {
     window.print();
@@ -140,6 +186,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   let hostMessage = '';
   let maintenanceAlert = false;
   let maintenanceDesc = '';
+  let retouches: Array<{ id: string; timestamp: string; author: string; text: string; photoUrl: string | null }> = [];
   let supplies: Record<string, 'full' | 'low' | 'out'> = { toiletPaper: 'full', soap: 'full', trashBags: 'full', paperTowels: 'full' };
   
   if (report.notes && report.notes.trim().startsWith('{')) {
@@ -150,6 +197,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       hostMessage = parsed.hostMessage || '';
       maintenanceAlert = !!parsed.maintenanceAlert;
       maintenanceDesc = parsed.maintenanceDesc || '';
+      retouches = parsed.retouches || [];
       if (parsed.supplies) {
         supplies = { ...supplies, ...parsed.supplies };
       }
@@ -225,24 +273,33 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <span>{lang === 'en' ? 'Close Certificate' : 'Cerrar Certificado'}</span>
           </button>
           
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setShowRetouchModal(true)}
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Camera className="h-4 w-4 text-emerald-400" />
+              <span>{lang === 'en' ? '📷 Add Fix / Retouch Proof' : '📷 Añadir Corrección'}</span>
+            </button>
+
             <button
               onClick={() => {
                 document.title = `TurnProofs_Audit_${reportId.substring(0, 8)}.pdf`;
                 window.print();
               }}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Download className="h-4 w-4" />
-              <span>{lang === 'en' ? 'Download PDF File' : 'Guardar en PDF'}</span>
+              <span>{lang === 'en' ? 'Download PDF' : 'Guardar PDF'}</span>
             </button>
 
             <button
               onClick={handlePrint}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 font-bold text-xs text-neutral-200 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 font-bold text-xs text-neutral-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Printer className="h-4 w-4 text-neutral-400" />
-              <span>{lang === 'en' ? 'Print Certificate' : 'Imprimir Certificado'}</span>
+              <span>{lang === 'en' ? 'Print' : 'Imprimir'}</span>
             </button>
           </div>
         </div>
@@ -599,7 +656,41 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="py-8 border-t border-neutral-800/80 space-y-3">
               <h3 className="print-text-dark font-bold text-base text-neutral-300">Direct Note to Host</h3>
               <div className="print-badge p-5 rounded-2xl bg-neutral-950 border border-neutral-800">
-                <p className="text-sm leading-relaxed text-rose-455 text-rose-400 print-text-muted whitespace-pre-wrap font-semibold">{hostMessage}</p>
+                <p className="text-sm leading-relaxed text-rose-400 print-text-muted whitespace-pre-wrap font-semibold">{hostMessage}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Quality Control Retouch Addendum Section */}
+          {retouches.length > 0 && (
+            <div className="py-8 border-t border-emerald-500/30 space-y-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-5 w-5 text-emerald-400" />
+                <h3 className="print-text-dark font-extrabold text-base text-emerald-300">
+                  {lang === 'en' ? '🟢 Quality Control Resolution Addendum' : '🟢 Adenda de Resolución de Control de Calidad'}
+                </h3>
+              </div>
+
+              <div className="space-y-4">
+                {retouches.map((item, idx) => (
+                  <div key={item.id || idx} className="p-5 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-neutral-400 border-b border-emerald-500/20 pb-2">
+                      <span className="font-bold text-emerald-300">{item.author}</span>
+                      <span className="font-mono text-[11px]">{new Date(item.timestamp).toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-neutral-200 print-text-dark font-medium whitespace-pre-wrap">{item.text}</p>
+                    {item.photoUrl && (
+                      <div className="pt-2">
+                        <img 
+                          src={item.photoUrl} 
+                          alt="retouch resolution proof" 
+                          onClick={() => setSelectedPhoto(item.photoUrl)}
+                          className="h-36 sm:h-48 rounded-xl border border-emerald-500/40 object-cover cursor-zoom-in hover:opacity-90 transition-opacity" 
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -617,6 +708,125 @@ export default function ReportClient({ reportId }: { reportId: string }) {
 
         </div>
       </div>
+
+      {/* INSTANT RETOUCH / FIX PROOF MODAL (Hidden in prints) */}
+      {showRetouchModal && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50 no-print animate-fade-in">
+          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+            <button
+              type="button"
+              onClick={() => setShowRetouchModal(false)}
+              className="absolute top-4 right-4 text-neutral-400 hover:text-white p-1 rounded-full bg-neutral-950 border border-neutral-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3 border-b border-neutral-850 pb-4">
+              <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                <Camera className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-white">
+                  {lang === 'en' ? 'Add Retouch / Fix Resolution' : 'Añadir Foto de Corrección'}
+                </h3>
+                <p className="text-xs text-neutral-400">
+                  {lang === 'en' ? 'Upload photo & notes of re-cleaned or retouched items.' : 'Suba foto y notas de los objetos corregidos.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase mb-1.5">
+                  {lang === 'en' ? 'Fix Description & Notes' : 'Descripción del Arreglo'}
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder={lang === 'en' ? 'e.g. Re-cleaned microwave and refreshed bath towels as requested by host.' : 'Ej. Se volvió a limpiar el microondas y toallas.'}
+                  value={retouchText}
+                  onChange={(e) => setRetouchText(e.target.value)}
+                  className="w-full p-3 bg-neutral-950 border border-neutral-800 rounded-xl text-sm text-white focus:border-emerald-500 outline-none resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-neutral-300 uppercase mb-1.5">
+                  {lang === 'en' ? 'Resolution Photo Proof (Optional)' : 'Foto de Prueba (Opcional)'}
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploadingRetouchPhoto(true);
+                    try {
+                      const fileExt = file.name.split('.').pop();
+                      const fileName = `retouch_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                      const filePath = `reports/${fileName}`;
+
+                      const { error: uploadErr } = await (await import('@/lib/supabase')).supabase.storage
+                        .from('airbnb-proofs')
+                        .upload(filePath, file);
+
+                      if (uploadErr) throw uploadErr;
+
+                      const { data } = (await import('@/lib/supabase')).supabase.storage
+                        .from('airbnb-proofs')
+                        .getPublicUrl(filePath);
+
+                      setRetouchPhotoUrl(data.publicUrl);
+                    } catch (err: any) {
+                      alert('Photo upload failed: ' + (err.message || 'Error'));
+                    } finally {
+                      setUploadingRetouchPhoto(false);
+                    }
+                  }}
+                  className="w-full text-xs text-neutral-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-neutral-800 file:text-neutral-200 hover:file:bg-neutral-700 cursor-pointer"
+                />
+
+                {uploadingRetouchPhoto && (
+                  <p className="text-xs text-emerald-400 mt-2 flex items-center gap-1.5">
+                    <span className="h-3 w-3 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
+                    <span>Uploading photo proof...</span>
+                  </p>
+                )}
+
+                {retouchPhotoUrl && (
+                  <div className="mt-3 relative inline-block">
+                    <img src={retouchPhotoUrl} alt="Retouch proof" className="h-28 w-28 rounded-xl object-cover border border-emerald-500/50" />
+                    <button
+                      type="button"
+                      onClick={() => setRetouchPhotoUrl('')}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 text-xs"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowRetouchModal(false)}
+                className="flex-1 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-neutral-400 hover:text-white"
+              >
+                {lang === 'en' ? 'Cancel' : 'Cancelar'}
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitRetouch}
+                disabled={submittingRetouch || uploadingRetouchPhoto || !retouchText.trim()}
+                className="flex-1 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-extrabold text-xs text-white transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
+              >
+                {submittingRetouch ? 'Saving...' : (lang === 'en' ? 'Save Resolution Addendum' : 'Guardar Resolución')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* FULL SCREEN PHOTO MODAL PREVIEW (Hidden in prints) */}
       {selectedPhoto && (

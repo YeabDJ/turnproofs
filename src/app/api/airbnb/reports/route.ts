@@ -137,6 +137,51 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Follow-up Quality Control Addendum (Host request / Cleaner retouch update)
+    if (action === 'add_retouch_update') {
+      const { reportId, author, text, photoUrl } = body;
+      if (!reportId || !text) {
+        return NextResponse.json({ success: false, error: 'Report ID and description are required.' }, { status: 400 });
+      }
+
+      const { data: existingReport } = await supabaseAdmin
+        .from('airbnb_reports')
+        .select('notes, property_id')
+        .eq('id', reportId)
+        .maybeSingle();
+
+      let notesObj: any = {};
+      try {
+        if (existingReport?.notes) {
+          notesObj = JSON.parse(existingReport.notes);
+        }
+      } catch (e) {
+        notesObj = { rawNotes: existingReport?.notes || '' };
+      }
+
+      const retouches = notesObj.retouches || [];
+      retouches.push({
+        id: 'retouch_' + Date.now(),
+        timestamp: new Date().toISOString(),
+        author: author || 'Cleaner Retouch',
+        text: text.trim(),
+        photoUrl: photoUrl || null
+      });
+
+      notesObj.retouches = retouches;
+
+      const { error: updateErr } = await supabaseAdmin
+        .from('airbnb_reports')
+        .update({ notes: JSON.stringify(notesObj) })
+        .eq('id', reportId);
+
+      if (updateErr) {
+        return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, message: 'Follow-up retouch addendum saved to report certificate.' });
+    }
+
     // Collaborative Action: Start Session
     if (action === 'start_session') {
       if (!property_id || !cleaner_name) {
