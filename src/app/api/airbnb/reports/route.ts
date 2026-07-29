@@ -86,21 +86,29 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'TurnProofs <onboarding@resend.dev>',
-        to: Array.from(recipients),
-        subject: `📋 TurnProofs Cleaning Audit Completed for ${propertyName}`,
-        html
-      })
-    });
-    const resData = await res.json();
-    console.log('[RESEND CHECKOUT EMAIL DISPATCH]:', res.status, resData);
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <onboarding@resend.dev>';
+
+    for (const recipient of Array.from(recipients)) {
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: fromAddress,
+            to: [recipient],
+            subject: `📋 TurnProofs Cleaning Audit Completed for ${propertyName}`,
+            html
+          })
+        });
+        const resData = await res.json();
+        console.log(`[RESEND EMAIL DISPATCH -> ${recipient}]: status = ${res.status}`, resData);
+      } catch (err) {
+        console.error(`Failed to send email to ${recipient}:`, err);
+      }
+    }
   } catch (e) {
     console.error('Failed to send checkout email:', e);
   }
