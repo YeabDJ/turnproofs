@@ -36,7 +36,6 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
     const recipients = new Set<string>();
     recipients.add(hostEmail);
     recipients.add('support@turnproofs.com');
-    recipients.add('yeabidj@gmail.com');
 
     if (cleanerEmail && cleanerEmail.includes('@')) {
       recipients.add(cleanerEmail.trim());
