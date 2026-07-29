@@ -986,7 +986,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                   onClick={() => {
                     setInstantModalType('damage');
                     setInstantDesc('');
-                    setInstantPhotoUrl('');
+                    setInstantPhotos([]);
                   }}
                   className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 hover:border-red-500/60 hover:bg-red-500/20 text-red-300 text-left transition-all cursor-pointer group"
                 >
@@ -1002,7 +1002,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                   onClick={() => {
                     setInstantModalType('lost_found');
                     setInstantDesc('');
-                    setInstantPhotoUrl('');
+                    setInstantPhotos([]);
                   }}
                   className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 hover:border-amber-500/60 hover:bg-amber-500/20 text-amber-300 text-left transition-all cursor-pointer group"
                 >
@@ -1339,7 +1339,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                     onClick={() => {
                       setInstantModalType('damage');
                       setInstantDesc('');
-                      setInstantPhotoUrl('');
+                      setInstantPhotos([]);
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-red-300 text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all active:scale-95"
                   >
@@ -1351,7 +1351,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                     onClick={() => {
                       setInstantModalType('lost_found');
                       setInstantDesc('');
-                      setInstantPhotoUrl('');
+                      setInstantPhotos([]);
                     }}
                     className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold flex items-center gap-1 cursor-pointer transition-all active:scale-95"
                   >
