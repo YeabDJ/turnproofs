@@ -131,11 +131,17 @@ export async function POST(request: NextRequest) {
 
     const cleanEmail = email.trim().toLowerCase();
 
+    // Alias email mapping for primary host
+    const isPrimaryAlias = ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail);
+    const searchEmails = isPrimaryAlias ? ['support@turnproofs.com', 'yeabidj@gmail.com'] : [cleanEmail];
+
     // Check if host already exists
     const { data: host, error: fetchError } = await supabaseAdmin
       .from('airbnb_hosts')
       .select('*')
-      .eq('email', cleanEmail)
+      .in('email', searchEmails)
+      .order('created_at', { ascending: true })
+      .limit(1)
       .maybeSingle();
 
     if (fetchError) {
