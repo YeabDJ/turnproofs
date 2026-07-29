@@ -48,20 +48,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Support alias host accounts (yeabidj@gmail.com & support@turnproofs.com)
-    const { data: sisterHosts } = await supabaseAdmin
-      .from('airbnb_hosts')
-      .select('id')
-      .in('email', ['yeabidj@gmail.com', 'support@turnproofs.com']);
-    
-    const hostIds = (sisterHosts && ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(host.email))
-      ? sisterHosts.map((h: any) => h.id)
-      : [host.id];
-
     const { data: properties, error } = await supabaseAdmin
       .from('airbnb_properties')
       .select('*')
-      .in('host_id', hostIds)
+      .eq('host_id', host.id)
       .order('created_at', { ascending: false });
 
     if (error) {

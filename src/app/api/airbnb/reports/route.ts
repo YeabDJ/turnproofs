@@ -133,21 +133,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const propertyId = searchParams.get('propertyId');
 
-    // Support alias host accounts (yeabidj@gmail.com & support@turnproofs.com)
-    const { data: sisterHosts } = await supabaseAdmin
-      .from('airbnb_hosts')
-      .select('id')
-      .in('email', ['yeabidj@gmail.com', 'support@turnproofs.com']);
-    
-    const hostIds = (sisterHosts && ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(host.email))
-      ? sisterHosts.map((h: any) => h.id)
-      : [host.id];
-
     // First get properties owned by this host
     const { data: properties, error: propError } = await supabaseAdmin
       .from('airbnb_properties')
       .select('id')
-      .in('host_id', hostIds);
+      .eq('host_id', host.id);
 
     if (propError) {
       return NextResponse.json({ success: false, error: propError.message }, { status: 500 });

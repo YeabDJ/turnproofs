@@ -135,14 +135,36 @@ export async function POST(request: NextRequest) {
     const isPrimaryAlias = ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail);
     const searchEmails = isPrimaryAlias ? ['support@turnproofs.com', 'yeabidj@gmail.com'] : [cleanEmail];
 
-    // Check if host already exists
-    const { data: host, error: fetchError } = await supabaseAdmin
-      .from('airbnb_hosts')
-      .select('*')
-      .in('email', searchEmails)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
+    let host: any = null;
+    let fetchError: any = null;
+
+    if (isPrimaryAlias) {
+      const { data: primaryHost } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .select('*')
+        .eq('email', 'support@turnproofs.com')
+        .maybeSingle();
+      
+      if (primaryHost) {
+        host = primaryHost;
+      } else {
+        const { data: altHost, error: altErr } = await supabaseAdmin
+          .from('airbnb_hosts')
+          .select('*')
+          .eq('email', 'yeabidj@gmail.com')
+          .maybeSingle();
+        host = altHost;
+        fetchError = altErr;
+      }
+    } else {
+      const { data: singleHost, error: singleErr } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .select('*')
+        .eq('email', cleanEmail)
+        .maybeSingle();
+      host = singleHost;
+      fetchError = singleErr;
+    }
 
     if (fetchError) {
       return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });

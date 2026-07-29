@@ -33,17 +33,10 @@ export async function GET(request: NextRequest) {
       hostId = host.id;
     }
 
-    const { data: sisterHosts } = await supabaseAdmin
-      .from('airbnb_hosts')
-      .select('id')
-      .in('email', ['yeabidj@gmail.com', 'support@turnproofs.com']);
-
-    const hostIds = sisterHosts ? sisterHosts.map((h: any) => h.id) : [hostId];
-
     const { data: cleaners, error } = await supabaseAdmin
       .from('airbnb_cleaners')
       .select('*')
-      .in('host_id', hostIds)
+      .eq('host_id', hostId)
       .order('name', { ascending: true });
 
     if (error) {
