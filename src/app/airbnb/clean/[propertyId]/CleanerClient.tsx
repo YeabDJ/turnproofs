@@ -821,7 +821,6 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
             <span>✨ {lang === 'en' ? 'Start New Guest Turnover' : 'Iniciar Nueva Limpieza'}</span>
           </button>
         </div>
-        </div>
 
         <div className="text-center text-xs text-neutral-600 pb-4 font-semibold">
           TurnProofs System Certification
