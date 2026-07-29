@@ -134,24 +134,6 @@ function LoginContent() {
       return newVal;
     });
   };
-          if (newVal === sentCode) {
-            setEnteredCode(newVal);
-            setResetStep('new_pin');
-            setPin('');
-            setError('');
-            setInfoMessage('Security Code Verified! Enter your NEW 6-digit passcode PIN.');
-          } else {
-            setError('Incorrect 6-digit security code. Please check your email.');
-            setPin('');
-          }
-        } else if (resetStep === 'new_pin') {
-          submitNewPin(newVal);
-        } else {
-          submitAuth(newVal);
-        }
-      }
-    }
-  };
 
   const handleBackspace = () => {
     setPin(prev => prev.slice(0, -1));
