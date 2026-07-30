@@ -911,6 +911,22 @@ export default function DashboardClient() {
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
+                {/* 0. 14 Days Remaining Top Trial Banner */}
+                <div className="p-4 rounded-2xl bg-linear-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-xs shrink-0">
+                      14d
+                    </div>
+                    <div>
+                      <span className="text-xs font-black text-white block">14 Days Remaining in Your Free Trial</span>
+                      <span className="text-[11px] text-neutral-400">Full Pro feature access active. A payment card will be required after your 14-day trial ends on August 13, 2026.</span>
+                    </div>
+                  </div>
+                  <span className="px-3 py-1.5 rounded-xl bg-neutral-950 border border-emerald-500/30 text-emerald-400 text-[11px] font-extrabold shrink-0">
+                    💳 Card Required After Trial
+                  </span>
+                </div>
+
                 {/* 1. Current Active Subscription & Usage Overview */}
                 <div className="p-8 rounded-3xl bg-neutral-900/60 border border-neutral-800 backdrop-blur-md relative overflow-hidden space-y-6">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-850">
@@ -920,7 +936,7 @@ export default function DashboardClient() {
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                           <span>Active Plan</span>
                         </span>
-                        <span className="text-xs text-neutral-400 font-semibold">• 14-Day Free Trial (No Card Charge Today)</span>
+                        <span className="text-xs text-neutral-400 font-semibold">• 14-Day Free Trial (Card Required After Trial)</span>
                       </div>
 
                       <h2 className="text-2xl font-black text-white flex items-center gap-3">
@@ -963,21 +979,29 @@ export default function DashboardClient() {
                     </div>
                   </div>
 
-                  {/* Account Metadata Row: Usage, Next Billing Date, Billing Email */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                  {/* Account Metadata Row: Usage, Billing Cycle Dates, Billing Email */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
                     <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
                       <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Portfolio Capacity Usage</span>
-                      <p className="text-sm font-black text-white font-mono flex items-center gap-1.5">
-                        <Home className="h-4 w-4 text-rose-400" />
+                      <p className="text-xs font-black text-white font-mono flex items-center gap-1.5">
+                        <Home className="h-3.5 w-3.5 text-rose-400" />
                         <span>{properties.length} of {properties.length <= 1 ? '1' : properties.length <= 3 ? '3' : properties.length <= 6 ? '6' : properties.length} Units Used</span>
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
-                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Next Renewal / Billing Date</span>
-                      <p className="text-sm font-black text-emerald-400 font-mono flex items-center gap-1.5">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                        <span>August 29, 2026 ($0.00 Due Today)</span>
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Current Billing Cycle</span>
+                      <p className="text-xs font-black text-emerald-400 font-mono flex items-center gap-1.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                        <span>Aug 29, 2026 – Sep 28, 2026</span>
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Next Renewal Amount</span>
+                      <p className="text-xs font-black text-white font-mono flex items-center gap-1.5">
+                        <CreditCard className="h-3.5 w-3.5 text-rose-400" />
+                        <span>$0.00 Due Today ($9.00 Next)</span>
                       </p>
                     </div>
 
@@ -986,10 +1010,10 @@ export default function DashboardClient() {
                         <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Billing Receipts Email</span>
                         <button
                           onClick={() => {
-                            const newEmail = prompt('Enter primary billing email address:', host?.email || 'support@turnproofs.com');
+                            const newEmail = prompt('Enter primary billing email address:', customBillingEmail || host?.email || 'support@turnproofs.com');
                             if (newEmail && newEmail.includes('@')) {
                               setCustomBillingEmail(newEmail.trim());
-                              alert(`Billing email updated to: ${newEmail.trim()}`);
+                              alert(`Billing receipt email updated to: ${newEmail.trim()}`);
                             }
                           }}
                           className="text-[10px] font-bold text-rose-400 hover:underline cursor-pointer"
@@ -1054,7 +1078,7 @@ export default function DashboardClient() {
                                 <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$7.65' : '$9.00'}</span>
                                 <span className="text-xs text-neutral-400 font-semibold">/ month</span>
                               </div>
-                              {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($91.80/yr)</span>}
+                              {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">💰 Save $16.20 / yr ($91.80/yr)</span>}
                             </div>
                             <ul className="space-y-2 text-xs text-neutral-300">
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> 1 Managed Property</li>
@@ -1111,7 +1135,7 @@ export default function DashboardClient() {
                                 <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$16.14' : '$18.99'}</span>
                                 <span className="text-xs text-neutral-400 font-semibold">/ month</span>
                               </div>
-                              {billingCycle === 'annual' && <span className="text-[10px] text-amber-400 font-bold block mt-1">Billed annually ($193.68/yr)</span>}
+                              {billingCycle === 'annual' && <span className="text-[10px] text-amber-400 font-bold block mt-1">💰 Save $34.20 / yr ($193.68/yr)</span>}
                             </div>
                             <ul className="space-y-2 text-xs text-neutral-300">
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> 2 to 3 Managed Properties</li>
@@ -1167,7 +1191,11 @@ export default function DashboardClient() {
                                 <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$25.49' : '$29.99'}</span>
                                 <span className="text-xs text-neutral-400 font-semibold">/ month</span>
                               </div>
-                              <span className="text-[10px] text-purple-400 font-bold block mt-1">+$4.99/mo per unit beyond 6</span>
+                              {billingCycle === 'annual' ? (
+                                <span className="text-[10px] text-purple-400 font-bold block mt-1">💰 Save $54.00 / yr (15% OFF)</span>
+                              ) : (
+                                <span className="text-[10px] text-purple-400 font-bold block mt-1">+$4.99/mo per unit beyond 6</span>
+                              )}
                             </div>
                             <ul className="space-y-2 text-xs text-neutral-300">
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> 4 to 6+ Managed Properties</li>
@@ -1218,7 +1246,7 @@ export default function DashboardClient() {
                                 <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$76.49' : '$89.99'}</span>
                                 <span className="text-xs text-neutral-400 font-semibold">/ month</span>
                               </div>
-                              {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($917.88/yr)</span>}
+                              {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">💰 Save $162.00 / yr ($917.88/yr)</span>}
                             </div>
                             <ul className="space-y-2 text-xs text-neutral-300">
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> 1 Building / Multi-Tenant Complex</li>
@@ -1259,10 +1287,18 @@ export default function DashboardClient() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Payment Method Card */}
                   <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-4">
-                    <h4 className="text-base font-extrabold text-white flex items-center gap-2">
-                      <CreditCard className="h-4.5 w-4.5 text-neutral-400" />
-                      <span>Payment Method</span>
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-base font-extrabold text-white flex items-center gap-2">
+                        <CreditCard className="h-4.5 w-4.5 text-neutral-400" />
+                        <span>Payment Method</span>
+                      </h4>
+                      <button
+                        onClick={() => alert("Redirecting to Stripe payment setup to add a backup card...")}
+                        className="text-xs font-bold text-rose-400 hover:underline cursor-pointer"
+                      >
+                        + Add Backup Card
+                      </button>
+                    </div>
                     <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="h-9 w-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center font-bold text-xs text-neutral-300">
@@ -1271,6 +1307,7 @@ export default function DashboardClient() {
                         <div>
                           <span className="text-xs font-bold text-neutral-200 block">•••• •••• •••• 4242</span>
                           <span className="text-[10px] text-neutral-400 block">Expires 12/28 • Default Payment Card</span>
+                          <span className="text-[9px] text-emerald-400 font-semibold block mt-0.5">Last Payment: July 29, 2026 ($0.00 Trial Start)</span>
                         </div>
                       </div>
                       <button
@@ -1339,10 +1376,11 @@ export default function DashboardClient() {
                         </span>
                         <button
                           onClick={() => alert("Downloading PDF Receipt...")}
-                          className="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 hover:text-white transition-all cursor-pointer"
+                          className="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 hover:text-white transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold"
                           title="Download PDF Receipt"
                         >
                           <Printer className="h-3.5 w-3.5" />
+                          <span>PDF</span>
                         </button>
                       </div>
                     </div>
@@ -1384,13 +1422,14 @@ export default function DashboardClient() {
                       className="text-xs font-bold text-neutral-400 hover:text-neutral-200 flex items-center gap-1.5 cursor-pointer"
                     >
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFaqGuide ? 'rotate-180' : ''}`} />
-                      <span>What happens when I cancel or pause?</span>
+                      <span>Frequently Asked Billing Questions (Cancellation, Email, Reversion)</span>
                     </button>
                     {showFaqGuide && (
-                      <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2 animate-fade-in">
+                      <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2.5 animate-fade-in">
                         <p><strong>1. Zero Cancellation Fees:</strong> There are no cancellation penalties or contract lock-ins.</p>
                         <p><strong>2. Free Tier Reversion:</strong> Your account retains 1 free property slot with complete mobile cleaner terminal access.</p>
                         <p><strong>3. Permanent Certificate Storage:</strong> All past audit logs, photos, and dispute-proof PDF reports stay saved in your account forever.</p>
+                        <p><strong>4. Can I change my billing email?</strong> Yes! Use the <em>'Edit Email'</em> button inside the Active Subscription section at the top of this tab to direct receipts to any secondary email.</p>
                       </div>
                     )}
                   </div>
