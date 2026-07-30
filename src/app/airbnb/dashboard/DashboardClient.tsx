@@ -1830,6 +1830,10 @@ export default function DashboardClient() {
                 {upgradingTier ? 'Upgrading...' : '⚡ Unlock Commercial Plan ($89.99)'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL: EMBEDDED HIGH-TRUST STRIPE CHECKOUT */}
       {showCheckoutModal && checkoutPlan && (
         <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
