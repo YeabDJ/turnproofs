@@ -29,8 +29,7 @@ import {
   Shield,
   CheckCircle2,
   AlertTriangle,
-  ChevronRight,
-  Check
+  ChevronRight
 } from 'lucide-react';
 
 interface Property {
