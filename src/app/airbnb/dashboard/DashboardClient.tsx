@@ -1325,7 +1325,7 @@ export default function DashboardClient() {
                         }}
                         className="text-xs font-bold text-rose-400 hover:underline cursor-pointer"
                       >
-                        View All Invoices ➔
+                        View All Invoices &rarr;
                       </button>
                     </div>
                     <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 flex items-center justify-between">
@@ -1335,7 +1335,7 @@ export default function DashboardClient() {
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold uppercase border border-emerald-500/20">
-                          🟢 Paid / Active
+                          Paid / Active
                         </span>
                         <button
                           onClick={() => alert("Downloading PDF Receipt...")}
