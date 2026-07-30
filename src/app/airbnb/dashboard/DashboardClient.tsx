@@ -30,7 +30,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   ChevronRight,
-  Clock
+  Clock,
+  HelpCircle
 } from 'lucide-react';
 
 interface Property {
@@ -484,14 +485,24 @@ export default function DashboardClient() {
       {/* Navigation Header */}
       <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/airbnb/dashboard" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-            <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-md shadow-rose-500/10">
-              <ShieldCheck className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-bold text-lg tracking-tight bg-linear-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
-              TurnProofs
-            </span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/airbnb" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity" title="Go to TurnProofs Main Landing Page">
+              <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-md shadow-rose-500/10">
+                <ShieldCheck className="h-5 w-5 text-white" />
+              </div>
+              <span className="font-bold text-lg tracking-tight bg-linear-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
+                TurnProofs
+              </span>
+            </Link>
+
+            <Link
+              href="/airbnb"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-neutral-300 hover:text-white transition-all cursor-pointer"
+            >
+              <Home className="h-3.5 w-3.5 text-rose-400" />
+              <span>Landing Page</span>
+            </Link>
+          </div>
 
           <div className="flex items-center gap-3">
             {/* Bilingual Toggle Button */}
@@ -1446,24 +1457,57 @@ export default function DashboardClient() {
                     </div>
                   </div>
 
-                  {/* Expandable FAQ: What happens when I cancel or pause? */}
-                  <div className="pt-2 border-t border-red-900/30">
+                  {/* Expandable FAQ: Frequently Asked Billing Questions */}
+                  <div className="pt-4 border-t border-red-900/30 space-y-3">
                     <button
+                      type="button"
                       onClick={() => setShowFaqGuide(!showFaqGuide)}
-                      className="text-xs font-bold text-neutral-400 hover:text-neutral-200 flex items-center gap-1.5 cursor-pointer"
+                      className="w-full p-4 rounded-2xl bg-neutral-950/80 border border-neutral-800 hover:border-neutral-700 flex items-center justify-between text-xs font-black text-neutral-200 transition-all cursor-pointer"
                     >
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFaqGuide ? 'rotate-180' : ''}`} />
-                      <span>Frequently Asked Billing & Subscription Questions (Pause Rules, Email & File Ownership)</span>
+                      <div className="flex items-center gap-2">
+                        <HelpCircle className="h-4 w-4 text-rose-400 shrink-0" />
+                        <span>Frequently Asked Billing & Subscription Questions (Pause Rules, Email & File Ownership)</span>
+                      </div>
+                      <ChevronDown className={`h-4 w-4 text-neutral-400 transition-transform duration-200 ${showFaqGuide ? 'rotate-180 text-rose-400' : ''}`} />
                     </button>
+
                     {showFaqGuide && (
-                      <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2.5 animate-fade-in">
-                        <p><strong>1. How does Subscription Pause work & can I extend?</strong> Your subscription freezes for 30 days. You can unpause manually anytime in 1-click, extend by another 30 days before expiry, or let it auto-resume on day 30.</p>
-                        <p><strong>2. Will I get a reminder email before pause or trial ends?</strong> Yes! Reminders are sent on Trial Days 10, 13, and Day 14 at 12:00 PM ("Reverts in 24 hours at midnight EST"). For pauses, a reminder is sent 3 days before expiry.</p>
-                        <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can cancel directly while paused without unpausing first.</p>
-                        <p><strong>4. How does Re-Subscription work?</strong> Reactivate anytime with 1 click. You'll resume on your previous plan with zero setup fees. Your saved payment method will be used (update it anytime in Billing & Subscription).</p>
-                        <p><strong>5. How does Annual Billing work?</strong> Annual billing is charged as one discounted upfront payment for 12 months, renewing annually with zero monthly charges.</p>
-                        <p><strong>6. Non-Archived Drafts & Data:</strong> Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days (gives you time to re-upload or recover). After 30 days, automatically deleted to keep TurnProofs lightweight and your subscription costs low.</p>
-                        <p><strong>7. Billing Email Dispatch:</strong> Invoices and PDF receipts are automatically dispatched to your primary billing email. Click <em>'Edit Email'</em> at the top of this tab to update anytime.</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2 animate-fade-in">
+                        {[
+                          {
+                            q: "1. How does Subscription Pause work & can I extend?",
+                            a: "Your subscription freezes for 30 days. You can unpause manually anytime in 1-click, extend by another 30 days before expiry, or let it auto-resume on day 30."
+                          },
+                          {
+                            q: "2. Will I get a reminder email before pause or trial ends?",
+                            a: "Yes! Reminders are sent on Trial Days 10, 13, and Day 14 at 12:00 PM ('Reverts in 24 hours at midnight EST'). For pauses, a reminder is sent 3 days before expiry."
+                          },
+                          {
+                            q: "3. Can I pause mid-cycle or cancel during a pause?",
+                            a: "Yes! Mid-cycle pauses take effect immediately with unused days credited. You can cancel directly while paused without unpausing first."
+                          },
+                          {
+                            q: "4. How does Re-Subscription work?",
+                            a: "Reactivate anytime with 1 click. You'll resume on your previous plan with zero setup fees. Your saved payment method will be used (update it anytime in Billing & Subscription)."
+                          },
+                          {
+                            q: "5. How does Annual Billing work?",
+                            a: "Annual billing is charged as one discounted upfront payment for 12 months, renewing annually with zero monthly charges."
+                          },
+                          {
+                            q: "6. Non-Archived Drafts & Data Retention",
+                            a: "Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days (gives you time to re-upload or recover). After 30 days, automatically deleted to keep TurnProofs lightweight and your subscription costs low."
+                          },
+                          {
+                            q: "7. Billing Email Dispatch",
+                            a: "Invoices and PDF receipts are automatically dispatched to your primary billing email. Click 'Edit Email' at the top of this tab to update anytime."
+                          }
+                        ].map((item, idx) => (
+                          <div key={idx} className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 space-y-1.5 hover:border-neutral-800 transition-all">
+                            <h5 className="text-xs font-bold text-rose-300 leading-snug">{item.q}</h5>
+                            <p className="text-[11px] text-neutral-300 leading-relaxed font-normal">{item.a}</p>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
