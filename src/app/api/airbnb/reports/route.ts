@@ -85,11 +85,11 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <info@eqcdmv.com>';
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <onboarding@resend.dev>';
 
     for (const recipient of Array.from(recipients)) {
       try {
-        const res = await fetch('https://api.resend.com/emails', {
+        let res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${apiKey}`,
@@ -102,8 +102,28 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
             html
           })
         });
-        const resData = await res.json();
+        let resData = await res.json();
         console.log(`[RESEND EMAIL DISPATCH -> ${recipient}]: status = ${res.status}`, resData);
+
+        // If Resend testing mode restricts recipient, fallback retry to account owner (yeabidj@gmail.com)
+        if (!res.ok && resData.message?.includes('only send to your own email address')) {
+          console.warn(`[RESEND TESTING MODE RESTRICTION] Retrying dispatch to account owner yeabidj@gmail.com...`);
+          res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'TurnProofs <onboarding@resend.dev>',
+              to: ['yeabidj@gmail.com'],
+              subject: `📋 [TEST MODE COPY -> ${recipient}] TurnProofs Cleaning Audit Completed for ${propertyName}`,
+              html
+            })
+          });
+          resData = await res.json();
+          console.log(`[RESEND FALLBACK DISPATCH -> yeabidj@gmail.com]: status = ${res.status}`, resData);
+        }
       } catch (err) {
         console.error(`Failed to send email to ${recipient}:`, err);
       }
@@ -180,24 +200,50 @@ async function sendResendAlertEmail({
     </div>
   `;
 
-  try {
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'TurnProofs <onboarding@resend.dev>',
-        to: toEmails.length > 0 ? toEmails : ['yeabidj@gmail.com'],
-        subject,
-        html
-      })
-    });
-    const resData = await res.json();
-    console.log('[RESEND ALERT EMAIL SENT]:', res.status, resData);
-  } catch (err) {
-    console.error('Failed to send Resend alert email:', err);
+  const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <onboarding@resend.dev>';
+  const targetRecipients = toEmails.filter(e => e && e.includes('@'));
+  if (targetRecipients.length === 0) targetRecipients.push('yeabidj@gmail.com');
+
+  for (const recipient of targetRecipients) {
+    try {
+      let res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: fromAddress,
+          to: [recipient],
+          subject,
+          html
+        })
+      });
+      let resData = await res.json();
+      console.log(`[RESEND ALERT EMAIL SENT -> ${recipient}]:`, res.status, resData);
+
+      // Fallback if testing mode restricts unverified target recipient
+      if (!res.ok && resData.message?.includes('only send to your own email address')) {
+        console.warn(`[RESEND TESTING MODE RESTRICTION] Retrying alert to account owner yeabidj@gmail.com...`);
+        res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'TurnProofs <onboarding@resend.dev>',
+            to: ['yeabidj@gmail.com'],
+            subject: `[TEST MODE COPY -> ${recipient}] ${subject}`,
+            html
+          })
+        });
+        resData = await res.json();
+        console.log(`[RESEND ALERT FALLBACK SENT -> yeabidj@gmail.com]:`, res.status, resData);
+      }
+    } catch (err) {
+      console.error(`Failed to send Resend alert email to ${recipient}:`, err);
+    }
   }
 }
 
