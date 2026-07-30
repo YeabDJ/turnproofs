@@ -606,7 +606,7 @@ export default function AirbnbLanding() {
             },
             {
               q: "What happens after the 14-day trial?",
-              a: "You can choose to activate a paid tier or automatically revert to the free tier (1 property slot) with all past audit certificates permanently stored in your account."
+              a: "You can choose to activate a paid tier or revert to the free tier (1 property slot). All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down."
             },
             {
               q: "How does TurnProofs protect me against false guest cleanliness refund claims?",
@@ -621,8 +621,8 @@ export default function AirbnbLanding() {
               a: "Yes! Zero contract lock-ins or cancellation fees. Swapping plans takes effect immediately with prorated credits applied automatically."
             },
             {
-              q: "Where is my data stored and is photo proof secure?",
-              a: "All data is encrypted via 256-bit SSL, hosted in secure US data centers, and PDF certificates are permanently archived."
+              q: "Where is my data stored and how are files delivered?",
+              a: "All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down."
             },
             {
               q: "What payment methods do you accept?",

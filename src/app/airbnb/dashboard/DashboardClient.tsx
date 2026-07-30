@@ -1427,7 +1427,7 @@ export default function DashboardClient() {
                         <span>Manage Subscription Status (Pause or Cancel)</span>
                       </h4>
                       <p className="text-xs text-neutral-400 mt-1 max-w-2xl">
-                        Need a break? You can pause your subscription for 30 days or cancel anytime. Your account will revert to the Free Tier (1 property limit), and your historical audit reports remain permanently saved in your account.
+                        Need a break? You can pause your subscription for 30 days or cancel anytime. All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down.
                       </p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -1453,7 +1453,7 @@ export default function DashboardClient() {
                       className="text-xs font-bold text-neutral-400 hover:text-neutral-200 flex items-center gap-1.5 cursor-pointer"
                     >
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFaqGuide ? 'rotate-180' : ''}`} />
-                      <span>Frequently Asked Billing & Subscription Questions (Pause Rules, Email & Cancellation)</span>
+                      <span>Frequently Asked Billing & Subscription Questions (Pause Rules, Email & File Ownership)</span>
                     </button>
                     {showFaqGuide && (
                       <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2.5 animate-fade-in">
@@ -1461,7 +1461,7 @@ export default function DashboardClient() {
                         <p><strong>2. Will I get a reminder email before pause ends?</strong> Yes! An automated email reminder is sent to your billing email 3 days before your 30-day pause expires.</p>
                         <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can also cancel directly while paused without needing to unpause first.</p>
                         <p><strong>4. Free Tier Reversion:</strong> Upon cancellation, your account retains 1 free property slot with full mobile cleaner terminal access.</p>
-                        <p><strong>5. Permanent Certificate Storage:</strong> All past audit logs, photos, and dispute-proof PDF reports remain saved in your account forever.</p>
+                        <p><strong>5. File Ownership & Delivery:</strong> All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down.</p>
                         <p><strong>6. Can I change my billing email?</strong> Yes! Click the <em>'Edit Email'</em> button inside the Active Subscription section at the top of this tab to route receipts to any secondary email.</p>
                       </div>
                     )}
@@ -2253,7 +2253,7 @@ export default function DashboardClient() {
             <div className="space-y-2">
               <h3 className="font-black text-xl text-white">Pause Subscription for 30 Days?</h3>
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Freeze your billing for 30 days while keeping all property configurations and past audit certificates saved in your account.
+                Freeze your billing for 30 days. All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover.
               </p>
             </div>
 
@@ -2308,7 +2308,7 @@ export default function DashboardClient() {
               <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 text-[11px] text-neutral-300 space-y-1">
                 <span className="font-bold text-white block">What happens when you cancel:</span>
                 <p>• Zero future charges will occur.</p>
-                <p>• Your historical audit certificates and reports remain permanently saved.</p>
+                <p>• All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down.</p>
                 <p>• You can re-activate or upgrade anytime in 1 click.</p>
               </div>
             </div>
@@ -2399,9 +2399,9 @@ export default function DashboardClient() {
             </div>
 
             <div className="p-3.5 rounded-xl bg-neutral-950/80 border border-neutral-850 text-[11px] text-neutral-400 space-y-1">
-              <span className="font-bold text-white block">Proration & Property Retention:</span>
+              <span className="font-bold text-white block">Proration & File Delivery:</span>
               <p>• Unused days from your previous plan are automatically credited to your account.</p>
-              <p>• Unselected properties are paused (not deleted). All past audit logs remain permanently saved.</p>
+              <p>• All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down.</p>
             </div>
 
             <div className="flex items-center gap-3 pt-2">
