@@ -925,12 +925,39 @@ export default function DashboardClient() {
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
-                {/* 0. 30-Day Split Trial Banner & Dynamic Billing Date Countdown Bar */}
+                {/* 0. 30-Day Split Trial Banner OR Active Paid Subscription Banner */}
                 {(() => {
                   const createdDate = host?.created_at ? new Date(host.created_at) : new Date();
                   const phase2UnlockDate = new Date(createdDate.getTime() + 14 * 24 * 60 * 60 * 1000);
                   const firstBillingDate = new Date(createdDate.getTime() + 30 * 24 * 60 * 60 * 1000);
                   const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                  const isPaidActive = host?.subscription_status === 'active' || host?.stripe_subscription_id;
+
+                  if (isPaidActive) {
+                    return (
+                      <div className="p-6 rounded-3xl bg-neutral-900/80 border border-emerald-500/30 space-y-3 backdrop-blur-md">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-sm shrink-0">
+                              <CheckCircle2 className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-black text-white">Active Subscription ({host?.subscription_tier?.toUpperCase() || 'PRO'})</span>
+                                <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold border border-emerald-500/20">
+                                  AUTO-RENEWS
+                                </span>
+                              </div>
+                              <span className="text-xs text-neutral-400">Trial completed. Full features active across your portfolio with zero hidden fees.</span>
+                            </div>
+                          </div>
+                          <span className="px-3.5 py-2 rounded-xl bg-neutral-950 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold shrink-0">
+                            🟢 Billing Active
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
 
                   return (
                     <div className="p-6 rounded-3xl bg-neutral-900/80 border border-emerald-500/30 space-y-4 backdrop-blur-md">
