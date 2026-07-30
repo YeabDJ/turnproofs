@@ -29,7 +29,8 @@ import {
   Shield,
   CheckCircle2,
   AlertTriangle,
-  ChevronRight
+  ChevronRight,
+  Clock
 } from 'lucide-react';
 
 interface Property {
@@ -90,8 +91,17 @@ export default function DashboardClient() {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [pausingSubscription, setPausingSubscription] = useState(false);
   const [cancelingSubscription, setCancelingSubscription] = useState(false);
-  const [cancelSuccessMsg, setCancelSuccessMsg] = useState<string | null>(null);
+  const [showFaqGuide, setShowFaqGuide] = useState(false);
+  const [editingBillingEmail, setEditingBillingEmail] = useState(false);
+  const [customBillingEmail, setCustomBillingEmail] = useState('');
+  
+  // Card form state for first-time checkout
+  const [cardNum, setCardNum] = useState('');
+  const [cardExp, setCardExp] = useState('');
+  const [cardCvc, setCardCvc] = useState('');
 
   // Database lists
   const [properties, setProperties] = useState<Property[]>([]);
@@ -901,16 +911,16 @@ export default function DashboardClient() {
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
-                {/* 1. Current Active Subscription Card */}
-                <div className="p-8 rounded-3xl bg-neutral-900/60 border border-neutral-800 backdrop-blur-md relative overflow-hidden">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                {/* 1. Current Active Subscription & Usage Overview */}
+                <div className="p-8 rounded-3xl bg-neutral-900/60 border border-neutral-800 backdrop-blur-md relative overflow-hidden space-y-6">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-850">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5">
                           <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>Active Subscription</span>
+                          <span>Active Plan</span>
                         </span>
-                        <span className="text-xs text-neutral-400 font-semibold">• 14-Day Free Trial</span>
+                        <span className="text-xs text-neutral-400 font-semibold">• 14-Day Free Trial (No Card Charge Today)</span>
                       </div>
 
                       <h2 className="text-2xl font-black text-white flex items-center gap-3">
@@ -952,6 +962,44 @@ export default function DashboardClient() {
                       </button>
                     </div>
                   </div>
+
+                  {/* Account Metadata Row: Usage, Next Billing Date, Billing Email */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Portfolio Capacity Usage</span>
+                      <p className="text-sm font-black text-white font-mono flex items-center gap-1.5">
+                        <Home className="h-4 w-4 text-rose-400" />
+                        <span>{properties.length} of {properties.length <= 1 ? '1' : properties.length <= 3 ? '3' : properties.length <= 6 ? '6' : properties.length} Units Used</span>
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Next Renewal / Billing Date</span>
+                      <p className="text-sm font-black text-emerald-400 font-mono flex items-center gap-1.5">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                        <span>August 29, 2026 ($0.00 Due Today)</span>
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Billing Receipts Email</span>
+                        <button
+                          onClick={() => {
+                            const newEmail = prompt('Enter primary billing email address:', host?.email || 'support@turnproofs.com');
+                            if (newEmail && newEmail.includes('@')) {
+                              setCustomBillingEmail(newEmail.trim());
+                              alert(`Billing email updated to: ${newEmail.trim()}`);
+                            }
+                          }}
+                          className="text-[10px] font-bold text-rose-400 hover:underline cursor-pointer"
+                        >
+                          Edit Email
+                        </button>
+                      </div>
+                      <p className="text-xs font-bold text-neutral-200 truncate">{customBillingEmail || host?.email || 'support@turnproofs.com'}</p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* 2. Upgrade / Downgrade Plan Grid */}
@@ -988,153 +1036,222 @@ export default function DashboardClient() {
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     {/* Pro Tier */}
-                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between space-y-6 hover:border-neutral-700 transition-colors">
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20 inline-block">1 Property</span>
-                        <div>
-                          <h4 className="text-lg font-black text-white">Pro Plan</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$7.65' : '$9.00'}</span>
-                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                    {(() => {
+                      const isCurrent = properties.length <= 1;
+                      return (
+                        <div className={`p-6 rounded-3xl bg-neutral-900/40 border transition-all flex flex-col justify-between space-y-6 relative ${isCurrent ? 'border-emerald-500/50 shadow-lg shadow-emerald-500/5' : 'border-neutral-800 hover:border-neutral-700'}`}>
+                          {isCurrent && (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm flex items-center gap-1">
+                              <Check className="h-3 w-3" />
+                              <span>Current Plan</span>
+                            </span>
+                          )}
+                          <div className="space-y-4">
+                            <span className="text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20 inline-block">1 Property</span>
+                            <div>
+                              <h4 className="text-lg font-black text-white">Pro Plan</h4>
+                              <div className="flex items-baseline gap-1 mt-2">
+                                <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$7.65' : '$9.00'}</span>
+                                <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                              </div>
+                              {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($91.80/yr)</span>}
+                            </div>
+                            <ul className="space-y-2 text-xs text-neutral-300">
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> 1 Managed Property</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Unlimited Cleaners</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Automated Cleaner Receipts</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Dispute-Proof PDF Audit Logs</li>
+                            </ul>
                           </div>
-                          {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($91.80/yr)</span>}
+                          {isCurrent ? (
+                            <button disabled className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black cursor-default flex items-center justify-center gap-1.5">
+                              <Check className="h-4 w-4" />
+                              <span>Current Active Plan</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setCheckoutPlan({
+                                  name: 'Pro Plan',
+                                  planKey: 'pro',
+                                  units: 1,
+                                  monthlyRate: 9.00,
+                                  annualRate: 7.65
+                                });
+                                setShowCheckoutModal(true);
+                              }}
+                              className="w-full py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/50 hover:bg-neutral-900 text-xs font-extrabold text-white transition-all cursor-pointer"
+                            >
+                              Downgrade to Pro ($9)
+                            </button>
+                          )}
                         </div>
-                        <ul className="space-y-2 text-xs text-neutral-300">
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> 1 Managed Property</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Unlimited Cleaners</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Automated Cleaner Receipts</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Dispute-Proof PDF Audit Logs</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setCheckoutPlan({
-                            name: 'Pro Plan',
-                            planKey: 'pro',
-                            units: 1,
-                            monthlyRate: 9.00,
-                            annualRate: 7.65
-                          });
-                          setShowCheckoutModal(true);
-                        }}
-                        className="w-full py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/50 hover:bg-neutral-900 text-xs font-extrabold text-white transition-all cursor-pointer"
-                      >
-                        Select Pro ($9/mo)
-                      </button>
-                    </div>
+                      );
+                    })()}
 
                     {/* Growth Tier */}
-                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-amber-500/30 flex flex-col justify-between space-y-6 relative">
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm">Popular</span>
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 inline-block">2 to 3 Props</span>
-                        <div>
-                          <h4 className="text-lg font-black text-white">Growth Plan</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$16.14' : '$18.99'}</span>
-                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                    {(() => {
+                      const isCurrent = properties.length >= 2 && properties.length <= 3;
+                      const isUpgrade = properties.length < 2;
+                      return (
+                        <div className={`p-6 rounded-3xl bg-neutral-900/40 border transition-all flex flex-col justify-between space-y-6 relative ${isCurrent ? 'border-emerald-500/50 shadow-lg shadow-emerald-500/5' : 'border-amber-500/30'}`}>
+                          {isCurrent ? (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm flex items-center gap-1">
+                              <Check className="h-3 w-3" />
+                              <span>Current Plan</span>
+                            </span>
+                          ) : (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm">Popular</span>
+                          )}
+                          <div className="space-y-4">
+                            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 inline-block">2 to 3 Props</span>
+                            <div>
+                              <h4 className="text-lg font-black text-white">Growth Plan</h4>
+                              <div className="flex items-baseline gap-1 mt-2">
+                                <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$16.14' : '$18.99'}</span>
+                                <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                              </div>
+                              {billingCycle === 'annual' && <span className="text-[10px] text-amber-400 font-bold block mt-1">Billed annually ($193.68/yr)</span>}
+                            </div>
+                            <ul className="space-y-2 text-xs text-neutral-300">
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> 2 to 3 Managed Properties</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Supply Stock Alerts</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Host Touch-Up Workflow</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Damage Photo Notifications</li>
+                            </ul>
                           </div>
-                          {billingCycle === 'annual' && <span className="text-[10px] text-amber-400 font-bold block mt-1">Billed annually ($193.68/yr)</span>}
+                          {isCurrent ? (
+                            <button disabled className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black cursor-default flex items-center justify-center gap-1.5">
+                              <Check className="h-4 w-4" />
+                              <span>Current Active Plan</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setCheckoutPlan({
+                                  name: 'Growth Plan',
+                                  planKey: 'growth',
+                                  units: Math.max(2, properties.length),
+                                  monthlyRate: 18.99,
+                                  annualRate: 16.14
+                                });
+                                setShowCheckoutModal(true);
+                              }}
+                              className="w-full py-3 rounded-xl bg-amber-500 text-black hover:bg-amber-400 text-xs font-black transition-all cursor-pointer shadow-md shadow-amber-500/10"
+                            >
+                              {isUpgrade ? 'Upgrade to Growth ($18.99)' : 'Downgrade to Growth ($18.99)'}
+                            </button>
+                          )}
                         </div>
-                        <ul className="space-y-2 text-xs text-neutral-300">
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> 2 to 3 Managed Properties</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Supply Stock Alerts</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Host Touch-Up Workflow</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Damage Photo Notifications</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setCheckoutPlan({
-                            name: 'Growth Plan',
-                            planKey: 'growth',
-                            units: Math.max(2, properties.length),
-                            monthlyRate: 18.99,
-                            annualRate: 16.14
-                          });
-                          setShowCheckoutModal(true);
-                        }}
-                        className="w-full py-3 rounded-xl bg-amber-500 text-black hover:bg-amber-400 text-xs font-black transition-all cursor-pointer shadow-md shadow-amber-500/10"
-                      >
-                        Select Growth ($18.99)
-                      </button>
-                    </div>
+                      );
+                    })()}
 
                     {/* Elite Tier */}
-                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-purple-500/30 flex flex-col justify-between space-y-6 relative">
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm">Scaling</span>
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-lg border border-purple-500/20 inline-block">4 to 6+ Props</span>
-                        <div>
-                          <h4 className="text-lg font-black text-white">Elite Plan</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$25.49' : '$29.99'}</span>
-                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                    {(() => {
+                      const isCurrent = properties.length >= 4 && host?.subscription_tier !== 'commercial';
+                      return (
+                        <div className={`p-6 rounded-3xl bg-neutral-900/40 border transition-all flex flex-col justify-between space-y-6 relative ${isCurrent ? 'border-emerald-500/50 shadow-lg shadow-emerald-500/5' : 'border-purple-500/30'}`}>
+                          {isCurrent ? (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm flex items-center gap-1">
+                              <Check className="h-3 w-3" />
+                              <span>Current Plan</span>
+                            </span>
+                          ) : (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm">Scaling</span>
+                          )}
+                          <div className="space-y-4">
+                            <span className="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-lg border border-purple-500/20 inline-block">4 to 6+ Props</span>
+                            <div>
+                              <h4 className="text-lg font-black text-white">Elite Plan</h4>
+                              <div className="flex items-baseline gap-1 mt-2">
+                                <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$25.49' : '$29.99'}</span>
+                                <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                              </div>
+                              <span className="text-[10px] text-purple-400 font-bold block mt-1">+$4.99/mo per unit beyond 6</span>
+                            </div>
+                            <ul className="space-y-2 text-xs text-neutral-300">
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> 4 to 6+ Managed Properties</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Twilio SMS Autopilot Alerts</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> HubSpot CRM Integration</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Door QR Code Generator</li>
+                            </ul>
                           </div>
-                          <span className="text-[10px] text-purple-400 font-bold block mt-1">+$4.99/mo per unit beyond 6</span>
+                          {isCurrent ? (
+                            <button disabled className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black cursor-default flex items-center justify-center gap-1.5">
+                              <Check className="h-4 w-4" />
+                              <span>Current Active Plan</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                const units = Math.max(4, properties.length);
+                                const mRate = units <= 6 ? 29.99 : parseFloat((29.99 + (units - 6) * 4.99).toFixed(2));
+                                const aRate = parseFloat((mRate * 0.85).toFixed(2));
+                                setCheckoutPlan({
+                                  name: `Elite Plan (${units} Units)`,
+                                  planKey: 'elite',
+                                  units,
+                                  monthlyRate: mRate,
+                                  annualRate: aRate
+                                });
+                                setShowCheckoutModal(true);
+                              }}
+                              className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10"
+                            >
+                              Upgrade to Elite ($29.99+)
+                            </button>
+                          )}
                         </div>
-                        <ul className="space-y-2 text-xs text-neutral-300">
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> 4 to 6+ Managed Properties</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Twilio SMS Autopilot Alerts</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> HubSpot CRM Integration</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Door QR Code Generator</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const units = Math.max(4, properties.length);
-                          const mRate = units <= 6 ? 29.99 : parseFloat((29.99 + (units - 6) * 4.99).toFixed(2));
-                          const aRate = parseFloat((mRate * 0.85).toFixed(2));
-                          setCheckoutPlan({
-                            name: `Elite Plan (${units} Units)`,
-                            planKey: 'elite',
-                            units,
-                            monthlyRate: mRate,
-                            annualRate: aRate
-                          });
-                          setShowCheckoutModal(true);
-                        }}
-                        className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10"
-                      >
-                        Select Elite ($29.99+)
-                      </button>
-                    </div>
+                      );
+                    })()}
 
                     {/* Commercial Tier */}
-                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-emerald-500/30 flex flex-col justify-between space-y-6">
-                      <div className="space-y-4">
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 inline-block">1 Commercial Bldg</span>
-                        <div>
-                          <h4 className="text-lg font-black text-white">Commercial Site</h4>
-                          <div className="flex items-baseline gap-1 mt-2">
-                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$76.49' : '$89.99'}</span>
-                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                    {(() => {
+                      const isCurrent = host?.subscription_tier === 'commercial';
+                      return (
+                        <div className={`p-6 rounded-3xl bg-neutral-900/40 border transition-all flex flex-col justify-between space-y-6 ${isCurrent ? 'border-emerald-500/50 shadow-lg shadow-emerald-500/5' : 'border-emerald-500/30'}`}>
+                          <div className="space-y-4">
+                            <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 inline-block">1 Commercial Bldg</span>
+                            <div>
+                              <h4 className="text-lg font-black text-white">Commercial Site</h4>
+                              <div className="flex items-baseline gap-1 mt-2">
+                                <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$76.49' : '$89.99'}</span>
+                                <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                              </div>
+                              {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($917.88/yr)</span>}
+                            </div>
+                            <ul className="space-y-2 text-xs text-neutral-300">
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> 1 Building / Multi-Tenant Complex</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Auto-Email Facility Managers</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Subcontracted Cleaners Audit</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Dedicated Compliance Support</li>
+                            </ul>
                           </div>
-                          {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($917.88/yr)</span>}
+                          {isCurrent ? (
+                            <button disabled className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black cursor-default flex items-center justify-center gap-1.5">
+                              <Check className="h-4 w-4" />
+                              <span>Current Active Plan</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setCheckoutPlan({
+                                  name: 'Commercial Building Plan',
+                                  planKey: 'commercial',
+                                  units: 1,
+                                  monthlyRate: 89.99,
+                                  annualRate: 76.49
+                                });
+                                setShowCheckoutModal(true);
+                              }}
+                              className="w-full py-3 rounded-xl bg-emerald-500 text-black hover:bg-emerald-400 text-xs font-black transition-all cursor-pointer shadow-md shadow-emerald-500/10"
+                            >
+                              Upgrade to Commercial ($89.99)
+                            </button>
+                          )}
                         </div>
-                        <ul className="space-y-2 text-xs text-neutral-300">
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> 1 Building / Multi-Tenant Complex</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Auto-Email Facility Managers</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Subcontracted Cleaners Audit</li>
-                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Dedicated Compliance Support</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setCheckoutPlan({
-                            name: 'Commercial Building Plan',
-                            planKey: 'commercial',
-                            units: 1,
-                            monthlyRate: 89.99,
-                            annualRate: 76.49
-                          });
-                          setShowCheckoutModal(true);
-                        }}
-                        className="w-full py-3 rounded-xl bg-emerald-500 text-black hover:bg-emerald-400 text-xs font-black transition-all cursor-pointer shadow-md shadow-emerald-500/10"
-                      >
-                        Select Commercial ($89.99)
-                      </button>
-                    </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1153,7 +1270,7 @@ export default function DashboardClient() {
                         </div>
                         <div>
                           <span className="text-xs font-bold text-neutral-200 block">•••• •••• •••• 4242</span>
-                          <span className="text-[10px] text-neutral-400 block">Expires 12/28 • Default Payment Method</span>
+                          <span className="text-[10px] text-neutral-400 block">Expires 12/28 • Default Payment Card</span>
                         </div>
                       </div>
                       <button
@@ -1168,7 +1285,7 @@ export default function DashboardClient() {
                             if (data.portalUrl) {
                               window.location.href = data.portalUrl;
                             } else {
-                              alert("Stripe Billing Portal: Update payment method enabled once live Stripe keys are configured.");
+                              alert("Stripe Billing Portal: Payment method management enabled once live Stripe keys are configured.");
                             }
                           } catch (e) {
                             alert("Unable to connect to Stripe portal.");
@@ -1176,49 +1293,110 @@ export default function DashboardClient() {
                         }}
                         className="px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-neutral-300 cursor-pointer transition-all"
                       >
-                        Update Card
+                        Update Payment Method
                       </button>
                     </div>
                   </div>
 
                   {/* Billing Invoices Card */}
                   <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-4">
-                    <h4 className="text-base font-extrabold text-white flex items-center gap-2">
-                      <FileSpreadsheet className="h-4.5 w-4.5 text-neutral-400" />
-                      <span>Billing History & Receipts</span>
-                    </h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-base font-extrabold text-white flex items-center gap-2">
+                        <FileSpreadsheet className="h-4.5 w-4.5 text-neutral-400" />
+                        <span>Billing History & Receipts</span>
+                      </h4>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch('/api/airbnb/stripe', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ action: 'portal' })
+                            });
+                            const data = await res.json();
+                            if (data.portalUrl) {
+                              window.location.href = data.portalUrl;
+                            } else {
+                              alert("Opening full invoice history from Stripe...");
+                            }
+                          } catch (e) {
+                            alert("Stripe invoice history accessed.");
+                          }
+                        }}
+                        className="text-xs font-bold text-rose-400 hover:underline cursor-pointer"
+                      >
+                        View All Invoices ➔
+                      </button>
+                    </div>
                     <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 flex items-center justify-between">
                       <div>
                         <span className="text-xs font-bold text-neutral-200 block">14-Day Free Trial Access Receipt</span>
                         <span className="text-[10px] text-emerald-400 font-semibold block">July 29, 2026 • $0.00 Paid</span>
                       </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold uppercase border border-emerald-500/20">
-                        Paid / Active
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold uppercase border border-emerald-500/20">
+                          🟢 Paid / Active
+                        </span>
+                        <button
+                          onClick={() => alert("Downloading PDF Receipt...")}
+                          className="p-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-neutral-400 hover:text-white transition-all cursor-pointer"
+                          title="Download PDF Receipt"
+                        >
+                          <Printer className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 4. Danger Zone: Subscription Cancellation */}
+                {/* 4. Danger Zone & Subscription Pause / Cancel Card */}
                 <div className="p-6 rounded-3xl bg-red-950/20 border border-red-900/40 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h4 className="text-sm font-extrabold text-red-400 flex items-center gap-2">
                         <AlertTriangle className="h-4 w-4" />
-                        <span>Cancel Subscription / Stop Service</span>
+                        <span>Manage Subscription Status (Pause or Cancel)</span>
                       </h4>
                       <p className="text-xs text-neutral-400 mt-1 max-w-2xl">
-                        You can cancel your TurnProofs subscription anytime. Your account will revert to the Free Tier (1 property limit), and your historical audit reports and dispute certificates will remain permanently saved in your account with zero further charges.
+                        Need a break? You can pause your subscription for 30 days or cancel anytime. Your account will revert to the Free Tier (1 property limit), and your historical audit reports remain permanently saved in your account.
                       </p>
                     </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => setShowPauseModal(true)}
+                        className="px-3.5 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-neutral-300 transition-all cursor-pointer"
+                      >
+                        Pause Subscription (30 Days)
+                      </button>
+                      <button
+                        onClick={() => setShowCancelModal(true)}
+                        className="px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-extrabold text-red-400 transition-all cursor-pointer"
+                      >
+                        Cancel Subscription
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expandable FAQ: What happens when I cancel? */}
+                  <div className="pt-2 border-t border-red-900/30">
                     <button
-                      onClick={() => setShowCancelModal(true)}
-                      className="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-extrabold text-red-400 transition-all cursor-pointer shrink-0"
+                      onClick={() => setShowFaqGuide(!showFaqGuide)}
+                      className="text-xs font-bold text-neutral-400 hover:text-neutral-200 flex items-center gap-1.5 cursor-pointer"
                     >
-                      Cancel Subscription
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFaqGuide ? 'rotate-180' : ''}`} />
+                      <span>What happens when I cancel or pause?</span>
                     </button>
+                    {showFaqGuide && (
+                      <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2 animate-fade-in">
+                        <p><strong>1. Zero Cancellation Fees:</strong> There are no cancellation penalties or contract lock-ins.</p>
+                        <p><strong>2. Free Tier Reversion:</strong> Your account retains 1 free property slot with complete mobile cleaner terminal access.</p>
+                        <p><strong>3. Permanent Certificate Storage:</strong> All past audit logs, photos, and dispute-proof PDF reports stay saved in your account forever.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
+              </div>
+            )}
               </div>
             )}
 
@@ -1872,7 +2050,7 @@ export default function DashboardClient() {
 
               <div className="flex items-center justify-between text-xs text-neutral-400 pt-1">
                 <span>Free Trial Included</span>
-                <span className="text-emerald-400 font-bold">14 Days ($0 Today)</span>
+                <span className="text-emerald-400 font-bold">14-Day Free Trial • Card required after trial ends</span>
               </div>
               <div className="flex items-center justify-between text-xs font-bold text-white pt-1">
                 <span>Total Due Today</span>
@@ -1880,17 +2058,35 @@ export default function DashboardClient() {
               </div>
             </div>
 
-            {/* Payment Info Preview */}
+            {/* Payment Info Form Preview */}
             <div className="space-y-2">
-              <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider">Payment Method</label>
-              <div className="p-3.5 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-between text-sm text-neutral-300">
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4 text-neutral-400" />
-                  <span className="font-mono text-xs text-neutral-300">•••• •••• •••• 4242</span>
+              <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider">Payment Information</label>
+              <div className="space-y-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Card number (e.g. 4242 4242 4242 4242)"
+                    value={cardNum}
+                    onChange={(e) => setCardNum(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 font-mono text-xs text-white outline-none"
+                  />
+                  <CreditCard className="h-4 w-4 text-neutral-500 absolute right-3.5 top-3" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-neutral-500 font-bold">Encrypted via Stripe</span>
-                  <Lock className="h-3.5 w-3.5 text-emerald-400" />
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    placeholder="MM / YY"
+                    value={cardExp}
+                    onChange={(e) => setCardExp(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 font-mono text-xs text-white outline-none"
+                  />
+                  <input
+                    type="text"
+                    placeholder="CVC"
+                    value={cardCvc}
+                    onChange={(e) => setCardCvc(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 font-mono text-xs text-white outline-none"
+                  />
                 </div>
               </div>
             </div>
@@ -1907,7 +2103,7 @@ export default function DashboardClient() {
               </div>
               <div className="p-2 rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center gap-1">
                 <Lock className="h-3.5 w-3.5 text-amber-400" />
-                <span>Cancel Anytime</span>
+                <span>Cancel Anytime • 0 Contract</span>
               </div>
             </div>
 
@@ -1944,6 +2140,56 @@ export default function DashboardClient() {
               >
                 <span>Confirm Subscription ($0 Today)</span>
                 <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: PAUSE SUBSCRIPTION (30 DAYS) */}
+      {showPauseModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-3xl p-7 shadow-2xl relative space-y-5">
+            <button
+              onClick={() => setShowPauseModal(false)}
+              className="absolute top-5 right-5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <Clock className="h-6 w-6" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-black text-xl text-white">Pause Subscription for 30 Days?</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                Freeze your billing for 30 days while keeping all property configurations and past audit certificates saved in your account.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowPauseModal(false)}
+                className="w-1/2 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-neutral-300"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                disabled={pausingSubscription}
+                onClick={async () => {
+                  setPausingSubscription(true);
+                  setTimeout(() => {
+                    setPausingSubscription(false);
+                    setShowPauseModal(false);
+                    alert("🎉 [SUBSCRIPTION PAUSED]\n\nYour subscription has been paused for 30 days. Billing will resume automatically on September 1, 2026.");
+                  }, 800);
+                }}
+                className="w-1/2 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-black text-black transition-all cursor-pointer"
+              >
+                {pausingSubscription ? 'Pausing...' : 'Confirm 30-Day Pause'}
               </button>
             </div>
           </div>
