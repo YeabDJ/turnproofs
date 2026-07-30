@@ -964,7 +964,7 @@ export default function DashboardClient() {
                           <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[3.3%]" />
                         </div>
                         <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
-                          <span>📧 Automated Phase 2 Email Reminder: {fmt(phase2UnlockDate)} at 12:00 PM</span>
+                          <span>📧 Email Reminder Scheduled: {fmt(phase2UnlockDate)} at 12:00 PM</span>
                           <span className="text-neutral-300 font-semibold">$0.00 Due Today</span>
                         </div>
                       </div>
