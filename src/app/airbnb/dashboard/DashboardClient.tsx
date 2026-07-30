@@ -100,7 +100,7 @@ export default function DashboardClient() {
   const [showFaqGuide, setShowFaqGuide] = useState(false);
   const [editingBillingEmail, setEditingBillingEmail] = useState(false);
   const [customBillingEmail, setCustomBillingEmail] = useState('');
-  const [emailRemindersEnabled, setEmailRemindersEnabled] = useState(true);
+  const [emailRemindersEnabled, setEmailRemindersEnabled] = useState(false);
   
   // Card form state for first-time checkout
   const [cardNum, setCardNum] = useState('');
@@ -2359,7 +2359,7 @@ export default function DashboardClient() {
             <div className="space-y-2">
               <h3 className="font-black text-xl text-white">Pause Subscription for 30 Days?</h3>
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Freeze your billing for 30 days. All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover.
+                Freeze your billing for 30 days. On Day 27, an automated email reminder is sent to your billing address. If no action is taken, your subscription automatically resumes on Day 30 so turnover checklists continue running smoothly.
               </p>
             </div>
 
