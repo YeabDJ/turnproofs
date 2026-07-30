@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check } from 'lucide-react';
+import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle } from 'lucide-react';
 import DemoVideoPlayer from './components/DemoVideoPlayer';
 
 export default function AirbnbLanding() {
   const [isAnnual, setIsAnnual] = useState(true);
   const [authHost, setAuthHost] = useState<any>(null);
   const [calcUnits, setCalcUnits] = useState(3);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const calcPrice = calcUnits === 1 
     ? (isAnnual ? '$7.65' : '$9.00') 
@@ -557,6 +558,70 @@ export default function AirbnbLanding() {
         </div>
       </section>
 
+      {/* Frequently Asked Questions (FAQ) Section */}
+      <section className="py-20 px-6 max-w-4xl mx-auto border-t border-neutral-900">
+        <div className="text-center space-y-3 mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-extrabold uppercase tracking-wider">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span>Got Questions?</span>
+          </div>
+          <h2 className="text-3xl font-black text-white">Frequently Asked Questions</h2>
+          <p className="text-sm text-neutral-400 max-w-lg mx-auto">Everything you need to know about dispute proofing, cleaner tracking, and property audits.</p>
+        </div>
+
+        <div className="space-y-4">
+          {[
+            {
+              q: "How does TurnProofs protect me against false guest cleanliness refund claims?",
+              a: "Cleaners record timestamped high-resolution photo proofs, room-by-room checklist completions, and verified GPS check-in location coordinates before guest arrival. TurnProofs compiles these into an official PDF Audit Certificate with a shareable verification link to submit directly to Airbnb Support or VRBO resolution centers."
+            },
+            {
+              q: "Do my cleaners need to download an app or create an account?",
+              a: "Zero app downloads or logins required. Cleaners simply scan a door QR code or tap a 1-click magic link sent via text/email to open their mobile checklist in any smartphone browser."
+            },
+            {
+              q: "What happens if a cleaner spots damage or missing supplies during turnover?",
+              a: "Cleaners can attach photo evidence and flag maintenance issues or low inventory stock directly inside their checklist. TurnProofs instantly alerts you with room details so you can fix issues before check-in."
+            },
+            {
+              q: "Can I customize cleaning checklists for different properties?",
+              a: "Yes! The Host Control Center includes a Room Checklist Builder where you can group tasks by specific rooms (e.g. [Master Bedroom], [Kitchen]), set photo requirements, and order tasks."
+            },
+            {
+              q: "How does the 14-day free trial work?",
+              a: "You get 14 days of full feature access with $0 charged today. You can upgrade, change plans, pause for 30 days, or cancel anytime with zero contracts or hidden fees."
+            },
+            {
+              q: "Can I auto-send audit certificates to facility managers or clients?",
+              a: "Yes! Under Growth, Elite, and Commercial plans, you can configure secondary notification email addresses so completed cleaning reports deliver automatically to inspectors or building managers upon cleaner completion."
+            }
+          ].map((faq, idx) => {
+            const isOpen = openFaqIndex === idx;
+            return (
+              <div
+                key={idx}
+                className={`rounded-2xl border transition-all overflow-hidden ${
+                  isOpen ? 'bg-neutral-900/60 border-rose-500/40 shadow-lg shadow-rose-500/5' : 'bg-neutral-900/30 border-neutral-850 hover:border-neutral-800'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-extrabold text-sm text-white cursor-pointer"
+                >
+                  <span>{faq.q}</span>
+                  <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isOpen && (
+                  <div className="px-5 pb-5 pt-1 text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60 animate-fade-in">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="border-t border-neutral-900 py-12 px-6 bg-neutral-950 text-center text-neutral-500 text-sm">
