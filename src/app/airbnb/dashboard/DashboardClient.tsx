@@ -23,7 +23,12 @@ import {
   RefreshCw,
   ExternalLink,
   QrCode,
-  Printer
+  Printer,
+  CreditCard,
+  Lock,
+  Shield,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react';
 
 interface Property {
@@ -77,7 +82,15 @@ export default function DashboardClient() {
   const [lang, setLang] = useState<'en' | 'es'>('en');
 
   // Tabs
-  const [activeTab, setActiveTab] = useState<'properties' | 'cleaners' | 'reports'>('properties');
+  const [activeTab, setActiveTab] = useState<'properties' | 'cleaners' | 'reports' | 'billing'>('properties');
+
+  // Billing & Subscription states
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
+  const [showCheckoutModal, setShowCheckoutModal] = useState(false);
+  const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelingSubscription, setCancelingSubscription] = useState(false);
+  const [cancelSuccessMsg, setCancelSuccessMsg] = useState<string | null>(null);
 
   // Database lists
   const [properties, setProperties] = useState<Property[]>([]);
@@ -502,71 +515,24 @@ export default function DashboardClient() {
           <div className="flex items-center gap-3">
             <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-neutral-200">
-                {properties.length <= 1 
-                  ? `Plan Status: 14-Day Free Trial (Full Access). Portfolio: ${properties.length} property.` 
-                  : properties.length <= 3
-                  ? `Plan Status: Growth Tier ($18.99/mo). Portfolio: ${properties.length} properties ($6.33/unit).`
-                  : properties.length <= 6
-                  ? `Plan Status: Elite Tier ($29.99/mo). Portfolio: ${properties.length} properties.`
-                  : `Plan Status: Elite Scaling ($${(29.99 + (properties.length - 6) * 4.99).toFixed(2)}/mo). Portfolio: ${properties.length} units ($29.99 + ${properties.length - 6} × $4.99/mo).`
-                }
-              </p>
-              <p className="text-xs text-neutral-400">
-                ⚡ 14-Day Full Access Free Trial Active. No credit card required upfront. Choose a plan anytime to unlock automated receipt emails & facility modes.
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  {properties.length <= 1 ? '14-Day Free Trial' : properties.length <= 3 ? 'Growth Tier' : properties.length <= 6 ? 'Elite Tier' : 'Elite Scaling'}
+                </span>
+                <span className="text-xs text-neutral-400 font-semibold">({properties.length} Active {properties.length === 1 ? 'Unit' : 'Units'})</span>
+              </div>
+              <p className="text-xs text-neutral-400 mt-1">
+                Full feature access active. Manage your billing, plan scaling, and payment methods in your Billing tab.
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              onClick={async () => {
-                try {
-                  const targetPlan = properties.length <= 1 ? 'pro' : properties.length <= 3 ? 'growth' : 'elite';
-                  const res = await fetch('/api/airbnb/stripe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan: targetPlan, propertiesCount: properties.length })
-                  });
-                  const data = await res.json();
-                  if (data.checkoutUrl) {
-                    window.location.href = data.checkoutUrl;
-                  } else if (data.demo) {
-                    alert(`[PAYMENT CHECKOUT ACCESSED]\n\nPlan: ${data.planName}\nAmount: $${data.amount}/mo\n\n${data.message}`);
-                  }
-                } catch (e) {
-                  alert("Unable to open checkout portal.");
-                }
-              }}
-              className="px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-extrabold transition-all shadow-md shadow-rose-500/10 cursor-pointer text-white flex items-center gap-1.5"
-            >
-              <span>Manage Plan & Card ($9 - $29.99/mo)</span>
-              <ExternalLink className="h-3.5 w-3.5" />
-            </button>
-
-            <button
-              onClick={async () => {
-                if (!confirm("Are you sure you want to cancel your subscription or stop using TurnProofs? Your account will revert to the Free Tier (1 property limit) with zero further charges.")) return;
-                try {
-                  const res = await fetch('/api/airbnb/stripe', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'cancel' })
-                  });
-                  const data = await res.json();
-                  if (data.portalUrl) {
-                    window.location.href = data.portalUrl;
-                  } else if (data.demo) {
-                    alert(`[SUBSCRIPTION CANCELED]\n\n${data.message}`);
-                  }
-                } catch (e) {
-                  alert("Unable to process cancellation.");
-                }
-              }}
-              className="px-3 py-2 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-red-500/40 hover:bg-red-500/10 text-xs font-bold text-neutral-400 hover:text-red-400 transition-all cursor-pointer"
-            >
-              Cancel Subscription
-            </button>
-          </div>
+          <button
+            onClick={() => setActiveTab('billing')}
+            className="px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-extrabold transition-all shadow-md shadow-rose-500/10 cursor-pointer text-white flex items-center gap-1.5 shrink-0"
+          >
+            <CreditCard className="h-4 w-4" />
+            <span>Manage Billing & Subscription</span>
+          </button>
         </div>
 
         {/* Statistics Widgets */}
@@ -592,10 +558,10 @@ export default function DashboardClient() {
         </div>
 
         {/* Tab Controls */}
-        <div className="flex items-center border-b border-neutral-800 mb-8 gap-6">
+        <div className="flex items-center border-b border-neutral-800 mb-8 gap-6 overflow-x-auto">
           <button
             onClick={() => setActiveTab('properties')}
-            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 shrink-0 ${
               activeTab === 'properties'
                 ? 'border-rose-500 text-rose-500'
                 : 'border-transparent text-neutral-400 hover:text-neutral-200'
@@ -606,7 +572,7 @@ export default function DashboardClient() {
           </button>
           <button
             onClick={() => setActiveTab('cleaners')}
-            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 shrink-0 ${
               activeTab === 'cleaners'
                 ? 'border-rose-500 text-rose-500'
                 : 'border-transparent text-neutral-400 hover:text-neutral-200'
@@ -617,7 +583,7 @@ export default function DashboardClient() {
           </button>
           <button
             onClick={() => setActiveTab('reports')}
-            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 shrink-0 ${
               activeTab === 'reports'
                 ? 'border-rose-500 text-rose-500'
                 : 'border-transparent text-neutral-400 hover:text-neutral-200'
@@ -625,6 +591,17 @@ export default function DashboardClient() {
           >
             <FileSpreadsheet className="h-4.5 w-4.5" />
             <span>Reports History</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('billing')}
+            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'billing'
+                ? 'border-rose-500 text-rose-500'
+                : 'border-transparent text-neutral-400 hover:text-neutral-200'
+            }`}
+          >
+            <CreditCard className="h-4.5 w-4.5" />
+            <span>Billing & Subscription</span>
           </button>
         </div>
 
@@ -917,6 +894,327 @@ export default function DashboardClient() {
                     </div>
                   </div>
                 )}
+            {/* TAB 4: BILLING & SUBSCRIPTION */}
+            {activeTab === 'billing' && (
+              <div className="space-y-10">
+                {/* 1. Current Active Subscription Card */}
+                <div className="p-8 rounded-3xl bg-neutral-900/60 border border-neutral-800 backdrop-blur-md relative overflow-hidden">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>Active Subscription</span>
+                        </span>
+                        <span className="text-xs text-neutral-400 font-semibold">• 14-Day Free Trial</span>
+                      </div>
+
+                      <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                        <span>
+                          {properties.length <= 1 
+                            ? 'Pro Plan (1 Property)' 
+                            : properties.length <= 3 
+                            ? 'Growth Plan (2-3 Properties)' 
+                            : properties.length <= 6 
+                            ? 'Elite Plan (4-6 Properties)' 
+                            : `Elite Scaling Plan (${properties.length} Properties)`}
+                        </span>
+                      </h2>
+
+                      <p className="text-sm text-neutral-400">
+                        Current portfolio rate: <strong className="text-white font-mono">$
+                          {properties.length <= 1 ? '9.00' : properties.length <= 3 ? '18.99' : (29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)}
+                        /mo</strong> ({properties.length} active unit{properties.length === 1 ? '' : 's'})
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <button
+                        onClick={() => {
+                          const targetPlan = properties.length <= 1 ? 'pro' : properties.length <= 3 ? 'growth' : 'elite';
+                          setCheckoutPlan({
+                            name: properties.length <= 1 ? 'Pro Plan' : properties.length <= 3 ? 'Growth Plan' : 'Elite Plan',
+                            planKey: targetPlan,
+                            units: properties.length,
+                            monthlyRate: properties.length <= 1 ? 9.00 : properties.length <= 3 ? 18.99 : parseFloat((29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)),
+                            annualRate: properties.length <= 1 ? 7.65 : properties.length <= 3 ? 16.14 : parseFloat(((29.99 + Math.max(0, properties.length - 6) * 4.99) * 0.85).toFixed(2))
+                          });
+                          setShowCheckoutModal(true);
+                        }}
+                        className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-sm font-black text-white shadow-lg shadow-rose-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        <CreditCard className="h-4.5 w-4.5" />
+                        <span>Manage / Change Plan</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Upgrade / Downgrade Plan Grid */}
+                <div className="space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-xl font-extrabold text-white">Select or Upgrade Your Plan</h3>
+                      <p className="text-xs text-neutral-400">Scale your short-term rental portfolio with 0 hidden fees or contracts.</p>
+                    </div>
+
+                    {/* Billing Cycle Toggle */}
+                    <div className="inline-flex items-center p-1 rounded-2xl bg-neutral-950 border border-neutral-800 self-start">
+                      <button
+                        type="button"
+                        onClick={() => setBillingCycle('monthly')}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          billingCycle === 'monthly' ? 'bg-neutral-800 text-white shadow-sm' : 'text-neutral-400 hover:text-neutral-200'
+                        }`}
+                      >
+                        Monthly Billing
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setBillingCycle('annual')}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                          billingCycle === 'annual' ? 'bg-rose-500 text-white shadow-sm' : 'text-neutral-400 hover:text-neutral-200'
+                        }`}
+                      >
+                        <span>Annual Billing</span>
+                        <span className="px-1.5 py-0.5 rounded bg-black/30 text-[9px] font-extrabold text-white">15% OFF</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Pro Tier */}
+                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between space-y-6 hover:border-neutral-700 transition-colors">
+                      <div className="space-y-4">
+                        <span className="text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/20 inline-block">1 Property</span>
+                        <div>
+                          <h4 className="text-lg font-black text-white">Pro Plan</h4>
+                          <div className="flex items-baseline gap-1 mt-2">
+                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$7.65' : '$9.00'}</span>
+                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                          </div>
+                          {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($91.80/yr)</span>}
+                        </div>
+                        <ul className="space-y-2 text-xs text-neutral-300">
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> 1 Managed Property</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Unlimited Cleaners</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Automated Cleaner Receipts</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Dispute-Proof PDF Audit Logs</li>
+                        </ul>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCheckoutPlan({
+                            name: 'Pro Plan',
+                            planKey: 'pro',
+                            units: 1,
+                            monthlyRate: 9.00,
+                            annualRate: 7.65
+                          });
+                          setShowCheckoutModal(true);
+                        }}
+                        className="w-full py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/50 hover:bg-neutral-900 text-xs font-extrabold text-white transition-all cursor-pointer"
+                      >
+                        Select Pro ($9/mo)
+                      </button>
+                    </div>
+
+                    {/* Growth Tier */}
+                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-amber-500/30 flex flex-col justify-between space-y-6 relative">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm">Popular</span>
+                      <div className="space-y-4">
+                        <span className="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20 inline-block">2 to 3 Props</span>
+                        <div>
+                          <h4 className="text-lg font-black text-white">Growth Plan</h4>
+                          <div className="flex items-baseline gap-1 mt-2">
+                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$16.14' : '$18.99'}</span>
+                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                          </div>
+                          {billingCycle === 'annual' && <span className="text-[10px] text-amber-400 font-bold block mt-1">Billed annually ($193.68/yr)</span>}
+                        </div>
+                        <ul className="space-y-2 text-xs text-neutral-300">
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> 2 to 3 Managed Properties</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Supply Stock Alerts</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Host Touch-Up Workflow</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-amber-400 shrink-0" /> Damage Photo Notifications</li>
+                        </ul>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCheckoutPlan({
+                            name: 'Growth Plan',
+                            planKey: 'growth',
+                            units: Math.max(2, properties.length),
+                            monthlyRate: 18.99,
+                            annualRate: 16.14
+                          });
+                          setShowCheckoutModal(true);
+                        }}
+                        className="w-full py-3 rounded-xl bg-amber-500 text-black hover:bg-amber-400 text-xs font-black transition-all cursor-pointer shadow-md shadow-amber-500/10"
+                      >
+                        Select Growth ($18.99)
+                      </button>
+                    </div>
+
+                    {/* Elite Tier */}
+                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-purple-500/30 flex flex-col justify-between space-y-6 relative">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm">Scaling</span>
+                      <div className="space-y-4">
+                        <span className="text-xs font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2.5 py-1 rounded-lg border border-purple-500/20 inline-block">4 to 6+ Props</span>
+                        <div>
+                          <h4 className="text-lg font-black text-white">Elite Plan</h4>
+                          <div className="flex items-baseline gap-1 mt-2">
+                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$25.49' : '$29.99'}</span>
+                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                          </div>
+                          <span className="text-[10px] text-purple-400 font-bold block mt-1">+$4.99/mo per unit beyond 6</span>
+                        </div>
+                        <ul className="space-y-2 text-xs text-neutral-300">
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> 4 to 6+ Managed Properties</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Twilio SMS Autopilot Alerts</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> HubSpot CRM Integration</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Door QR Code Generator</li>
+                        </ul>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const units = Math.max(4, properties.length);
+                          const mRate = units <= 6 ? 29.99 : parseFloat((29.99 + (units - 6) * 4.99).toFixed(2));
+                          const aRate = parseFloat((mRate * 0.85).toFixed(2));
+                          setCheckoutPlan({
+                            name: `Elite Plan (${units} Units)`,
+                            planKey: 'elite',
+                            units,
+                            monthlyRate: mRate,
+                            annualRate: aRate
+                          });
+                          setShowCheckoutModal(true);
+                        }}
+                        className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10"
+                      >
+                        Select Elite ($29.99+)
+                      </button>
+                    </div>
+
+                    {/* Commercial Tier */}
+                    <div className="p-6 rounded-3xl bg-neutral-900/40 border border-emerald-500/30 flex flex-col justify-between space-y-6">
+                      <div className="space-y-4">
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20 inline-block">1 Commercial Bldg</span>
+                        <div>
+                          <h4 className="text-lg font-black text-white">Commercial Site</h4>
+                          <div className="flex items-baseline gap-1 mt-2">
+                            <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$76.49' : '$89.99'}</span>
+                            <span className="text-xs text-neutral-400 font-semibold">/ month</span>
+                          </div>
+                          {billingCycle === 'annual' && <span className="text-[10px] text-emerald-400 font-bold block mt-1">Billed annually ($917.88/yr)</span>}
+                        </div>
+                        <ul className="space-y-2 text-xs text-neutral-300">
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> 1 Building / Multi-Tenant Complex</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Auto-Email Facility Managers</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Subcontracted Cleaners Audit</li>
+                          <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> Dedicated Compliance Support</li>
+                        </ul>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setCheckoutPlan({
+                            name: 'Commercial Building Plan',
+                            planKey: 'commercial',
+                            units: 1,
+                            monthlyRate: 89.99,
+                            annualRate: 76.49
+                          });
+                          setShowCheckoutModal(true);
+                        }}
+                        className="w-full py-3 rounded-xl bg-emerald-500 text-black hover:bg-emerald-400 text-xs font-black transition-all cursor-pointer shadow-md shadow-emerald-500/10"
+                      >
+                        Select Commercial ($89.99)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Payment Method & Invoice History */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Payment Method Card */}
+                  <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-4">
+                    <h4 className="text-base font-extrabold text-white flex items-center gap-2">
+                      <CreditCard className="h-4.5 w-4.5 text-neutral-400" />
+                      <span>Payment Method</span>
+                    </h4>
+                    <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-9 w-12 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center font-bold text-xs text-neutral-300">
+                          VISA
+                        </div>
+                        <div>
+                          <span className="text-xs font-bold text-neutral-200 block">•••• •••• •••• 4242</span>
+                          <span className="text-[10px] text-neutral-400 block">Expires 12/28 • Default Payment Method</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch('/api/airbnb/stripe', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ action: 'portal' })
+                            });
+                            const data = await res.json();
+                            if (data.portalUrl) {
+                              window.location.href = data.portalUrl;
+                            } else {
+                              alert("Stripe Billing Portal: Update payment method enabled once live Stripe keys are configured.");
+                            }
+                          } catch (e) {
+                            alert("Unable to connect to Stripe portal.");
+                          }
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-neutral-300 cursor-pointer transition-all"
+                      >
+                        Update Card
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Billing Invoices Card */}
+                  <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-4">
+                    <h4 className="text-base font-extrabold text-white flex items-center gap-2">
+                      <FileSpreadsheet className="h-4.5 w-4.5 text-neutral-400" />
+                      <span>Billing History & Receipts</span>
+                    </h4>
+                    <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-neutral-200 block">14-Day Free Trial Access Receipt</span>
+                        <span className="text-[10px] text-emerald-400 font-semibold block">July 29, 2026 • $0.00 Paid</span>
+                      </div>
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold uppercase border border-emerald-500/20">
+                        Paid / Active
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Danger Zone: Subscription Cancellation */}
+                <div className="p-6 rounded-3xl bg-red-950/20 border border-red-900/40 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-extrabold text-red-400 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        <span>Cancel Subscription / Stop Service</span>
+                      </h4>
+                      <p className="text-xs text-neutral-400 mt-1 max-w-2xl">
+                        You can cancel your TurnProofs subscription anytime. Your account will revert to the Free Tier (1 property limit), and your historical audit reports and dispute certificates will remain permanently saved in your account with zero further charges.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setShowCancelModal(true)}
+                      className="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs font-extrabold text-red-400 transition-all cursor-pointer shrink-0"
+                    >
+                      Cancel Subscription
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1527,6 +1825,186 @@ export default function DashboardClient() {
                 className="flex-1 py-3 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-extrabold text-xs text-black transition-all shadow-md shadow-emerald-500/20 disabled:opacity-50 cursor-pointer"
               >
                 {upgradingTier ? 'Upgrading...' : '⚡ Unlock Commercial Plan ($89.99)'}
+              </button>
+            </div>
+      {/* MODAL: EMBEDDED HIGH-TRUST STRIPE CHECKOUT */}
+      {showCheckoutModal && checkoutPlan && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl relative space-y-6">
+            <button
+              onClick={() => setShowCheckoutModal(false)}
+              className="absolute top-5 right-5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-extrabold uppercase tracking-wider">
+                <Lock className="h-3 w-3" />
+                <span>256-Bit SSL Encrypted Checkout</span>
+              </div>
+              <h3 className="font-black text-2xl text-white">Subscribe to TurnProofs</h3>
+              <p className="text-xs text-neutral-400">Confirm your subscription to activate full property verification automation.</p>
+            </div>
+
+            {/* Order Summary Box */}
+            <div className="p-5 rounded-2xl bg-neutral-950 border border-neutral-800 space-y-3">
+              <div className="flex justify-between items-center pb-3 border-b border-neutral-850">
+                <div>
+                  <span className="text-sm font-black text-white block">{checkoutPlan.name}</span>
+                  <span className="text-xs text-neutral-400">{checkoutPlan.units} Managed Unit{checkoutPlan.units === 1 ? '' : 's'} • {billingCycle === 'annual' ? 'Annual Billing (15% OFF)' : 'Monthly Billing'}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-black text-white block font-mono">
+                    ${billingCycle === 'annual' ? checkoutPlan.annualRate : checkoutPlan.monthlyRate}
+                  </span>
+                  <span className="text-[10px] text-neutral-400 font-semibold uppercase">per month</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs text-neutral-400 pt-1">
+                <span>Free Trial Included</span>
+                <span className="text-emerald-400 font-bold">14 Days ($0 Today)</span>
+              </div>
+              <div className="flex items-center justify-between text-xs font-bold text-white pt-1">
+                <span>Total Due Today</span>
+                <span className="text-lg font-black text-emerald-400 font-mono">$0.00</span>
+              </div>
+            </div>
+
+            {/* Payment Info Preview */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider">Payment Method</label>
+              <div className="p-3.5 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-between text-sm text-neutral-300">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-4 w-4 text-neutral-400" />
+                  <span className="font-mono text-xs text-neutral-300">•••• •••• •••• 4242</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-neutral-500 font-bold">Encrypted via Stripe</span>
+                  <Lock className="h-3.5 w-3.5 text-emerald-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-2 py-1 text-center text-[10px] text-neutral-400 font-medium">
+              <div className="p-2 rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center gap-1">
+                <Shield className="h-3.5 w-3.5 text-rose-400" />
+                <span>Stripe Encrypted</span>
+              </div>
+              <div className="p-2 rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                <span>14-Day Free Trial</span>
+              </div>
+              <div className="p-2 rounded-xl bg-neutral-950 border border-neutral-850 flex flex-col items-center gap-1">
+                <Lock className="h-3.5 w-3.5 text-amber-400" />
+                <span>Cancel Anytime</span>
+              </div>
+            </div>
+
+            {/* CTA Action Buttons */}
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCheckoutModal(false)}
+                className="w-1/3 py-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:bg-neutral-850 text-xs font-bold text-neutral-400 hover:text-white transition-all cursor-pointer"
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/airbnb/stripe', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ plan: checkoutPlan.planKey, propertiesCount: checkoutPlan.units })
+                    });
+                    const data = await res.json();
+                    if (data.checkoutUrl) {
+                      window.location.href = data.checkoutUrl;
+                    } else if (data.demo) {
+                      setShowCheckoutModal(false);
+                      alert(`🎉 [SUBSCRIPTION CONFIRMED]\n\nPlan: ${checkoutPlan.name}\nBilling Cycle: ${billingCycle.toUpperCase()}\nMonthly Rate: $${billingCycle === 'annual' ? checkoutPlan.annualRate : checkoutPlan.monthlyRate}/mo\n\nYour 14-day free trial is active with full access! Add STRIPE_SECRET_KEY to Vercel environment variables whenever you want live card processing.`);
+                    }
+                  } catch (e) {
+                    alert("Unable to process subscription.");
+                  }
+                }}
+                className="w-2/3 py-3.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-black text-white shadow-lg shadow-rose-500/20 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <span>Confirm Subscription ($0 Today)</span>
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: 2-STEP CONFIRM SUBSCRIPTION CANCELLATION */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-3xl p-7 shadow-2xl relative space-y-5">
+            <button
+              onClick={() => setShowCancelModal(false)}
+              className="absolute top-5 right-5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="h-12 w-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-black text-xl text-white">Cancel Your Subscription?</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                Are you sure you want to cancel your TurnProofs subscription? Your account will revert to the Free Tier (1 property limit) at the end of your billing cycle.
+              </p>
+              <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 text-[11px] text-neutral-300 space-y-1">
+                <span className="font-bold text-white block">What happens when you cancel:</span>
+                <p>• Zero future charges will occur.</p>
+                <p>• Your historical audit certificates and reports remain permanently saved.</p>
+                <p>• You can re-activate or upgrade anytime in 1 click.</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCancelModal(false)}
+                className="w-1/2 py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:bg-neutral-850 text-xs font-bold text-neutral-300 transition-all cursor-pointer"
+              >
+                Keep My Plan
+              </button>
+              <button
+                type="button"
+                disabled={cancelingSubscription}
+                onClick={async () => {
+                  setCancelingSubscription(true);
+                  try {
+                    const res = await fetch('/api/airbnb/stripe', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ action: 'cancel' })
+                    });
+                    const data = await res.json();
+                    setCancelingSubscription(false);
+                    setShowCancelModal(false);
+                    if (data.portalUrl) {
+                      window.location.href = data.portalUrl;
+                    } else if (data.demo) {
+                      alert(`[SUBSCRIPTION CANCELED]\n\nYour plan has been canceled and reverted to Free Tier. Zero further charges will occur.`);
+                    }
+                  } catch (e) {
+                    setCancelingSubscription(false);
+                    alert("Unable to process cancellation.");
+                  }
+                }}
+                className="w-1/2 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black text-white transition-all cursor-pointer flex items-center justify-center gap-1"
+              >
+                {cancelingSubscription ? 'Canceling...' : 'Confirm Cancellation'}
               </button>
             </div>
           </div>
