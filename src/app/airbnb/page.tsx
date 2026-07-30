@@ -288,7 +288,7 @@ export default function AirbnbLanding() {
           </div>
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-amber-400" />
-            <span>$2M+ Dispute Payout Protection Standards</span>
+            <span>Zero Long-Term Data Storage — Your Files, Your Archive</span>
           </div>
         </div>
       </section>
