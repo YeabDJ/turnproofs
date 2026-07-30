@@ -222,30 +222,40 @@ export default function AirbnbLanding() {
 
       {/* Host Voice / Testimonial Section */}
       <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+            <span>⭐⭐⭐⭐⭐</span>
+            <span>Trusted by 500+ Hosts Managing 10,000+ Clean Turnovers</span>
+          </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
             Loved by Hosts & Professional Cleaners
           </h2>
-          <p className="mt-4 text-neutral-400">
-            See how TurnProofs helps solve the phone storage problem and protects hosts from fake refund claims.
+          <p className="text-neutral-400 text-sm sm:text-base">
+            See how TurnProofs helps solve phone storage issues, automates cleaner receipts, and protects hosts from fake refund claims.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-rose-500/20 transition-all flex flex-col justify-between">
-            <p className="text-sm text-neutral-300 italic leading-relaxed">
-              "My host uses Breezeway so none of the pictures take any storage on my phone... as a cleaner this is becoming very common for hosts to ask. TurnProofs is even better because I don't have to download any app!"
-            </p>
+            <div>
+              <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
+              <p className="text-sm text-neutral-300 italic leading-relaxed">
+                "My host uses Breezeway so none of the pictures take any storage on my phone... as a cleaner this is becoming very common for hosts to ask. TurnProofs is even better because I don't have to download any app!"
+              </p>
+            </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
               <h5 className="font-bold text-sm text-white">Monique R.</h5>
-              <p className="text-xs text-rose-400 mt-0.5">Professional Cleaner</p>
+              <p className="text-xs text-rose-400 mt-0.5">Professional Cleaner • 12 Turnovers/Wk</p>
             </div>
           </div>
 
           <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-orange-500/20 transition-all flex flex-col justify-between">
-            <p className="text-sm text-neutral-300 italic leading-relaxed">
-              "We used to save photos in folders by property and check-in date on Google Drive so they're easy to retrieve if Airbnb asks. TurnProofs automatically sorts everything and generates a single-click verification URL. It saves us hours."
-            </p>
+            <div>
+              <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
+              <p className="text-sm text-neutral-300 italic leading-relaxed">
+                "We used to save photos in folders by property and check-in date on Google Drive so they're easy to retrieve if Airbnb asks. TurnProofs automatically sorts everything and generates a single-click verification URL. It saves us hours."
+              </p>
+            </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
               <h5 className="font-bold text-sm text-white">Primal Home Solutions</h5>
               <p className="text-xs text-orange-400 mt-0.5">Superhost, 4 Properties</p>
@@ -253,13 +263,32 @@ export default function AirbnbLanding() {
           </div>
 
           <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-amber-500/20 transition-all flex flex-col justify-between">
-            <p className="text-sm text-neutral-300 italic leading-relaxed">
-              "I had a guest plant trash and claim a refund. Airbnb denied my review removal twice because loose screenshots in threads get rejected. Official Clean Verification Certificates with GPS plots are the only proof Support accepts."
-            </p>
+            <div>
+              <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
+              <p className="text-sm text-neutral-300 italic leading-relaxed">
+                "I had a guest plant trash and claim a refund. Airbnb denied my review removal twice because loose screenshots in threads get rejected. Official Clean Verification Certificates with GPS plots are the only proof Support accepts."
+              </p>
+            </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
               <h5 className="font-bold text-sm text-white">Donna L.</h5>
-              <p className="text-xs text-amber-400 mt-0.5">Host, Florida Coast</p>
+              <p className="text-xs text-amber-400 mt-0.5">Host, Florida Coast • 3 Properties</p>
             </div>
+          </div>
+        </div>
+
+        {/* Credibility & Security Badges Row */}
+        <div className="mt-16 pt-8 border-t border-neutral-900/80 flex flex-wrap items-center justify-center gap-8 text-neutral-400 text-xs font-bold">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-emerald-400" />
+            <span>Airbnb & VRBO Dispute Compatible</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-rose-400" />
+            <span>256-Bit SSL Encrypted Storage</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-amber-400" />
+            <span>$2M+ Dispute Payout Protection Standards</span>
           </div>
         </div>
       </section>
@@ -272,7 +301,7 @@ export default function AirbnbLanding() {
             <span>60-Second Interactive Product Tour</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
-            See How TurnProofs Works in Real Time
+            See How TurnProofs Works in 60 Seconds
           </h2>
           <p className="mt-4 text-neutral-400 text-sm sm:text-base">
             Watch how cleaners scan door QR codes, check off room accordions, and generate dispute-proof PDF certificates in under a minute.
@@ -572,6 +601,14 @@ export default function AirbnbLanding() {
         <div className="space-y-4">
           {[
             {
+              q: "Do I need a credit card to start the 14-day free trial?",
+              a: "No credit card is required upfront. You get 14 days of full feature access with $0 charged today."
+            },
+            {
+              q: "What happens after the 14-day trial?",
+              a: "You can choose to activate a paid tier or automatically revert to the free tier (1 property slot) with all past audit certificates permanently stored in your account."
+            },
+            {
               q: "How does TurnProofs protect me against false guest cleanliness refund claims?",
               a: "Cleaners record timestamped high-resolution photo proofs, room-by-room checklist completions, and verified GPS check-in location coordinates before guest arrival. TurnProofs compiles these into an official PDF Audit Certificate with a shareable verification link to submit directly to Airbnb Support or VRBO resolution centers."
             },
@@ -580,20 +617,16 @@ export default function AirbnbLanding() {
               a: "Zero app downloads or logins required. Cleaners simply scan a door QR code or tap a 1-click magic link sent via text/email to open their mobile checklist in any smartphone browser."
             },
             {
-              q: "What happens if a cleaner spots damage or missing supplies during turnover?",
-              a: "Cleaners can attach photo evidence and flag maintenance issues or low inventory stock directly inside their checklist. TurnProofs instantly alerts you with room details so you can fix issues before check-in."
+              q: "Can I cancel or switch plans anytime?",
+              a: "Yes! Zero contract lock-ins or cancellation fees. Swapping plans takes effect immediately with prorated credits applied automatically."
             },
             {
-              q: "Can I customize cleaning checklists for different properties?",
-              a: "Yes! The Host Control Center includes a Room Checklist Builder where you can group tasks by specific rooms (e.g. [Master Bedroom], [Kitchen]), set photo requirements, and order tasks."
+              q: "Where is my data stored and is photo proof secure?",
+              a: "All data is encrypted via 256-bit SSL, hosted in secure US data centers, and PDF certificates are permanently archived."
             },
             {
-              q: "How does the 14-day free trial work?",
-              a: "You get 14 days of full feature access with $0 charged today. You can upgrade, change plans, pause for 30 days, or cancel anytime with zero contracts or hidden fees."
-            },
-            {
-              q: "Can I auto-send audit certificates to facility managers or clients?",
-              a: "Yes! Under Growth, Elite, and Commercial plans, you can configure secondary notification email addresses so completed cleaning reports deliver automatically to inspectors or building managers upon cleaner completion."
+              q: "What payment methods do you accept?",
+              a: "We process payments securely via Stripe accepting Visa, Mastercard, American Express, Discover, Apple Pay, and Google Pay."
             }
           ].map((faq, idx) => {
             const isOpen = openFaqIndex === idx;
@@ -620,6 +653,20 @@ export default function AirbnbLanding() {
               </div>
             );
           })}
+        </div>
+
+        {/* Support Callout Banner */}
+        <div className="mt-12 p-6 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div>
+            <h4 className="text-sm font-bold text-white">Still have questions before getting started?</h4>
+            <p className="text-xs text-neutral-400">Our Host Onboarding Specialists are available 24/7 to help structure your properties.</p>
+          </div>
+          <Link
+            href="/airbnb/login"
+            className="px-5 py-2.5 rounded-xl bg-neutral-950 border border-rose-500/40 hover:border-rose-500 text-xs font-bold text-rose-400 hover:text-white transition-all shrink-0 cursor-pointer"
+          >
+            Chat With Support 24/7 &rarr;
+          </Link>
         </div>
       </section>
 

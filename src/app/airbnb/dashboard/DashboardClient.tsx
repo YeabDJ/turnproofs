@@ -1415,21 +1415,23 @@ export default function DashboardClient() {
                     </div>
                   </div>
 
-                  {/* Expandable FAQ: What happens when I cancel? */}
+                  {/* Expandable FAQ: What happens when I cancel or pause? */}
                   <div className="pt-2 border-t border-red-900/30">
                     <button
                       onClick={() => setShowFaqGuide(!showFaqGuide)}
                       className="text-xs font-bold text-neutral-400 hover:text-neutral-200 flex items-center gap-1.5 cursor-pointer"
                     >
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showFaqGuide ? 'rotate-180' : ''}`} />
-                      <span>Frequently Asked Billing Questions (Cancellation, Email, Reversion)</span>
+                      <span>Frequently Asked Billing & Subscription Questions (Pause Rules, Email & Cancellation)</span>
                     </button>
                     {showFaqGuide && (
                       <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2.5 animate-fade-in">
-                        <p><strong>1. Zero Cancellation Fees:</strong> There are no cancellation penalties or contract lock-ins.</p>
-                        <p><strong>2. Free Tier Reversion:</strong> Your account retains 1 free property slot with complete mobile cleaner terminal access.</p>
-                        <p><strong>3. Permanent Certificate Storage:</strong> All past audit logs, photos, and dispute-proof PDF reports stay saved in your account forever.</p>
-                        <p><strong>4. Can I change my billing email?</strong> Yes! Use the <em>'Edit Email'</em> button inside the Active Subscription section at the top of this tab to direct receipts to any secondary email.</p>
+                        <p><strong>1. How does Subscription Pause work?</strong> Your subscription freezes for 30 days. You can unpause manually anytime in 1-click, or it auto-resumes on day 30.</p>
+                        <p><strong>2. Will I get a reminder email before pause ends?</strong> Yes! An automated email reminder is sent to your billing email 3 days before your 30-day pause expires.</p>
+                        <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can also cancel directly while paused without needing to unpause first.</p>
+                        <p><strong>4. Free Tier Reversion:</strong> Upon cancellation, your account retains 1 free property slot with full mobile cleaner terminal access.</p>
+                        <p><strong>5. Permanent Certificate Storage:</strong> All past audit logs, photos, and dispute-proof PDF reports remain saved in your account forever.</p>
+                        <p><strong>6. Can I change my billing email?</strong> Yes! Click the <em>'Edit Email'</em> button inside the Active Subscription section at the top of this tab to route receipts to any secondary email.</p>
                       </div>
                     )}
                   </div>
