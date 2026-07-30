@@ -936,9 +936,9 @@ export default function DashboardClient() {
                       </h2>
 
                       <p className="text-sm text-neutral-400">
-                        Current portfolio rate: <strong className="text-white font-mono">$
-                          {properties.length <= 1 ? '9.00' : properties.length <= 3 ? '18.99' : (29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)}
-                        /mo</strong> ({properties.length} active unit{properties.length === 1 ? '' : 's'})
+                        Current portfolio rate: <strong className="text-white font-mono">
+                          {`$${properties.length <= 1 ? '9.00' : properties.length <= 3 ? '18.99' : (29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)} /mo`}
+                        </strong> ({properties.length} active unit{properties.length === 1 ? '' : 's'})
                       </p>
                     </div>
 
