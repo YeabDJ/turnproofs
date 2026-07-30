@@ -542,6 +542,30 @@ export default function DashboardClient() {
               <span>Manage Plan & Card ($9 - $29.99/mo)</span>
               <ExternalLink className="h-3.5 w-3.5" />
             </button>
+
+            <button
+              onClick={async () => {
+                if (!confirm("Are you sure you want to cancel your subscription or stop using TurnProofs? Your account will revert to the Free Tier (1 property limit) with zero further charges.")) return;
+                try {
+                  const res = await fetch('/api/airbnb/stripe', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'cancel' })
+                  });
+                  const data = await res.json();
+                  if (data.portalUrl) {
+                    window.location.href = data.portalUrl;
+                  } else if (data.demo) {
+                    alert(`[SUBSCRIPTION CANCELED]\n\n${data.message}`);
+                  }
+                } catch (e) {
+                  alert("Unable to process cancellation.");
+                }
+              }}
+              className="px-3 py-2 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-red-500/40 hover:bg-red-500/10 text-xs font-bold text-neutral-400 hover:text-red-400 transition-all cursor-pointer"
+            >
+              Cancel Subscription
+            </button>
           </div>
         </div>
 

@@ -8,9 +8,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { plan, propertiesCount } = await request.json();
+    const body = await request.json();
+    const { action, plan, propertiesCount, customerId } = body;
+    const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
-    // Calculate plan amount
+    // Handle Customer Portal / Unsubscribe / Cancel action
+    if (action === 'portal' || action === 'cancel') {
+      if (stripeSecret && customerId) {
+        try {
+          const res = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${stripeSecret}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+              'customer': customerId,
+              'return_url': 'https://turnproofs.com/airbnb/dashboard'
+            })
+          });
+          const portalSession = await res.json();
+          if (portalSession.url) {
+            return NextResponse.json({ success: true, portalUrl: portalSession.url });
+          }
+        } catch (err) {
+          console.error('Stripe Customer Portal error:', err);
+        }
+      }
+
+      // Demo Mode cancellation response
+      return NextResponse.json({
+        success: true,
+        demo: true,
+        canceled: true,
+        message: `Subscription Canceled: Host ${host.email} plan has been reverted to Free Tier (1 property included). No further charges will occur.`
+      });
+    }
+
+    // Handle Checkout action
     let amount = 9.00;
     let planName = 'Pro Plan';
 
@@ -31,8 +66,6 @@ export async function POST(request: NextRequest) {
       amount = 89.99;
       planName = 'Commercial Site Plan ($89.99/building)';
     }
-
-    const stripeSecret = process.env.STRIPE_SECRET_KEY;
 
     if (stripeSecret) {
       // Direct Stripe Checkout Session API integration
