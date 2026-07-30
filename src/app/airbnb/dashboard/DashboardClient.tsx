@@ -92,6 +92,8 @@ export default function DashboardClient() {
   const [checkoutPlan, setCheckoutPlan] = useState<any>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPauseModal, setShowPauseModal] = useState(false);
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
+  const [downgradeTargetPlan, setDowngradeTargetPlan] = useState<any>(null);
   const [pausingSubscription, setPausingSubscription] = useState(false);
   const [cancelingSubscription, setCancelingSubscription] = useState(false);
   const [showFaqGuide, setShowFaqGuide] = useState(false);
@@ -911,20 +913,43 @@ export default function DashboardClient() {
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
-                {/* 0. 14 Days Remaining Top Trial Banner */}
-                <div className="p-4 rounded-2xl bg-linear-to-r from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/20 flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-xs shrink-0">
-                      14d
+                {/* 0. 14 Days Remaining Top Trial Banner & Countdown Bar */}
+                <div className="p-6 rounded-3xl bg-neutral-900/80 border border-emerald-500/30 space-y-4 backdrop-blur-md">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-sm shrink-0">
+                        14d
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-black text-white">Free Trial • Day 1 of 14</span>
+                          <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold border border-emerald-500/20">
+                            14 Days Remaining
+                          </span>
+                        </div>
+                        <span className="text-xs text-neutral-400">Full Pro feature access active. Payment card required to continue after trial ends on August 13, 2026.</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-xs font-black text-white block">14 Days Remaining in Your Free Trial</span>
-                      <span className="text-[11px] text-neutral-400">Full Pro feature access active. A payment card will be required after your 14-day trial ends on August 13, 2026.</span>
+                    <span className="px-3.5 py-2 rounded-xl bg-neutral-950 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold shrink-0">
+                      💳 Card Required After Trial
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400">
+                      <span>Trial Start: July 30, 2026</span>
+                      <span className="text-emerald-400 font-mono">Day 1 of 14 (7.1% Complete)</span>
+                      <span>Trial End: August 13, 2026</span>
+                    </div>
+                    <div className="w-full h-2.5 bg-neutral-950 rounded-full overflow-hidden border border-neutral-850 p-0.5">
+                      <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[7.1%]" />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
+                      <span>📧 Automated Email Reminders: Scheduled for Days 10, 13, & 14</span>
+                      <span className="text-neutral-300 font-semibold">$0.00 Due Today</span>
                     </div>
                   </div>
-                  <span className="px-3 py-1.5 rounded-xl bg-neutral-950 border border-emerald-500/30 text-emerald-400 text-[11px] font-extrabold shrink-0">
-                    💳 Card Required After Trial
-                  </span>
                 </div>
 
                 {/* 1. Current Active Subscription & Usage Overview */}
@@ -1095,14 +1120,20 @@ export default function DashboardClient() {
                           ) : (
                             <button
                               onClick={() => {
-                                setCheckoutPlan({
+                                const target = {
                                   name: 'Pro Plan',
                                   planKey: 'pro',
                                   units: 1,
                                   monthlyRate: 9.00,
                                   annualRate: 7.65
-                                });
-                                setShowCheckoutModal(true);
+                                };
+                                if (properties.length > 1) {
+                                  setDowngradeTargetPlan(target);
+                                  setShowDowngradeModal(true);
+                                } else {
+                                  setCheckoutPlan(target);
+                                  setShowCheckoutModal(true);
+                                }
                               }}
                               className="w-full py-3 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/50 hover:bg-neutral-900 text-xs font-extrabold text-white transition-all cursor-pointer"
                             >
@@ -1453,7 +1484,27 @@ export default function DashboardClient() {
               <X className="h-5 w-5" />
             </button>
             <h3 className="font-extrabold text-xl mb-1.5">Add Property Listing</h3>
-            <p className="text-xs text-neutral-400 mb-6">Create a property listing below. Coordinates are optional but verify location compliance.</p>
+            <p className="text-xs text-neutral-400 mb-4">Create a property listing below. Coordinates are optional but verify location compliance.</p>
+
+            {/* Capacity Limit Warning Banner */}
+            {properties.length >= (host?.subscription_tier === 'growth' ? 3 : host?.subscription_tier === 'pro' || !host?.subscription_tier ? 1 : 6) && (
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between gap-3 text-xs mb-4">
+                <div className="flex items-center gap-2 text-amber-400 font-bold">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>Capacity Reached ({properties.length} of {properties.length <= 1 ? '1' : properties.length <= 3 ? '3' : '6'} Used)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsPropertyModalOpen(false);
+                    setActiveTab('billing');
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500 text-black font-extrabold text-[11px] hover:bg-amber-400 cursor-pointer shrink-0 transition-all shadow-md shadow-amber-500/10"
+                >
+                  Upgrade Plan ➔
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleAddProperty} className="space-y-4">
               <div>
@@ -2297,6 +2348,80 @@ export default function DashboardClient() {
                 className="w-1/2 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black text-white transition-all cursor-pointer flex items-center justify-center gap-1"
               >
                 {cancelingSubscription ? 'Canceling...' : 'Confirm Cancellation'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: DOWNGRADE PROPERTY RETENTION SELECTOR */}
+      {showDowngradeModal && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-7 shadow-2xl relative space-y-5">
+            <button
+              onClick={() => setShowDowngradeModal(false)}
+              className="absolute top-5 right-5 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+              <AlertTriangle className="h-6 w-6" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-black text-xl text-white">Select Properties to Retain</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                You are downgrading to <strong className="text-white">{downgradeTargetPlan?.name || 'a lower tier'}</strong> which supports up to <strong className="text-emerald-400">{downgradeTargetPlan?.units || 1} active property slot(s)</strong>. Select which properties to keep active:
+              </p>
+            </div>
+
+            <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
+              {properties.map((prop) => (
+                <label
+                  key={prop.id}
+                  className="p-3 rounded-xl bg-neutral-950 border border-neutral-850 flex items-center justify-between cursor-pointer hover:border-neutral-700"
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      defaultChecked={true}
+                      className="h-4 w-4 rounded bg-neutral-900 border-neutral-700 text-rose-500 focus:ring-0 cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-xs font-bold text-white block">{prop.name}</span>
+                      <span className="text-[10px] text-neutral-400 block">{prop.address}</span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-400">Active Slot</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-neutral-950/80 border border-neutral-850 text-[11px] text-neutral-400 space-y-1">
+              <span className="font-bold text-white block">Proration & Property Retention:</span>
+              <p>• Unused days from your previous plan are automatically credited to your account.</p>
+              <p>• Unselected properties are paused (not deleted). All past audit logs remain permanently saved.</p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDowngradeModal(false)}
+                className="w-1/3 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-neutral-400 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDowngradeModal(false);
+                  setCheckoutPlan(downgradeTargetPlan);
+                  setShowCheckoutModal(true);
+                }}
+                className="w-2/3 py-3 rounded-xl bg-amber-500 text-black font-black text-xs hover:bg-amber-400 transition-all cursor-pointer shadow-md shadow-amber-500/10"
+              >
+                Confirm Plan Downgrade
               </button>
             </div>
           </div>
