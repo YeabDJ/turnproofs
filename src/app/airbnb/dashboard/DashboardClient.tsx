@@ -100,6 +100,7 @@ export default function DashboardClient() {
   const [showFaqGuide, setShowFaqGuide] = useState(false);
   const [editingBillingEmail, setEditingBillingEmail] = useState(false);
   const [customBillingEmail, setCustomBillingEmail] = useState('');
+  const [emailRemindersEnabled, setEmailRemindersEnabled] = useState(true);
   
   // Card form state for first-time checkout
   const [cardNum, setCardNum] = useState('');
@@ -964,7 +965,7 @@ export default function DashboardClient() {
                           <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[3.3%]" />
                         </div>
                         <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
-                          <span>📧 Email Reminder Scheduled: {fmt(phase2UnlockDate)} at 12:00 PM</span>
+                          <span>{emailRemindersEnabled ? `📧 Email Reminder Scheduled: ${fmt(phase2UnlockDate)} at 12:00 PM` : '🔕 Trial & Billing Email Reminders Paused by Host'}</span>
                           <span className="text-neutral-300 font-semibold">$0.00 Due Today</span>
                         </div>
                       </div>
@@ -1024,35 +1025,35 @@ export default function DashboardClient() {
                     </div>
                   </div>
 
-                  {/* Account Metadata Row: Usage, Billing Cycle Dates, Billing Email */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                    {/* Account Metadata Row: Usage, Billing Cycle Dates, Billing Email, Reminder Toggle */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pt-2">
                     <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
-                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Portfolio Capacity Usage</span>
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Portfolio Usage</span>
                       <p className="text-xs font-black text-white font-mono flex items-center gap-1.5">
                         <Home className="h-3.5 w-3.5 text-rose-400" />
-                        <span>{properties.length} of {properties.length <= 1 ? '1' : properties.length <= 3 ? '3' : properties.length <= 6 ? '6' : properties.length} Units Used</span>
+                        <span>{properties.length} of {properties.length <= 1 ? '1' : properties.length <= 3 ? '3' : properties.length <= 6 ? '6' : properties.length} Units</span>
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
-                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Current Billing Cycle</span>
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Billing Cycle</span>
                       <p className="text-xs font-black text-emerald-400 font-mono flex items-center gap-1.5">
                         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                        <span>Aug 29, 2026 – Sep 28, 2026</span>
+                        <span>Aug 29 – Sep 28</span>
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
-                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Next Renewal Amount</span>
+                      <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Next Renewal</span>
                       <p className="text-xs font-black text-white font-mono flex items-center gap-1.5">
                         <CreditCard className="h-3.5 w-3.5 text-rose-400" />
-                        <span>$0.00 Due Today ($9.00 Next)</span>
+                        <span>$0.00 Today ($9.00 Next)</span>
                       </p>
                     </div>
 
                     <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Billing Receipts Email</span>
+                        <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Receipts Email</span>
                         <button
                           onClick={() => {
                             const newEmail = prompt('Enter primary billing email address:', customBillingEmail || host?.email || 'support@turnproofs.com');
@@ -1067,6 +1068,30 @@ export default function DashboardClient() {
                         </button>
                       </div>
                       <p className="text-xs font-bold text-neutral-200 truncate">{customBillingEmail || host?.email || 'support@turnproofs.com'}</p>
+                    </div>
+
+                    {/* Interactive Reminder Toggle Card */}
+                    <div className="p-4 rounded-2xl bg-neutral-950/80 border border-neutral-850 space-y-1 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] font-extrabold text-neutral-400 uppercase tracking-wider block">Email Reminders</span>
+                        <p className="text-xs font-bold text-white flex items-center gap-1">
+                          <span>{emailRemindersEnabled ? '🔔 Active' : '🔕 Paused'}</span>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = !emailRemindersEnabled;
+                          setEmailRemindersEnabled(next);
+                          alert(next ? '🔔 Trial & billing email reminders enabled!' : '🔕 Trial & billing email reminders paused.');
+                        }}
+                        className={`w-10 h-5 flex items-center rounded-full p-0.5 cursor-pointer transition-colors duration-200 ${
+                          emailRemindersEnabled ? 'bg-emerald-500 justify-end' : 'bg-neutral-800 justify-start'
+                        }`}
+                        title="Toggle automated trial & billing email reminders"
+                      >
+                        <div className="bg-white w-4 h-4 rounded-full shadow-md transition-transform" />
+                      </button>
                     </div>
                   </div>
                 </div>
