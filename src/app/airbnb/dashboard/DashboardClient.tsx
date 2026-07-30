@@ -1830,7 +1830,7 @@ export default function DashboardClient() {
       {activeQrProperty && (
         <div id="qr-modal-container" className="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-6 z-50">
           {/* Print Style Injector */}
-          <style jsx global>{`
+          <style>{`
             @media print {
               body * {
                 visibility: hidden;
