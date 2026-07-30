@@ -1462,7 +1462,7 @@ export default function DashboardClient() {
                         <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can cancel directly while paused without unpausing first.</p>
                         <p><strong>4. How does Re-Subscription work?</strong> Reactivate anytime with 1 click. You'll resume on your previous plan with zero setup fees.</p>
                         <p><strong>5. How does Annual Billing work?</strong> Annual billing is charged as one discounted upfront payment for 12 months, renewing annually with zero monthly charges.</p>
-                        <p><strong>6. Non-Archived Drafts & Data:</strong> Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days before automatic cleanup.</p>
+                        <p><strong>6. Non-Archived Drafts & Data:</strong> Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days (gives you time to re-upload or recover). After 30 days, automatically deleted to keep TurnProofs lightweight and your subscription costs low.</p>
                         <p><strong>7. Billing Email Dispatch:</strong> Invoices and PDF receipts are automatically dispatched to your primary billing email. Click <em>'Edit Email'</em> at the top of this tab to update anytime.</p>
                       </div>
                     )}
