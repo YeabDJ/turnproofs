@@ -31,7 +31,8 @@ import {
   AlertTriangle,
   ChevronRight,
   Clock,
-  HelpCircle
+  HelpCircle,
+  Edit3
 } from 'lucide-react';
 
 interface Property {
@@ -128,6 +129,75 @@ export default function DashboardClient() {
   const [newPropLat, setNewPropLat] = useState('');
   const [newPropLng, setNewPropLng] = useState('');
   const [newPropEmails, setNewPropEmails] = useState('');
+
+  // Edit Property Modal states
+  const [isEditPropertyModalOpen, setIsEditPropertyModalOpen] = useState(false);
+  const [editingPropId, setEditingPropId] = useState<string | null>(null);
+  const [editPropName, setEditPropName] = useState('');
+  const [editPropAddress, setEditPropAddress] = useState('');
+  const [editPropImage, setEditPropImage] = useState('');
+  const [editPropLat, setEditPropLat] = useState('');
+  const [editPropLng, setEditPropLng] = useState('');
+  const [editPropEmails, setEditPropEmails] = useState('');
+  const [savingEditProperty, setSavingEditProperty] = useState(false);
+
+  const openEditPropertyModal = (prop: Property) => {
+    setEditingPropId(prop.id);
+    setEditPropName(prop.name || '');
+    setEditPropAddress(prop.address || '');
+    
+    let imgUrl = prop.cover_image_url || '';
+    let emailStr = '';
+    if (imgUrl.includes('|||')) {
+      const parts = imgUrl.split('|||');
+      imgUrl = parts[0] || '';
+      emailStr = parts[1] || '';
+    }
+    setEditPropImage(imgUrl);
+    setEditPropEmails(emailStr);
+    setEditPropLat(prop.latitude ? String(prop.latitude) : '');
+    setEditPropLng(prop.longitude ? String(prop.longitude) : '');
+    setIsEditPropertyModalOpen(true);
+  };
+
+  const handleSaveEditProperty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingPropId || !editPropName || !editPropAddress) return;
+
+    setSavingEditProperty(true);
+    try {
+      const defaultImg = editPropImage?.trim() || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80';
+      const serializedImg = editPropEmails.trim() ? `${defaultImg}|||${editPropEmails.trim()}` : defaultImg;
+
+      const res = await fetch('/api/airbnb/properties', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingPropId,
+          name: editPropName.trim(),
+          address: editPropAddress.trim(),
+          cover_image_url: serializedImg,
+          latitude: editPropLat ? parseFloat(editPropLat) : null,
+          longitude: editPropLng ? parseFloat(editPropLng) : null
+        })
+      });
+
+      const data = await res.json();
+      setSavingEditProperty(false);
+
+      if (data.success && data.property) {
+        setProperties(prev => prev.map(p => p.id === editingPropId ? data.property : p));
+        setIsEditPropertyModalOpen(false);
+        setEditingPropId(null);
+        alert('🎉 Property details updated successfully!');
+      } else {
+        alert('Failed to update property: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      setSavingEditProperty(false);
+      alert('Network error while updating property.');
+    }
+  };
 
   const [newCleanerName, setNewCleanerName] = useState('');
   const [newCleanerPhone, setNewCleanerPhone] = useState('');
@@ -745,6 +815,13 @@ export default function DashboardClient() {
                               >
                                 <ListTodo className="h-4 w-4 text-neutral-400" />
                                 <span>Edit Checklist</span>
+                              </button>
+                              <button
+                                onClick={() => openEditPropertyModal(prop)}
+                                className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-rose-500/30 hover:bg-rose-500/10 hover:text-rose-400 transition-all cursor-pointer"
+                                title="Edit Property Details (Name, Address, Cover Image, GPS, Emails)"
+                              >
+                                <Edit3 className="h-4.5 w-4.5" />
                               </button>
                               <button
                                 onClick={() => setActiveQrProperty(prop)}
@@ -1725,6 +1802,151 @@ export default function DashboardClient() {
               >
                 Create Listing
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: EDIT PROPERTY */}
+      {isEditPropertyModalOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-7 shadow-2xl relative space-y-6">
+            <button
+              onClick={() => setIsEditPropertyModalOpen(false)}
+              className="absolute top-6 right-6 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+                <Edit3 className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-xl text-white">Edit Property Listing</h3>
+                <p className="text-xs text-neutral-400">Update property name, cover image URL, facility emails, or GPS location.</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSaveEditProperty} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Property Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Sunset Luxury Villa"
+                  value={editPropName}
+                  onChange={(e) => setEditPropName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Physical Address</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 123 Ocean Drive, Miami FL"
+                  value={editPropAddress}
+                  onChange={(e) => setEditPropAddress(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Cover Image URL</label>
+                <input
+                  type="text"
+                  placeholder="Paste image URL (e.g. https://images.unsplash.com/...)"
+                  value={editPropImage}
+                  onChange={(e) => setEditPropImage(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-white font-mono"
+                />
+                {editPropImage && (
+                  <div className="mt-2 h-20 w-full rounded-xl overflow-hidden bg-neutral-950 border border-neutral-800">
+                    <img src={editPropImage} alt="Cover Preview" className="w-full h-full object-cover" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1 flex items-center justify-between">
+                  <span>Auto-Email Reports to Facility Managers</span>
+                  {host?.subscription_tier === 'commercial' ? (
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-extrabold tracking-wider">
+                      ✓ Commercial Unlocked
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[9px] font-extrabold tracking-wider flex items-center gap-1">
+                      🔒 Commercial Plan Only
+                    </span>
+                  )}
+                </label>
+
+                {host?.subscription_tier === 'commercial' ? (
+                  <input
+                    type="text"
+                    placeholder="e.g. manager@building.com, inspector@company.com"
+                    value={editPropEmails}
+                    onChange={(e) => setEditPropEmails(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm text-white"
+                  />
+                ) : (
+                  <div
+                    onClick={() => setShowUpgradeModal(true)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950/90 border border-amber-500/30 hover:border-amber-500/60 rounded-xl flex items-center justify-between text-xs cursor-pointer transition-all shadow-sm"
+                  >
+                    <span className="text-neutral-400 font-medium italic truncate max-w-[260px]">
+                      🔒 Locked for Commercial Tier Subscribers ($89.99/mo)
+                    </span>
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-extrabold text-[10px] shrink-0">
+                      Upgrade Tier ⚡
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Target Latitude (Optional)</label>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    placeholder="e.g. 40.7128"
+                    value={editPropLat}
+                    onChange={(e) => setEditPropLat(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Target Longitude (Optional)</label>
+                  <input
+                    type="number"
+                    step="0.000001"
+                    placeholder="e.g. -74.0060"
+                    value={editPropLng}
+                    onChange={(e) => setEditPropLng(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-white font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsEditPropertyModalOpen(false)}
+                  className="w-1/3 py-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:bg-neutral-850 text-xs font-bold text-neutral-300 transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEditProperty}
+                  className="w-2/3 py-3.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-white transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {savingEditProperty ? 'Saving Changes...' : 'Save Property Changes'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

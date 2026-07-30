@@ -172,3 +172,52 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
+
+// PUT update a property
+export async function PUT(request: NextRequest) {
+  try {
+    const host = await getAuthenticatedHost();
+    if (!host) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id, name, address, cover_image_url, latitude, longitude } = await request.json();
+
+    if (!id || !name || !address) {
+      return NextResponse.json({ success: false, error: 'Property ID, name, and address are required.' }, { status: 400 });
+    }
+
+    // Verify property belongs to host
+    const { data: property, error: fetchError } = await supabaseAdmin
+      .from('airbnb_properties')
+      .select('id')
+      .eq('id', id)
+      .eq('host_id', host.id)
+      .maybeSingle();
+
+    if (fetchError || !property) {
+      return NextResponse.json({ success: false, error: 'Property not found or access denied.' }, { status: 404 });
+    }
+
+    const { data: updatedProperty, error: updateError } = await supabaseAdmin
+      .from('airbnb_properties')
+      .update({
+        name: name.trim(),
+        address: address.trim(),
+        cover_image_url: cover_image_url?.trim() || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80',
+        latitude: latitude ? parseFloat(latitude) : null,
+        longitude: longitude ? parseFloat(longitude) : null
+      })
+      .eq('id', id)
+      .select('*')
+      .single();
+
+    if (updateError) {
+      return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, property: updatedProperty });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
