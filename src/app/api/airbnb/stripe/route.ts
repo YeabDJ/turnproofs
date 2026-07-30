@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
       amount = 18.99;
       planName = 'Growth Plan (2-3 units)';
     } else if (plan === 'elite' || count >= 4) {
-      if (count <= 8) {
+      if (count <= 6) {
         amount = 29.99;
-        planName = 'Elite Plan (4-8 units)';
+        planName = 'Elite Plan (4-6 units)';
       } else {
-        const extra = count - 8;
+        const extra = count - 6;
         amount = parseFloat((29.99 + extra * 4.99).toFixed(2));
         planName = `Elite Plan (${count} units - $29.99 + ${extra}x$4.99)`;
       }

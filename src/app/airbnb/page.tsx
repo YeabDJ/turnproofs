@@ -14,9 +14,9 @@ export default function AirbnbLanding() {
     ? (isAnnual ? '$7.65' : '$9.00') 
     : calcUnits <= 3 
     ? (isAnnual ? '$16.14' : '$18.99') 
-    : calcUnits <= 8 
+    : calcUnits <= 6 
     ? (isAnnual ? '$25.49' : '$29.99') 
-    : (isAnnual ? `$${((29.99 + (calcUnits - 8) * 4.99) * 0.85).toFixed(2)}` : `$${(29.99 + (calcUnits - 8) * 4.99).toFixed(2)}`);
+    : (isAnnual ? `$${((29.99 + (calcUnits - 6) * 4.99) * 0.85).toFixed(2)}` : `$${(29.99 + (calcUnits - 6) * 4.99).toFixed(2)}`);
 
   useEffect(() => {
     window.scrollTo(0, 0);

@@ -507,9 +507,9 @@ export default function DashboardClient() {
                   ? `Plan Status: 14-Day Free Trial (Full Access). Portfolio: ${properties.length} property.` 
                   : properties.length <= 3
                   ? `Plan Status: Growth Tier ($18.99/mo). Portfolio: ${properties.length} properties ($6.33/unit).`
-                  : properties.length <= 8
+                  : properties.length <= 6
                   ? `Plan Status: Elite Tier ($29.99/mo). Portfolio: ${properties.length} properties.`
-                  : `Plan Status: Elite Scaling ($${(29.99 + (properties.length - 8) * 4.99).toFixed(2)}/mo). Portfolio: ${properties.length} units ($29.99 + ${properties.length - 8} × $4.99/mo).`
+                  : `Plan Status: Elite Scaling ($${(29.99 + (properties.length - 6) * 4.99).toFixed(2)}/mo). Portfolio: ${properties.length} units ($29.99 + ${properties.length - 6} × $4.99/mo).`
                 }
               </p>
               <p className="text-xs text-neutral-400">
