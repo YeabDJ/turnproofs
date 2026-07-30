@@ -1457,12 +1457,13 @@ export default function DashboardClient() {
                     </button>
                     {showFaqGuide && (
                       <div className="mt-3 p-4 rounded-2xl bg-neutral-950 border border-neutral-850 text-xs text-neutral-300 space-y-2.5 animate-fade-in">
-                        <p><strong>1. How does Subscription Pause work?</strong> Your subscription freezes for 30 days. You can unpause manually anytime in 1-click, or it auto-resumes on day 30.</p>
-                        <p><strong>2. Will I get a reminder email before pause ends?</strong> Yes! An automated email reminder is sent to your billing email 3 days before your 30-day pause expires.</p>
-                        <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can also cancel directly while paused without needing to unpause first.</p>
-                        <p><strong>4. Free Tier Reversion:</strong> Upon cancellation, your account retains 1 free property slot with full mobile cleaner terminal access.</p>
-                        <p><strong>5. Where is my data stored and how long do you keep it?</strong> TurnProofs doesn't store your photos, videos, or audit logs. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control.</p>
-                        <p><strong>6. Can I change my billing email?</strong> Yes! Click the <em>'Edit Email'</em> button inside the Active Subscription section at the top of this tab to route receipts to any secondary email.</p>
+                        <p><strong>1. How does Subscription Pause work & can I extend?</strong> Your subscription freezes for 30 days. You can unpause manually anytime in 1-click, extend by another 30 days before expiry, or let it auto-resume on day 30.</p>
+                        <p><strong>2. Will I get a reminder email before pause or trial ends?</strong> Yes! Reminders are sent on Trial Days 10, 13, and Day 14 at 12:00 PM ("Reverts in 24 hours at midnight EST"). For pauses, a reminder is sent 3 days before expiry.</p>
+                        <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can cancel directly while paused without unpausing first.</p>
+                        <p><strong>4. How does Re-Subscription work?</strong> Reactivate anytime with 1 click. You'll resume on your previous plan with zero setup fees.</p>
+                        <p><strong>5. How does Annual Billing work?</strong> Annual billing is charged as one discounted upfront payment for 12 months, renewing annually with zero monthly charges.</p>
+                        <p><strong>6. Non-Archived Drafts & Data:</strong> Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days before automatic cleanup.</p>
+                        <p><strong>7. Billing Email Dispatch:</strong> Invoices and PDF receipts are automatically dispatched to your primary billing email. Click <em>'Edit Email'</em> at the top of this tab to update anytime.</p>
                       </div>
                     )}
                   </div>

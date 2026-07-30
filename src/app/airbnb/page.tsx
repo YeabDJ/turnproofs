@@ -605,8 +605,12 @@ export default function AirbnbLanding() {
               a: "No credit card is required upfront. You get 14 days of full feature access with $0 charged today."
             },
             {
-              q: "What happens after the 14-day trial?",
-              a: "You can choose to activate a paid tier or revert to the free tier (1 property slot). All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down."
+              q: "When does the trial end and what happens on Day 15?",
+              a: "Your trial ends automatically on Day 15 at 12:00 AM Midnight EST. On Day 14 at 12:00 PM, you'll receive a final reminder email ('Reverts in 24 hours'). If you don't activate a paid plan, your account smoothly reverts to 1 Free Property Slot. You can also manually downgrade or upgrade anytime."
+            },
+            {
+              q: "How does Annual Billing work?",
+              a: "Annual billing is charged as one discounted upfront payment for 12 months (saving 15%), renewing annually with zero monthly charges."
             },
             {
               q: "How does TurnProofs protect me against false guest cleanliness refund claims?",
@@ -617,12 +621,12 @@ export default function AirbnbLanding() {
               a: "Zero app downloads or logins required. Cleaners simply scan a door QR code or tap a 1-click magic link sent via text/email to open their mobile checklist in any smartphone browser."
             },
             {
-              q: "Can I cancel or switch plans anytime?",
-              a: "Yes! Zero contract lock-ins or cancellation fees. Swapping plans takes effect immediately with prorated credits applied automatically."
+              q: "Can I cancel, pause, or re-subscribe anytime?",
+              a: "Yes! Zero contract lock-ins or cancellation fees. You can pause billing for 30 days (extendable anytime), or cancel and re-subscribe later in 1-click on your previous plan with zero setup fees."
             },
             {
               q: "Where is my data stored and how long do you keep it?",
-              a: "TurnProofs doesn't store your photos, videos, or audit logs. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control."
+              a: "TurnProofs doesn't store your photos, videos, or audit logs long-term. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control."
             },
             {
               q: "What payment methods do you accept?",
