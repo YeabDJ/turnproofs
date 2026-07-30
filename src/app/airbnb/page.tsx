@@ -663,14 +663,14 @@ export default function AirbnbLanding() {
         <div className="mt-12 p-6 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
             <h4 className="text-sm font-bold text-white">Still have questions before getting started?</h4>
-            <p className="text-xs text-neutral-400">Our Host Onboarding Specialists are available 24/7 to help structure your properties.</p>
+            <p className="text-xs text-neutral-400">Email our host onboarding team at <a href="mailto:support@turnproofs.com" className="text-rose-400 font-bold underline">support@turnproofs.com</a> — we respond within 24–48 hours! <span className="text-neutral-500 font-medium">(Live chat coming soon)</span></p>
           </div>
-          <Link
-            href="/airbnb/login"
+          <a
+            href="mailto:support@turnproofs.com"
             className="px-5 py-2.5 rounded-xl bg-neutral-950 border border-rose-500/40 hover:border-rose-500 text-xs font-bold text-rose-400 hover:text-white transition-all shrink-0 cursor-pointer"
           >
-            Chat With Support 24/7 &rarr;
-          </Link>
+            Email Support (24–48hr Response) &rarr;
+          </a>
         </div>
       </section>
 
