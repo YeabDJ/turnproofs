@@ -894,6 +894,9 @@ export default function DashboardClient() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
