@@ -924,25 +924,25 @@ export default function DashboardClient() {
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
-                {/* 0. 14 Days Remaining Top Trial Banner & Countdown Bar */}
+                {/* 0. 30-Day Split Trial Banner & Countdown Bar */}
                 <div className="p-6 rounded-3xl bg-neutral-900/80 border border-emerald-500/30 space-y-4 backdrop-blur-md">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-sm shrink-0">
-                        14d
+                        30d
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-black text-white">Free Trial • Day 1 of 14</span>
+                          <span className="text-sm font-black text-white">30-Day Free Trial • Phase 1 (Days 1–14 No Card)</span>
                           <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold border border-emerald-500/20">
-                            14 Days Remaining
+                            14 Days Remaining in Phase 1
                           </span>
                         </div>
-                        <span className="text-xs text-neutral-400">Full Pro feature access active. Payment card required to continue after trial ends on August 13, 2026.</span>
+                        <span className="text-xs text-neutral-400">Full Pro feature access active. Enter card on Day 15 to unlock Phase 2 (Days 15–30 for $0 today). First billing begins Day 31.</span>
                       </div>
                     </div>
                     <span className="px-3.5 py-2 rounded-xl bg-neutral-950 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold shrink-0">
-                      💳 Card Required After Trial
+                      💳 Card Required Day 15 ($0 Today)
                     </span>
                   </div>
 
@@ -950,14 +950,14 @@ export default function DashboardClient() {
                   <div className="space-y-1.5 pt-1">
                     <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400">
                       <span>Trial Start: July 30, 2026</span>
-                      <span className="text-emerald-400 font-mono">Day 1 of 14 (7.1% Complete)</span>
-                      <span>Trial End: August 13, 2026</span>
+                      <span className="text-emerald-400 font-mono">Day 1 of 30 (Phase 1: Days 1–14 No Card)</span>
+                      <span>First Billing: August 29, 2026</span>
                     </div>
                     <div className="w-full h-2.5 bg-neutral-950 rounded-full overflow-hidden border border-neutral-850 p-0.5">
-                      <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[7.1%]" />
+                      <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[3.3%]" />
                     </div>
                     <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
-                      <span>📧 Automated Email Reminders: Scheduled for Days 10, 13, & 14</span>
+                      <span>📧 Automated Reminders: Days 10 & 14 (Phase 2 Card Unlock Email)</span>
                       <span className="text-neutral-300 font-semibold">$0.00 Due Today</span>
                     </div>
                   </div>
@@ -2348,7 +2348,7 @@ export default function DashboardClient() {
             <div className="space-y-2">
               <h3 className="font-black text-xl text-white">Cancel Your Subscription?</h3>
               <p className="text-xs text-neutral-400 leading-relaxed">
-                Are you sure you want to cancel your TurnProofs subscription? Your account will revert to the Free Tier (1 property limit) at the end of your billing cycle.
+                Are you sure you want to cancel your TurnProofs subscription? Your subscription will end at the close of your current billing cycle with zero future charges.
               </p>
               <div className="p-3.5 rounded-xl bg-neutral-950 border border-neutral-800 text-[11px] text-neutral-300 space-y-1">
                 <span className="font-bold text-white block">What happens when you cancel:</span>
@@ -2383,7 +2383,7 @@ export default function DashboardClient() {
                     if (data.portalUrl) {
                       window.location.href = data.portalUrl;
                     } else if (data.demo) {
-                      alert(`[SUBSCRIPTION CANCELED]\n\nYour plan has been canceled and reverted to Free Tier. Zero further charges will occur.`);
+                      alert(`[SUBSCRIPTION CANCELED]\n\nYour plan has been canceled. Zero further charges will occur.`);
                     }
                   } catch (e) {
                     setCancelingSubscription(false);
