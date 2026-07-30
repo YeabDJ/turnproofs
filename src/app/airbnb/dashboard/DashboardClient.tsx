@@ -1397,11 +1397,9 @@ export default function DashboardClient() {
                 </div>
               </div>
             )}
-              </div>
-            )}
 
           </div>
-        )}
+        </div>
       </main>
 
       {/* MODAL: ADD PROPERTY */}
