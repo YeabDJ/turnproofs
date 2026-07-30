@@ -1536,8 +1536,8 @@ export default function DashboardClient() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-2 animate-fade-in">
                         {[
                           {
-                            q: "1. How does Subscription Pause work & can I extend?",
-                            a: "Your subscription freezes for 30 days. You can unpause manually anytime in 1-click, extend by another 30 days before expiry, or let it auto-resume on day 30."
+                            q: "1. How does Subscription Pause work & what happens while paused?",
+                            a: "Pausing freezes your billing for 30 days with $0 charged. While paused, both your Host Dashboard and Mobile Cleaner Terminals freeze so zero checklists or reports can be created until resumed. Pause extensions are reserved for active paid subscriptions (unavailable during trial phase). On Day 27, a reminder email is sent before your plan auto-resumes on Day 30."
                           },
                           {
                             q: "2. Will I get a reminder email before pause or trial ends?",
@@ -2375,16 +2375,22 @@ export default function DashboardClient() {
                 type="button"
                 disabled={pausingSubscription}
                 onClick={async () => {
+                  const isTrialHost = !host?.stripe_subscription_id && (host?.created_at ? (Date.now() - new Date(host.created_at).getTime() < 30 * 24 * 60 * 60 * 1000) : true);
+                  if (isTrialHost) {
+                    alert("⚠️ Pause extension is unavailable during the 30-day free trial. Pause extension is reserved for active paid subscriptions. You can pause anytime once your paid plan begins.");
+                    setShowPauseModal(false);
+                    return;
+                  }
                   setPausingSubscription(true);
                   setTimeout(() => {
                     setPausingSubscription(false);
                     setShowPauseModal(false);
-                    alert("🎉 [SUBSCRIPTION PAUSED]\n\nYour subscription has been paused for 30 days. Billing will resume automatically on September 1, 2026.");
+                    alert("🎉 [SUBSCRIPTION PAUSED]\n\nYour subscription has been paused for 30 days ($0 charged). Zero charges will occur, and dashboard/cleaner portals are frozen until resumed on Day 30.");
                   }, 800);
                 }}
                 className="w-1/2 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-xs font-black text-black transition-all cursor-pointer"
               >
-                {pausingSubscription ? 'Pausing...' : 'Confirm 30-Day Pause'}
+                {pausingSubscription ? 'Pausing...' : 'Confirm Pause (30 Days)'}
               </button>
             </div>
           </div>

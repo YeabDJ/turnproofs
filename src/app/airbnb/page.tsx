@@ -622,7 +622,7 @@ export default function AirbnbLanding() {
             },
             {
               q: "Can I cancel, pause, or re-subscribe anytime?",
-              a: "Yes! Zero contract lock-ins or cancellation fees. You can pause billing for 30 days (extendable anytime), or cancel and re-subscribe later in 1-click on your previous plan with zero setup fees."
+              a: "Yes! Zero contract lock-ins or cancellation fees. You can pause billing for 30 days with $0 charged. While paused, both your Host Dashboard and Cleaner Terminals freeze until resumed. Pause extensions are reserved for active paid subscriptions (unavailable during trial phase). You can also cancel and re-subscribe anytime in 1-click on your previous plan with zero setup fees."
             },
             {
               q: "Where is my data stored and how long do you keep it?",

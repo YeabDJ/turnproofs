@@ -22,10 +22,19 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Property not found' }, { status: 404 });
       }
 
+      // Check if host account is paused
+      const { data: hostRecord } = await supabaseAdmin
+        .from('hosts')
+        .select('subscription_status')
+        .eq('id', property.host_id)
+        .maybeSingle();
+
+      const isPaused = hostRecord?.subscription_status === 'paused';
+
       // Check if current user is owner
       const host = await getAuthenticatedHost();
       if (host && property.host_id === host.id) {
-        return NextResponse.json({ success: true, property, isOwner: true });
+        return NextResponse.json({ success: true, property, isOwner: true, isPaused });
       }
 
       // Public data for cleaner
@@ -39,7 +48,8 @@ export async function GET(request: NextRequest) {
           latitude: property.latitude,
           longitude: property.longitude
         },
-        isOwner: false
+        isOwner: false,
+        isPaused
       });
     }
 

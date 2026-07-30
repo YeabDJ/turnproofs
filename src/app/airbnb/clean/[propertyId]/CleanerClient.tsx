@@ -222,6 +222,8 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   const [newSupplyName, setNewSupplyName] = useState('');
   const [showAddSupplyInput, setShowAddSupplyInput] = useState(false);
 
+  const [isHostPaused, setIsHostPaused] = useState(false);
+
   // Load initial data & restore saved cleaner email
   useEffect(() => {
     try {
@@ -238,6 +240,9 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         const propData = await propRes.json();
         if (propData.success) {
           setProperty(propData.property);
+          if (propData.isPaused) {
+            setIsHostPaused(true);
+          }
         } else {
           setGpsError('Property not found.');
         }
@@ -754,6 +759,26 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
       <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-6">
         <Loader2 className="h-8 w-8 text-rose-500 animate-spin mb-4" />
         <span className="text-neutral-400 font-medium">Initializing mobile cleaning terminal...</span>
+      </div>
+    );
+  }
+
+  // PAUSED HOST STATE VIEW
+  if (isHostPaused) {
+    return (
+      <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-6 text-center space-y-6">
+        <div className="h-16 w-16 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shadow-lg shadow-amber-500/10">
+          <Clock className="h-8 w-8 animate-pulse" />
+        </div>
+        <div className="space-y-2 max-w-sm">
+          <h2 className="text-2xl font-black tracking-tight">Checklist Frozen (Account Paused)</h2>
+          <p className="text-xs text-neutral-400 leading-relaxed">
+            This property's TurnProofs account is currently paused by the host. Zero charges occur while paused, but mobile checklists and turnover reports are temporarily frozen.
+          </p>
+        </div>
+        <div className="p-4 rounded-2xl bg-neutral-900 border border-neutral-800 text-xs text-neutral-300 max-w-sm">
+          Please contact your property manager or host to resume TurnProofs access.
+        </div>
       </div>
     );
   }
