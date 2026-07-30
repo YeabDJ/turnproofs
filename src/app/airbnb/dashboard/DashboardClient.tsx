@@ -207,8 +207,17 @@ export default function DashboardClient() {
     if (!newPropName || !newPropAddress) return;
 
     // Anti-gaming free trial guard (1 property limit)
-    if (properties.length >= 1) {
-      alert('14-Day Free Trial Limit: Your trial includes 1 managed property. To add more properties to your portfolio, please upgrade to Starter (1-3 properties @ $19.99/mo) or Pro (4-9 properties @ $29.99/mo).');
+    if (properties.length >= 1 && !host?.stripe_subscription_id && host?.subscription_status !== 'active') {
+      alert('30-Day Free Trial Capacity Reached: Your trial includes 1 managed property ($0 today). To add additional properties to your portfolio, please select a plan: Growth Tier (2-3 properties @ $18.99/mo) or Elite Tier (4-6 properties @ $29.99/mo).');
+      setCheckoutPlan({
+        name: 'Growth Plan',
+        planKey: 'growth',
+        units: 3,
+        monthlyRate: 18.99,
+        annualRate: 16.14
+      });
+      setIsPropertyModalOpen(false);
+      setShowCheckoutModal(true);
       return;
     }
 
