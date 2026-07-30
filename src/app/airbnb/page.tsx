@@ -621,8 +621,8 @@ export default function AirbnbLanding() {
               a: "Yes! Zero contract lock-ins or cancellation fees. Swapping plans takes effect immediately with prorated credits applied automatically."
             },
             {
-              q: "Where is my data stored and how are files delivered?",
-              a: "All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down."
+              q: "Where is my data stored and how long do you keep it?",
+              a: "TurnProofs doesn't store your photos, videos, or audit logs. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control."
             },
             {
               q: "What payment methods do you accept?",

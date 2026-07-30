@@ -1461,7 +1461,7 @@ export default function DashboardClient() {
                         <p><strong>2. Will I get a reminder email before pause ends?</strong> Yes! An automated email reminder is sent to your billing email 3 days before your 30-day pause expires.</p>
                         <p><strong>3. Can I pause mid-cycle or cancel during a pause?</strong> Yes! Mid-cycle pauses take effect immediately with unused days credited. You can also cancel directly while paused without needing to unpause first.</p>
                         <p><strong>4. Free Tier Reversion:</strong> Upon cancellation, your account retains 1 free property slot with full mobile cleaner terminal access.</p>
-                        <p><strong>5. File Ownership & Delivery:</strong> All PDF audit reports and certificates are sent directly to your email and your cleaners' emails immediately after each turnover. We don't store data long-term — you own all your files. This keeps TurnProofs lean and keeps your costs down.</p>
+                        <p><strong>5. Where is my data stored and how long do you keep it?</strong> TurnProofs doesn't store your photos, videos, or audit logs. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control.</p>
                         <p><strong>6. Can I change my billing email?</strong> Yes! Click the <em>'Edit Email'</em> button inside the Active Subscription section at the top of this tab to route receipts to any secondary email.</p>
                       </div>
                     )}
