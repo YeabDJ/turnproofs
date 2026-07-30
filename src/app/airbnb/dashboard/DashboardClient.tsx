@@ -1399,8 +1399,7 @@ export default function DashboardClient() {
             )}
 
           </div>
-        </div>
-      </main>
+        </main>
 
       {/* MODAL: ADD PROPERTY */}
       {isPropertyModalOpen && (
