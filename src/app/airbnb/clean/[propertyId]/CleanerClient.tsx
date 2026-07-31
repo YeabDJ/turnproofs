@@ -980,7 +980,10 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                   {cleanersList || (selectedCleaner === 'custom' ? customCleanerName : selectedCleaner)}
                 </span>
               </div>
-              <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-xl text-rose-400 font-mono text-sm font-bold shrink-0">
+              <div 
+                className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 px-3 py-1.5 rounded-xl text-rose-400 font-mono text-sm font-bold shrink-0 cursor-help"
+                title="Time elapsed since check-in"
+              >
                 <Clock className="h-4 w-4 animate-pulse" />
                 <span>{elapsedTime}</span>
               </div>
