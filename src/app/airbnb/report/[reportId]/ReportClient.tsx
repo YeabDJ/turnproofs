@@ -87,6 +87,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [selectedTouchupTasks, setSelectedTouchupTasks] = useState<string[]>([]);
   const [customTouchupNotes, setCustomTouchupNotes] = useState('');
   const [targetCleanerEmail, setTargetCleanerEmail] = useState('');
+  const [touchupBeforePhotos, setTouchupBeforePhotos] = useState<string[]>([]);
+  const [uploadingBeforePhoto, setUploadingBeforePhoto] = useState(false);
   const [submittingTouchup, setSubmittingTouchup] = useState(false);
   const [touchupSuccess, setTouchupSuccess] = useState(false);
   const [touchupShareInfo, setTouchupShareInfo] = useState<{ smsLink: string; whatsappLink: string; touchupUrl: string; shareText: string; cleanerEmail?: string } | null>(null);
@@ -937,28 +939,64 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                         </span>
                       </div>
                       <p className="text-sm text-neutral-200 print-text-dark font-medium whitespace-pre-wrap">{item.text}</p>
-                      {retouchPhotos.length > 0 && (
-                        <div className="pt-2 flex flex-wrap gap-3">
-                          {retouchPhotos.map((url, pIdx) => (
-                            <a
-                              key={pIdx}
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              title="Click to open full-size photo proof in browser"
-                              className="relative rounded-xl overflow-hidden border border-emerald-500/40 group cursor-pointer block"
-                            >
-                              <img 
-                                src={url} 
-                                alt={`Retouch proof ${pIdx+1}`} 
-                                className="h-36 sm:h-44 w-44 object-cover group-hover:scale-105 transition-all duration-300" 
-                              />
-                              <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/80 text-[9px] font-extrabold text-emerald-400 flex items-center gap-1">
-                                <Clock className="h-2.5 w-2.5" />
-                                <span>{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      {/* Side-by-Side Before vs After Comparison Card */}
+                      {(touchupRequest?.beforePhotos?.length > 0 || retouchPhotos.length > 0) && (
+                        <div className="pt-3 border-t border-emerald-500/20 space-y-2">
+                          <p className="text-[11px] font-extrabold uppercase text-neutral-300 tracking-wider flex items-center gap-1.5">
+                            <span>📸 Side-by-Side Touch-Up Evidence Comparison:</span>
+                          </p>
+                          <div className="grid grid-grid-cols-1 sm:grid-cols-2 gap-3">
+                            {/* BEFORE COLUMN */}
+                            <div className="p-3 rounded-xl bg-rose-950/30 border border-rose-500/40 space-y-2">
+                              <span className="text-[10px] font-black uppercase text-rose-300 tracking-wider block">
+                                🔴 BEFORE (Host Flagged Issue)
+                              </span>
+                              <div className="flex flex-wrap gap-2">
+                                {(touchupRequest?.beforePhotos || []).map((bUrl: string, bIdx: number) => (
+                                  <a
+                                    key={bIdx}
+                                    href={bUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Click to open full-resolution Before photo"
+                                    className="relative rounded-xl overflow-hidden border border-rose-500/60 block group cursor-pointer shadow-md"
+                                  >
+                                    <img src={bUrl} alt={`Before proof ${bIdx+1}`} className="h-28 w-28 object-cover group-hover:scale-105 transition-all" />
+                                    <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-[8px] font-extrabold text-rose-300">
+                                      🔴 Before
+                                    </div>
+                                  </a>
+                                ))}
+                                {(!touchupRequest?.beforePhotos || touchupRequest.beforePhotos.length === 0) && (
+                                  <p className="text-xs text-neutral-500 italic">No before photo provided</p>
+                                )}
                               </div>
-                            </a>
-                          ))}
+                            </div>
+
+                            {/* AFTER COLUMN */}
+                            <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/40 space-y-2">
+                              <span className="text-[10px] font-black uppercase text-emerald-300 tracking-wider block">
+                                🟢 AFTER (Cleaner Resolved Fix)
+                              </span>
+                              <div className="flex flex-wrap gap-2">
+                                {retouchPhotos.map((aUrl: string, aIdx: number) => (
+                                  <a
+                                    key={aIdx}
+                                    href={aUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title="Click to open full-resolution After photo"
+                                    className="relative rounded-xl overflow-hidden border border-emerald-500/60 block group cursor-pointer shadow-md"
+                                  >
+                                    <img src={aUrl} alt={`After proof ${aIdx+1}`} className="h-28 w-28 object-cover group-hover:scale-105 transition-all" />
+                                    <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-[8px] font-extrabold text-emerald-300">
+                                      🟢 Fixed
+                                    </div>
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1173,6 +1211,65 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               />
             </div>
 
+            {/* Upload Host BEFORE Photo Proof */}
+            <div className="space-y-2 pt-1 border-t border-neutral-800/80">
+              <label className="block text-xs font-bold text-amber-300 flex items-center justify-between">
+                <span>📷 {lang === 'en' ? 'Upload "BEFORE" Photo Proof (Issue Flagged):' : 'Cargar Foto "ANTES":'}</span>
+                <span className="text-[10px] text-neutral-500 font-normal">Optional</span>
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploadingBeforePhoto(true);
+                  try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const uploadRes = await fetch('/api/airbnb/reports', {
+                      method: 'PUT',
+                      body: formData
+                    });
+                    const uploadData = await uploadRes.json();
+                    if (!uploadRes.ok || !uploadData.success) {
+                      throw new Error(uploadData.error || 'Upload failed');
+                    }
+                    setTouchupBeforePhotos(prev => [...prev, uploadData.publicUrl]);
+                  } catch (err: any) {
+                    alert('Before photo upload failed: ' + (err.message || 'Error'));
+                  } finally {
+                    setUploadingBeforePhoto(false);
+                  }
+                }}
+                className="w-full text-xs text-neutral-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-500/20 file:text-amber-300 hover:file:bg-amber-500/30 cursor-pointer"
+              />
+
+              {uploadingBeforePhoto && (
+                <p className="text-xs text-amber-400 flex items-center gap-1.5">
+                  <span className="h-3 w-3 rounded-full border-2 border-amber-400 border-t-transparent animate-spin" />
+                  <span>Uploading before photo...</span>
+                </p>
+              )}
+
+              {touchupBeforePhotos.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {touchupBeforePhotos.map((url, idx) => (
+                    <div key={idx} className="relative group">
+                      <img src={url} alt={`Before proof ${idx+1}`} className="h-16 w-16 object-cover rounded-xl border border-rose-500/60" />
+                      <button
+                        type="button"
+                        onClick={() => setTouchupBeforePhotos(prev => prev.filter((_, i) => i !== idx))}
+                        className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white rounded-full p-0.5 text-xs shadow-md"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Direct Email to Cleaner Option */}
             <div className="space-y-1.5 pt-1">
               <label className="block text-xs font-bold text-neutral-300">
@@ -1203,7 +1300,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               </button>
               <button
                 type="button"
-                disabled={submittingTouchup || (selectedTouchupTasks.length === 0 && !customTouchupNotes.trim())}
+                disabled={submittingTouchup || uploadingBeforePhoto || (selectedTouchupTasks.length === 0 && !customTouchupNotes.trim() && touchupBeforePhotos.length === 0)}
                 onClick={async () => {
                   setSubmittingTouchup(true);
                   try {
@@ -1215,7 +1312,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                         reportId: reportId,
                         touchup_items: selectedTouchupTasks,
                         host_notes: customTouchupNotes,
-                        cleaner_email: targetCleanerEmail
+                        cleaner_email: targetCleanerEmail,
+                        before_photos: touchupBeforePhotos.join('|||')
                       })
                     });
                     const data = await res.json();

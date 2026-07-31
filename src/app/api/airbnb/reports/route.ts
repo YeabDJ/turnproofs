@@ -503,20 +503,43 @@ export async function POST(request: NextRequest) {
       // Send email alert to host (yeabidj@gmail.com and host email)!
       const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
       const propertyName = (existingReport as any)?.airbnb_properties?.name || 'Vacation Rental Unit';
-      const photosList = photoUrl ? photoUrl.split('|||').filter(Boolean) : [];
+      const beforePhotosList = notesObj?.touchupRequest?.beforePhotos || [];
+      const afterPhotosList = photoUrl ? photoUrl.split('|||').filter(Boolean) : [];
 
-      const photoHtml = photosList.length > 0
-        ? `<div style="margin-top: 15px;">
-            <p style="font-weight: 800; font-size: 11px; color: #4b5563; text-transform: uppercase; margin-bottom: 8px;">📷 Touch-Up Photo Evidence (${photosList.length}):</p>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-              ${photosList.map((p: string, idx: number) => `
-                <a href="${p}" target="_blank">
-                  <img src="${p}" alt="Touchup Proof ${idx+1}" style="height: 120px; width: 120px; object-fit: cover; border-radius: 10px; border: 2px solid #10b981;" />
-                </a>
-              `).join('')}
-            </div>
-          </div>`
-        : '';
+      let comparisonHtml = '';
+      if (beforePhotosList.length > 0 || afterPhotosList.length > 0) {
+        comparisonHtml = `
+          <div style="margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 16px;">
+            <p style="font-size: 12px; font-weight: 800; color: #1f2937; text-transform: uppercase; margin-bottom: 12px;">
+              📸 Side-by-Side Before vs After Touch-Up Comparison:
+            </p>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="width: 50%; vertical-align: top; padding-right: 6px;">
+                  <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; padding: 10px;">
+                    <span style="font-size: 10px; font-weight: 800; color: #9f1239; text-transform: uppercase; display: block; margin-bottom: 6px;">🔴 BEFORE (Host Flagged)</span>
+                    ${beforePhotosList.length > 0 ? beforePhotosList.map((p: string) => `
+                      <a href="${p}" target="_blank">
+                        <img src="${p}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; border: 1.5px solid #f43f5e;" />
+                      </a>
+                    `).join('') : '<p style="font-size: 11px; color: #9f1239; margin: 0; font-style: italic;">No before photo</p>'}
+                  </div>
+                </td>
+                <td style="width: 50%; vertical-align: top; padding-left: 6px;">
+                  <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 10px;">
+                    <span style="font-size: 10px; font-weight: 800; color: #166534; text-transform: uppercase; display: block; margin-bottom: 6px;">🟢 AFTER (Cleaner Fixed)</span>
+                    ${afterPhotosList.length > 0 ? afterPhotosList.map((p: string) => `
+                      <a href="${p}" target="_blank">
+                        <img src="${p}" style="width: 100%; height: 110px; object-fit: cover; border-radius: 8px; margin-bottom: 6px; border: 1.5px solid #10b981;" />
+                      </a>
+                    `).join('') : '<p style="font-size: 11px; color: #166534; margin: 0; font-style: italic;">No after photo</p>'}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        `;
+      }
 
       const html = `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
@@ -535,7 +558,7 @@ export async function POST(request: NextRequest) {
             <p style="margin: 0; font-size: 14px; color: #14532d; font-weight: 600; line-height: 1.5;">"${text.trim()}"</p>
           </div>
 
-          ${photoHtml}
+          ${comparisonHtml}
 
           <div style="text-align: center; margin: 24px 0;">
             <a href="https://turnproofs.com/airbnb/report/${reportId}" target="_blank" style="display: inline-block; background: #10b981; color: #ffffff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
@@ -584,7 +607,7 @@ export async function POST(request: NextRequest) {
 
     // Host Action: Request Touch-Up / Fix from Cleaner
     if (action === 'request_touchup') {
-      const { reportId, touchup_items, host_notes, cleaner_email } = body;
+      const { reportId, touchup_items, host_notes, cleaner_email, before_photos } = body;
       if (!reportId || (!touchup_items?.length && !host_notes)) {
         return NextResponse.json({ success: false, error: 'Report ID and touch-up items/notes are required.' }, { status: 400 });
       }
@@ -621,11 +644,14 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      const beforePhotosList = before_photos ? (Array.isArray(before_photos) ? before_photos : before_photos.split('|||')).filter(Boolean) : [];
+
       notesObj.touchupRequest = {
         id: 'touchup_' + Date.now(),
         timestamp: new Date().toISOString(),
         items: allTouchupItems,
         notes: host_notes || '',
+        beforePhotos: beforePhotosList,
         status: 'pending'
       };
 

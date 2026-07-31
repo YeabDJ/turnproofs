@@ -212,6 +212,8 @@ export default function DashboardClient() {
   const [newTaskRequiresPhoto, setNewTaskRequiresPhoto] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('General / Entire Unit');
   const [customRoom, setCustomRoom] = useState('');
+  const [newTaskRefPhoto, setNewTaskRefPhoto] = useState('');
+  const [uploadingRefPhoto, setUploadingRefPhoto] = useState(false);
 
   // Check auth and load initial dashboard data
   useEffect(() => {
@@ -413,7 +415,10 @@ export default function DashboardClient() {
 
     try {
       const finalRoom = selectedRoom === 'Custom Room' ? (customRoom.trim() || 'Custom Zone') : selectedRoom;
-      const fullTaskName = finalRoom !== 'General / Entire Unit' ? `[${finalRoom}] ${newTaskName.trim()}` : newTaskName.trim();
+      let fullTaskName = finalRoom !== 'General / Entire Unit' ? `[${finalRoom}] ${newTaskName.trim()}` : newTaskName.trim();
+      if (newTaskRefPhoto) {
+        fullTaskName = `${fullTaskName} ||| ${newTaskRefPhoto}`;
+      }
 
       const sortOrder = checklistTasks.length + 1;
       const res = await fetch('/api/airbnb/checklists', {
@@ -431,6 +436,7 @@ export default function DashboardClient() {
       if (data.success) {
         setNewTaskName('');
         setNewTaskRequiresPhoto(false);
+        setNewTaskRefPhoto('');
         // Refresh checklists
         openChecklistManager(activeChecklistProperty);
       }
@@ -2082,6 +2088,58 @@ export default function DashboardClient() {
                     required
                   />
 
+                  {/* Standard Reference Photo (Host Example) */}
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-[11px] font-bold text-neutral-300 flex items-center justify-between">
+                      <span>📷 Standard Reference Photo (How cleaner should set this up):</span>
+                      <span className="text-[10px] text-neutral-500 font-normal">Optional</span>
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploadingRefPhoto(true);
+                          try {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            const uploadRes = await fetch('/api/airbnb/reports', {
+                              method: 'PUT',
+                              body: formData
+                            });
+                            const uploadData = await uploadRes.json();
+                            if (!uploadRes.ok || !uploadData.success) {
+                              throw new Error(uploadData.error || 'Upload failed');
+                            }
+                            setNewTaskRefPhoto(uploadData.publicUrl);
+                          } catch (err: any) {
+                            alert('Reference photo upload failed: ' + (err.message || 'Error'));
+                          } finally {
+                            setUploadingRefPhoto(false);
+                          }
+                        }}
+                        className="flex-1 text-xs text-neutral-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-neutral-800 file:text-neutral-200 hover:file:bg-neutral-700 cursor-pointer"
+                      />
+                      {newTaskRefPhoto && (
+                        <div className="relative shrink-0">
+                          <img src={newTaskRefPhoto} alt="Ref preview" className="h-10 w-10 object-cover rounded-lg border border-rose-500/50" />
+                          <button
+                            type="button"
+                            onClick={() => setNewTaskRefPhoto('')}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 text-[9px]"
+                          >
+                            <X className="h-2.5 w-2.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {uploadingRefPhoto && (
+                      <p className="text-[10px] text-rose-400 animate-pulse">Uploading reference image...</p>
+                    )}
+                  </div>
+
                   <div className="flex items-center justify-between pt-1">
                     <label className="text-xs text-neutral-400 flex items-center gap-1.5 cursor-pointer">
                       <input
@@ -2094,7 +2152,8 @@ export default function DashboardClient() {
                     </label>
                     <button
                       type="submit"
-                      className="px-3.5 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                      disabled={uploadingRefPhoto}
+                      className="px-3.5 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
                     >
                       <Plus className="h-3.5 w-3.5" />
                       <span>Add Task</span>

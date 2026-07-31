@@ -206,13 +206,16 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   const [walkthroughDone, setWalkthroughDone] = useState(false);
 
   // Pending Touch-Up Request State
-  const [pendingTouchup, setPendingTouchup] = useState<{ reportId: string; notes: string; items: string[]; timestamp: string } | null>(null);
+  const [pendingTouchup, setPendingTouchup] = useState<{ reportId: string; notes: string; items: string[]; beforePhotos?: string[]; timestamp: string } | null>(null);
   const [checkedTouchupItems, setCheckedTouchupItems] = useState<string[]>([]);
   const [touchupFixNote, setTouchupFixNote] = useState('');
   const [touchupFixPhotos, setTouchupFixPhotos] = useState<string[]>([]);
   const [uploadingTouchupPhoto, setUploadingTouchupPhoto] = useState(false);
   const [submittingTouchupFix, setSubmittingTouchupFix] = useState(false);
   const [touchupResolved, setTouchupResolved] = useState(false);
+
+  // Standard Reference Photo Modal State
+  const [activeRefPhotoUrl, setActiveRefPhotoUrl] = useState<string | null>(null);
 
   // Instant Red Flag / Lost & Found Alert Modal State
   const [instantModalType, setInstantModalType] = useState<'damage' | 'lost_found' | null>(null);
@@ -310,6 +313,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                       reportId: r.id,
                       notes: parsed.touchupRequest.notes || '',
                       items: parsed.touchupRequest.items || [],
+                      beforePhotos: parsed.touchupRequest.beforePhotos || [],
                       timestamp: parsed.touchupRequest.timestamp
                     });
                     setWalkthroughDone(true);
@@ -1099,6 +1103,30 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                     </div>
                   )}
 
+                  {pendingTouchup.beforePhotos && pendingTouchup.beforePhotos.length > 0 && (
+                    <div className="p-3.5 rounded-xl bg-rose-950/30 border border-rose-500/40 space-y-2">
+                      <p className="text-xs font-extrabold text-rose-300 uppercase tracking-wider">
+                        🔴 Host "BEFORE" Photo Proof (Flagged Issue):
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {pendingTouchup.beforePhotos.map((url, idx) => (
+                          <a
+                            key={idx}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="relative rounded-xl overflow-hidden border border-rose-500/50 block group shadow-md"
+                          >
+                            <img src={url} alt={`Before proof ${idx+1}`} className="h-24 w-24 object-cover group-hover:scale-105 transition-all" />
+                            <span className="absolute top-1 left-1 bg-black/80 text-[8px] font-black text-rose-300 px-1.5 py-0.5 rounded uppercase">
+                              🔴 Before
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {pendingTouchup.items.length > 0 && (
                     <div className="space-y-2 pt-1">
                       <p className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center justify-between">
@@ -1399,7 +1427,14 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                               <div className="p-3 space-y-3 bg-neutral-950/70">
                                 {roomTasks.map((task) => {
                                   const status = taskStates[task.id] || { completed: false, photoUrl: null };
-                                  const cleanTaskText = task.task_name.replace(/^\[.*?\]\s*/, '');
+                                  let cleanTaskText = task.task_name.replace(/^\[.*?\]\s*/, '');
+                                  let referencePhotoUrl: string | null = null;
+
+                                  if (cleanTaskText.includes('|||')) {
+                                    const parts = cleanTaskText.split('|||');
+                                    cleanTaskText = parts[0].trim();
+                                    referencePhotoUrl = parts[1].trim();
+                                  }
 
                                   return (
                                     <div
@@ -1422,9 +1457,25 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                                               <Square className="h-5 w-5" />
                                             )}
                                           </div>
-                                          <span className={`text-xs font-semibold ${status.completed ? 'text-neutral-400 line-through' : 'text-neutral-200'}`}>
-                                            {cleanTaskText}
-                                          </span>
+                                          <div>
+                                            <span className={`text-xs font-semibold block ${status.completed ? 'text-neutral-400 line-through' : 'text-neutral-200'}`}>
+                                              {cleanTaskText}
+                                            </span>
+
+                                            {referencePhotoUrl && (
+                                              <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  setActiveRefPhotoUrl(referencePhotoUrl);
+                                                }}
+                                                className="mt-1.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[10px] font-extrabold transition-all cursor-pointer"
+                                              >
+                                                <Camera className="h-3 w-3 text-amber-400" />
+                                                <span>📷 View Host Standard Reference</span>
+                                              </button>
+                                            )}
+                                          </div>
                                         </button>
 
                                         {/* Photo upload trigger */}
@@ -1938,6 +1989,48 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* FULL SCREEN HOST STANDARD REFERENCE PHOTO MODAL */}
+      {activeRefPhotoUrl && (
+        <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-5 space-y-4 shadow-2xl relative">
+            <div className="flex items-center justify-between border-b border-neutral-800 pb-3">
+              <div className="flex items-center gap-2 text-amber-300 font-extrabold text-sm">
+                <Camera className="h-4.5 w-4.5 text-amber-400" />
+                <span>📷 Host Standard Reference Photo</span>
+              </div>
+              <button
+                onClick={() => setActiveRefPhotoUrl(null)}
+                className="p-1.5 rounded-full bg-neutral-800 text-neutral-400 hover:text-white cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="aspect-4/3 w-full rounded-2xl overflow-hidden border border-amber-500/40 relative shadow-lg">
+              <img
+                src={activeRefPhotoUrl}
+                alt="Host Standard Reference"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute top-2 left-2 bg-black/80 px-2.5 py-1 rounded-md text-[10px] font-black text-amber-300 uppercase tracking-wider border border-amber-500/30">
+                ⭐ Host Setup Standard
+              </div>
+            </div>
+
+            <p className="text-xs text-neutral-300 text-center font-medium">
+              {lang === 'en' ? 'Please set up this room task to match the host standard reference photo above.' : 'Por favor configure esta área para que coincida con la foto de referencia del anfitrión.'}
+            </p>
+
+            <button
+              onClick={() => setActiveRefPhotoUrl(null)}
+              className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 font-extrabold text-xs text-white transition-all shadow-md shadow-amber-500/20 cursor-pointer"
+            >
+              ✓ Got It / Close Reference
+            </button>
           </div>
         </div>
       )}
