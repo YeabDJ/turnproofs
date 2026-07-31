@@ -554,11 +554,12 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${report.start_latitude},${report.start_longitude}`}
                     target="_blank"
-                    rel="noreferrer"
-                    className="no-print p-2 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 text-neutral-400 hover:text-rose-400 transition-all"
-                    title="Open Start in Google Maps"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-xs flex items-center gap-1.5 hover:bg-rose-500/20 transition-all cursor-pointer shadow-sm shrink-0"
+                    title="Open GPS Start Location on Google Maps"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
+                    <span>🗺️ View on Maps</span>
                   </a>
                 )}
               </div>
@@ -584,11 +585,12 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   <a
                     href={`https://www.google.com/maps/search/?api=1&query=${report.end_latitude},${report.end_longitude}`}
                     target="_blank"
-                    rel="noreferrer"
-                    className="no-print p-2 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 text-neutral-400 hover:text-rose-400 transition-all"
-                    title="Open End in Google Maps"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-extrabold text-xs flex items-center gap-1.5 hover:bg-rose-500/20 transition-all cursor-pointer shadow-sm shrink-0"
+                    title="Open GPS End Location on Google Maps"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
+                    <span>🗺️ View on Maps</span>
                   </a>
                 )}
             </div>

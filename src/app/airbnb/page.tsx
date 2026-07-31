@@ -59,13 +59,12 @@ export default function AirbnbLanding() {
             >
               How it Works
             </button>
-            <button 
-              type="button"
-              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+            <Link 
+              href="/features"
               className="hover:text-white transition-colors cursor-pointer"
             >
               Features
-            </button>
+            </Link>
             <button 
               type="button"
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
