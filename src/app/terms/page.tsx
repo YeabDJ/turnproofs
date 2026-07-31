@@ -61,10 +61,11 @@ export default function TermsOfService() {
             </h2>
             <p>TurnProofs operates on a portfolio-tier subscription model:</p>
             <ul className="list-disc pl-5 space-y-1 text-neutral-400">
-              <li><strong>14-Day Free Trial:</strong> Limited to 1 managed property max to prevent trial abuse.</li>
-              <li><strong>Starter Plan ($19.99/mo or $16.99/mo annual):</strong> Covers 1 to 3 managed properties.</li>
-              <li><strong>Pro Plan ($29.99/mo or $24.99/mo annual):</strong> Covers 4 to 9 managed properties.</li>
-              <li><strong>Commercial Plan ($89.99/mo single bldg / $129.99/mo multi):</strong> Dedicated commercial facility audit tier.</li>
+              <li><strong>14-Day Free Trial:</strong> Full feature access with zero credit card required upfront ($0 charged today).</li>
+              <li><strong>Pro Plan ($9.00/mo or $7.65/mo annual):</strong> Covers 1 managed property.</li>
+              <li><strong>Growth Plan ($18.99/mo or $16.14/mo annual):</strong> Covers 2 to 3 managed properties.</li>
+              <li><strong>Elite Plan ($29.99/mo + $4.99/unit beyond 6):</strong> Covers 4 to 6+ managed properties.</li>
+              <li><strong>Commercial Plan ($89.99/mo):</strong> Dedicated commercial multi-tenant facility site tier.</li>
             </ul>
             <p>Subscriptions renew automatically unless canceled prior to the next billing cycle. All payments are non-refundable after the trial period.</p>
           </section>
@@ -72,13 +73,13 @@ export default function TermsOfService() {
           <section className="p-6 rounded-2xl bg-neutral-900/40 border border-neutral-800 backdrop-blur-md space-y-3">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              3. Platform Verification Disclaimer
+              3. Third-Party Platform Verification & Disclaimer
             </h2>
             <p>
-              TurnProofs provides independent, timestamped GPS geolocation logging and room photo compliance records (`/airbnb/report/[reportId]`). 
+              TurnProofs provides independent, timestamped GPS geolocation logging and room photo compliance documentation (`/airbnb/report/[reportId]`).
             </p>
             <p>
-              While TurnProofs verification certificates are designed to provide authoritative evidence for host cleanliness disputes, final dispute resolutions on third-party booking platforms (such as Airbnb, VRBO, or Booking.com) remain subject to those individual platforms&apos; respective policies and resolution centers. TurnProofs does not guarantee specific monetary outcomes in third-party platform arbitrations.
+              TurnProofs makes no representations or warranties regarding Airbnb or VRBO claim outcomes. Users accept all risk associated with submitting documentation to third-party platforms. Airbnb and VRBO make final dispute decisions independently. We provide the tools to document your compliance; hosts make all submission decisions.
             </p>
           </section>
 
@@ -88,7 +89,7 @@ export default function TermsOfService() {
               4. Limitation of Liability
             </h2>
             <p>
-              In no event shall TurnProofs, its operators, or suppliers be liable for indirect, incidental, or consequential damages resulting from lost bookings, third-party platform decisions, or temporary service unavailability. Total liability shall not exceed the subscription fees paid by the user in the preceding 12-month period.
+              In no event shall TurnProofs, its operators, or suppliers be liable for indirect, incidental, or consequential damages resulting from lost bookings, third-party platform decisions, or temporary service unavailability. TurnProofs liability is strictly limited to the subscription fees paid by the user in the preceding 12-month period.
             </p>
           </section>
 
