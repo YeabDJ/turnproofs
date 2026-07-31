@@ -381,18 +381,18 @@ export default function AirbnbLanding() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
-          {/* Free 30-Day Split Trial */}
+          {/* Free 14-Day Trial */}
           <div className="p-5 rounded-2xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between relative group hover:border-neutral-700 transition-all">
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-base text-neutral-200">30-Day Trial</h3>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[9px] font-bold text-emerald-400 uppercase tracking-wider">30 Days</span>
+                <h3 className="font-bold text-base text-neutral-200">14-Day Free Trial</h3>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-[9px] font-bold text-emerald-400 uppercase tracking-wider">14 Days</span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-2xl font-extrabold text-white">$0</span>
-                <span className="text-neutral-500 text-xs">/ 30-day trial</span>
+                <span className="text-neutral-500 text-xs">/ 14-day free trial</span>
               </div>
-              <p className="text-[10px] text-neutral-400 mb-4">No card required Days 1–14. Card entered Day 15 extends trial to Day 30 ($0 today).</p>
+              <p className="text-[10px] text-neutral-400 mb-4">Full feature access for 14 days with zero credit card required upfront.</p>
               <ul className="space-y-2.5 text-[11px] text-neutral-400 mb-6">
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
@@ -400,7 +400,7 @@ export default function AirbnbLanding() {
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                  <span>Card Extends Trial to Day 30 ($0)</span>
+                  <span>Card Required Day 15 to Continue</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
@@ -416,7 +416,7 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 font-bold text-[11px] text-center transition-all block cursor-pointer text-neutral-300"
             >
-              Start 30-Day Trial ($0)
+              Start 14-Day Free Trial ($0)
             </Link>
           </div>
 
@@ -605,8 +605,8 @@ export default function AirbnbLanding() {
               a: "No credit card is required upfront for Days 1–14. You get 14 days of full feature access with $0 charged today."
             },
             {
-              q: "How does the 30-day split trial work and when do I enter my card?",
-              a: "You get 14 days of full feature access with zero credit card required. On Day 15, simply enter your payment card to extend your free trial to the full 30 days ($0 charged today). Your selected subscription plan (Pro $9/mo, Growth $18.99/mo) begins on Day 31. Zero automatic charges occur during your 30-day trial and there is no permanent free tier."
+              q: "How does the 14-day free trial work and when do I enter my card?",
+              a: "You get 14 days of full feature access with zero credit card required upfront ($0 charged today). On Day 15, simply select a plan (Pro $9/mo, Growth $18.99/mo) and enter your payment card to continue using TurnProofs."
             },
             {
               q: "How does Annual Billing work?",

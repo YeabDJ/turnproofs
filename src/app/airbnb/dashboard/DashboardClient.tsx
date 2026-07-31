@@ -280,7 +280,7 @@ export default function DashboardClient() {
 
     // Anti-gaming free trial guard (1 property limit)
     if (properties.length >= 1 && !host?.stripe_subscription_id && host?.subscription_status !== 'active') {
-      alert('30-Day Free Trial Capacity Reached: Your trial includes 1 managed property ($0 today). To add additional properties to your portfolio, please select a plan: Growth Tier (2-3 properties @ $18.99/mo) or Elite Tier (4-6 properties @ $29.99/mo).');
+      alert('14-Day Free Trial Capacity Reached: Your trial includes 1 managed property ($0 today). To add additional properties to your portfolio, please select a plan: Growth Tier (2-3 properties @ $18.99/mo) or Elite Tier (4-6 properties @ $29.99/mo).');
       setCheckoutPlan({
         name: 'Growth Plan',
         planKey: 'growth',
@@ -1074,20 +1074,20 @@ export default function DashboardClient() {
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center font-black text-sm shrink-0">
-                            30d
+                            14d
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-black text-white">30-Day Free Trial • Phase 1 (Days 1–14 No Card)</span>
+                              <span className="text-sm font-black text-white">14-Day Free Trial (Zero Credit Card Required)</span>
                               <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-extrabold border border-emerald-500/20">
-                                Phase 2 Unlock: {fmt(phase2UnlockDate)}
+                                Card Required Day 15: {fmt(phase2UnlockDate)}
                               </span>
                             </div>
-                            <span className="text-xs text-neutral-400">Full Pro feature access active. Enter card on Day 15 ({fmt(phase2UnlockDate)}) to unlock Phase 2 ($0 today). First billing starts on Day 31 ({fmt(firstBillingDate)}).</span>
+                            <span className="text-xs text-neutral-400">Full Pro feature access active. Select a plan & enter card on Day 15 ({fmt(phase2UnlockDate)}) to continue using TurnProofs ($0 charged today).</span>
                           </div>
                         </div>
                         <span className="px-3.5 py-2 rounded-xl bg-neutral-950 border border-emerald-500/30 text-emerald-400 text-xs font-extrabold shrink-0">
-                          💳 Card Required Day 15 ($0 Today)
+                          💳 Card Required Day 15
                         </span>
                       </div>
 
