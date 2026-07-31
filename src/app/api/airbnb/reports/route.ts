@@ -524,62 +524,88 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
       }
 
-      // If cleaner email exists, send direct Touch-Up Notification Email via Resend
-      if (cleanerEmail && cleanerEmail.includes('@')) {
-        const apiKey = process.env.RESEND_API_KEY;
-        if (apiKey) {
-          const touchupUrl = `https://turnproofs.com/airbnb/clean/${existingReport.property_id}?reportId=${reportId}&mode=touchup`;
-          const html = `
-            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
-              <div style="border-bottom: 2px solid #f59e0b; padding-bottom: 16px; margin-bottom: 20px;">
-                <span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
-                  🔍 Host Touch-Up Requested
-                </span>
-                <h1 style="font-size: 20px; font-weight: 800; color: #111827; margin: 12px 0 4px 0;">
-                  Quality Control Touch-Up Request
-                </h1>
-                <p style="font-size: 13px; color: #6b7280; margin: 0;">The host reviewed the cleaning report and requested a quick touch-up.</p>
-              </div>
+      const touchupUrl = `https://turnproofs.com/airbnb/clean/${existingReport.property_id}?reportId=${reportId}&mode=touchup`;
+      
+      // Fetch cleaner phone number if available
+      let cleanerPhone = '';
+      const { data: cleanerObj } = await supabaseAdmin
+        .from('airbnb_cleaners')
+        .select('phone')
+        .eq('name', existingReport.cleaner_name)
+        .maybeSingle();
+      if (cleanerObj && cleanerObj.phone) {
+        cleanerPhone = cleanerObj.phone.replace(/[^0-9+]/g, '');
+      }
 
-              <div style="background: #fffbebf5; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-                <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #92400e;">Requested Touch-Up Items:</p>
-                <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #78350f;">
-                  ${(touchup_items || []).map((item: string) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
-                </ul>
-                ${host_notes ? `<p style="margin: 10px 0 0 0; font-size: 12px; color: #78350f; font-style: italic;"><strong>Host Notes:</strong> "${host_notes}"</p>` : ''}
-              </div>
+      const shareText = `Hi ${existingReport.cleaner_name}, the host requested a quick touch-up: ${touchupUrl}`;
+      const smsLink = cleanerPhone ? `sms:${cleanerPhone}?body=${encodeURIComponent(shareText)}` : `sms:?body=${encodeURIComponent(shareText)}`;
+      const whatsappLink = cleanerPhone ? `https://wa.me/${cleanerPhone}?text=${encodeURIComponent(shareText)}` : `https://wa.me/?text=${encodeURIComponent(shareText)}`;
 
-              <div style="text-align: center; margin: 24px 0;">
-                <a href="${touchupUrl}" target="_blank" style="display: inline-block; background: #f59e0b; color: #ffffff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
-                  📷 Open Mobile Touch-Up Terminal
-                </a>
-              </div>
+      // Dispatch notification via Resend API
+      const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
+          <div style="border-bottom: 2px solid #f59e0b; padding-bottom: 16px; margin-bottom: 20px;">
+            <span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
+              🔍 Host Touch-Up Requested
+            </span>
+            <h1 style="font-size: 20px; font-weight: 800; color: #111827; margin: 12px 0 4px 0;">
+              Quality Control Touch-Up Request
+            </h1>
+            <p style="font-size: 13px; color: #6b7280; margin: 0;">Cleaner: ${existingReport.cleaner_name}</p>
+          </div>
 
-              <p style="font-size: 11px; color: #9ca3af; text-align: center; margin: 0;">TurnProofs Automated Mobile Verification System</p>
-            </div>
-          `;
+          <div style="background: #fffbebf5; border: 1px solid #fef3c7; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: 700; color: #92400e;">Requested Touch-Up Items:</p>
+            <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #78350f;">
+              ${(touchup_items || []).map((item: string) => `<li style="margin-bottom: 4px;">${item}</li>`).join('')}
+            </ul>
+            ${host_notes ? `<p style="margin: 10px 0 0 0; font-size: 12px; color: #78350f; font-style: italic;"><strong>Host Notes:</strong> "${host_notes}"</p>` : ''}
+          </div>
 
-          try {
-            await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                from: 'TurnProofs <onboarding@resend.dev>',
-                to: [cleanerEmail],
-                subject: '🔍 TurnProofs Quality Control: Host Touch-Up Requested',
-                html
-              })
-            });
-          } catch (e) {
-            console.error('Failed to send touch-up email:', e);
-          }
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="${touchupUrl}" target="_blank" style="display: inline-block; background: #f59e0b; color: #ffffff; padding: 14px 28px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
+              📷 Open Mobile Touch-Up Terminal
+            </a>
+          </div>
+
+          <p style="font-size: 11px; color: #9ca3af; text-align: center; margin: 0;">TurnProofs Automated Mobile Verification System</p>
+        </div>
+      `;
+
+      const targetRecipients = ['yeabidj@gmail.com'];
+      if (cleanerEmail && cleanerEmail.includes('@') && !targetRecipients.includes(cleanerEmail)) {
+        targetRecipients.push(cleanerEmail);
+      }
+
+      for (const recipient of targetRecipients) {
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'TurnProofs <onboarding@resend.dev>',
+              to: [recipient],
+              subject: `🔍 TurnProofs Touch-Up Request from Host`,
+              html
+            })
+          });
+        } catch (e) {
+          console.error('Error sending touchup email:', e);
         }
       }
 
-      return NextResponse.json({ success: true, message: 'Touch-up request sent to cleaner.' });
+      return NextResponse.json({
+        success: true,
+        message: 'Touch-up request logged and dispatched.',
+        touchupUrl,
+        smsLink,
+        whatsappLink,
+        shareText
+      });
     }
 
     // Collaborative Action: Start Session

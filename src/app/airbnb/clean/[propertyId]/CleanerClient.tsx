@@ -205,6 +205,13 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   // Walkthrough Audit State (Priority #1 Niche)
   const [walkthroughDone, setWalkthroughDone] = useState(false);
 
+  // Pending Touch-Up Request State
+  const [pendingTouchup, setPendingTouchup] = useState<{ reportId: string; notes: string; items: string[]; timestamp: string } | null>(null);
+  const [touchupFixNote, setTouchupFixNote] = useState('');
+  const [touchupFixPhoto, setTouchupFixPhoto] = useState<string | null>(null);
+  const [submittingTouchupFix, setSubmittingTouchupFix] = useState(false);
+  const [touchupResolved, setTouchupResolved] = useState(false);
+
   // Instant Red Flag / Lost & Found Alert Modal State
   const [instantModalType, setInstantModalType] = useState<'damage' | 'lost_found' | null>(null);
   const [instantDesc, setInstantDesc] = useState('');
@@ -286,6 +293,30 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
             setTaskStates(initialStates);
           }
         }
+
+        // Check for pending touch-up requests for this property
+        try {
+          const touchupRes = await fetch('/api/airbnb/reports');
+          const touchupData = await touchupRes.json();
+          if (touchupData.reports && touchupData.reports.length > 0) {
+            for (const r of touchupData.reports) {
+              if (r.property_id === propertyId && r.notes) {
+                try {
+                  const parsed = JSON.parse(r.notes);
+                  if (parsed.touchupRequest && parsed.touchupRequest.status === 'pending') {
+                    setPendingTouchup({
+                      reportId: r.id,
+                      notes: parsed.touchupRequest.notes || '',
+                      items: parsed.touchupRequest.items || [],
+                      timestamp: parsed.touchupRequest.timestamp
+                    });
+                    break;
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+        } catch (e) {}
 
 
         // Check if there is an active auto-save session for this property
@@ -1022,6 +1053,114 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                 <p className="text-[10px] text-neutral-500 leading-normal">
                   {t.sendInvite}
                 </p>
+              </div>
+            )}
+
+            {/* PENDING TOUCH-UP REQUEST FROM HOST */}
+            {pendingTouchup && !touchupResolved && (
+              <div className="p-5 rounded-2xl border-2 border-amber-500 bg-amber-500/10 space-y-4 shadow-xl shadow-amber-500/10 animate-fade-in">
+                <div className="flex items-center justify-between pb-3 border-b border-amber-500/30">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-amber-400 animate-pulse shrink-0" />
+                    <h3 className="font-extrabold text-sm text-amber-200 tracking-tight uppercase">
+                      {lang === 'en' ? '🔍 HOST QUALITY CONTROL TOUCH-UP REQUEST' : '🔍 SOLICITUD DE RETOQUE DEL ANFITRIÓN'}
+                    </h3>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black uppercase shrink-0">
+                    ACTION NEEDED
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-neutral-300">Host Instructions & Notes:</p>
+                  <div className="p-3.5 rounded-xl bg-neutral-950/80 border border-amber-500/30 text-amber-200 text-xs font-semibold leading-relaxed">
+                    "{pendingTouchup.notes || 'Please perform a quick touchup on flagged items.'}"
+                  </div>
+                  {pendingTouchup.items.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {pendingTouchup.items.map((item, idx) => (
+                        <span key={idx} className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
+                          • {item}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Fix Submission Form */}
+                <div className="space-y-3 pt-2 border-t border-amber-500/20">
+                  <label className="block text-xs font-bold text-neutral-300">
+                    {lang === 'en' ? 'Cleaner Fix Notes & Proof:' : 'Notas de Corrección del Limpiador:'}
+                  </label>
+                  <textarea
+                    rows={2}
+                    placeholder={lang === 'en' ? 'Describe what was re-cleaned or fixed...' : 'Describa lo que corrigió...'}
+                    value={touchupFixNote}
+                    onChange={(e) => setTouchupFixNote(e.target.value)}
+                    className="w-full p-3 rounded-xl bg-neutral-950 border border-neutral-800 focus:border-amber-500 outline-none text-xs text-white resize-none"
+                  />
+
+                  <div className="flex flex-col sm:flex-row items-stretch gap-3">
+                    <label className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-amber-500 text-xs font-bold text-neutral-300 cursor-pointer flex items-center justify-center gap-2 transition-all">
+                      <Camera className="h-4 w-4 text-amber-400" />
+                      <span>{touchupFixPhoto ? '✓ Photo Evidence Attached' : '📷 Take Touch-Up Photo'}</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            const res = await fetch('/api/airbnb/checklists?action=upload_photo', {
+                              method: 'POST',
+                              body: formData
+                            });
+                            const data = await res.json();
+                            if (data.url) setTouchupFixPhoto(data.url);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    <button
+                      type="button"
+                      disabled={submittingTouchupFix || !touchupFixNote.trim()}
+                      onClick={async () => {
+                        setSubmittingTouchupFix(true);
+                        try {
+                          const res = await fetch('/api/airbnb/reports', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              action: 'add_retouch_update',
+                              reportId: pendingTouchup.reportId,
+                              author: cleanersList || selectedCleaner || 'Cleaner Team',
+                              text: touchupFixNote,
+                              photoUrl: touchupFixPhoto
+                            })
+                          });
+                          const data = await res.json();
+                          if (res.ok && data.success) {
+                            setTouchupResolved(true);
+                            alert('✅ Touch-up resolved and host updated!');
+                          } else {
+                            alert('Error: ' + (data.error || 'Failed'));
+                          }
+                        } catch (err) {
+                          alert('Network error submitting touch-up fix');
+                        } finally {
+                          setSubmittingTouchupFix(false);
+                        }
+                      }}
+                      className="flex-1 py-3.5 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-extrabold text-xs text-white shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+                    >
+                      {submittingTouchupFix ? 'Resolving...' : (lang === 'en' ? '⚡ Complete Touch-Up & Notify Host' : '⚡ Completar Retoque')}
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 

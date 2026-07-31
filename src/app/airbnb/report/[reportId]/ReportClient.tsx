@@ -88,6 +88,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [customTouchupNotes, setCustomTouchupNotes] = useState('');
   const [submittingTouchup, setSubmittingTouchup] = useState(false);
   const [touchupSuccess, setTouchupSuccess] = useState(false);
+  const [touchupShareInfo, setTouchupShareInfo] = useState<{ smsLink: string; whatsappLink: string; touchupUrl: string; shareText: string } | null>(null);
 
   // Translation state for Spanish cleaner notes
   const [translatedNotes, setTranslatedNotes] = useState<string | null>(null);
@@ -1112,12 +1113,12 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                     const data = await res.json();
                     if (res.ok && data.success) {
                       setTouchupSuccess(true);
-                      setTimeout(() => {
-                        setShowTouchupModal(false);
-                        setTouchupSuccess(false);
-                        setSelectedTouchupTasks([]);
-                        setCustomTouchupNotes('');
-                      }, 1500);
+                      setTouchupShareInfo({
+                        smsLink: data.smsLink || `sms:?body=${encodeURIComponent('Please check touchup request: ' + data.touchupUrl)}`,
+                        whatsappLink: data.whatsappLink || `https://wa.me/?text=${encodeURIComponent('Please check touchup request: ' + data.touchupUrl)}`,
+                        touchupUrl: data.touchupUrl || `https://turnproofs.com/airbnb/clean/${report?.property_id}`,
+                        shareText: data.shareText || 'Please check touchup request'
+                      });
                     } else {
                       alert('Failed: ' + (data.error || 'Error'));
                     }
@@ -1132,6 +1133,46 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 {submittingTouchup ? 'Sending...' : (lang === 'en' ? '⚡ Send Touch-Up Request' : '⚡ Enviar Solicitud')}
               </button>
             </div>
+            
+            {touchupShareInfo && (
+              <div className="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
+                <div className="flex items-center gap-2 text-amber-300 font-extrabold text-xs">
+                  <CheckCircle className="h-4 w-4 text-emerald-400" />
+                  <span>Touch-Up Request Saved & Emailed!</span>
+                </div>
+                <p className="text-[11px] text-neutral-300 leading-relaxed">
+                  Send a 1-click text or WhatsApp message to your cleaner with the mobile link:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                  <a
+                    href={touchupShareInfo.smsLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-extrabold text-[11px] text-white transition-all text-center flex items-center justify-center gap-1 shadow-sm"
+                  >
+                    <span>📱 Send SMS Text</span>
+                  </a>
+                  <a
+                    href={touchupShareInfo.whatsappLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-extrabold text-[11px] text-white transition-all text-center flex items-center justify-center gap-1 shadow-sm"
+                  >
+                    <span>💬 Send WhatsApp</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(touchupShareInfo.touchupUrl);
+                      alert('📋 Touch-up link copied to clipboard!');
+                    }}
+                    className="px-3 py-2.5 rounded-xl bg-neutral-900 border border-neutral-700 hover:border-amber-500 font-extrabold text-[11px] text-neutral-200 hover:text-white transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                  >
+                    <span>📋 Copy Link</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
