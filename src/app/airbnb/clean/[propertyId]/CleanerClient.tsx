@@ -529,18 +529,23 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     }
   };
 
-  // Check off a task manually
+  // Check off a task manually (or trigger camera if photo is required and missing)
   const toggleTask = (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // If it requires photo, can't toggle without uploading photo first
-    if (task.requires_photo && !taskStates[taskId].photoUrl) {
-      alert('This task requires photo evidence. Please capture a photo first.');
+    // If it requires photo and no photo uploaded yet, automatically trigger the camera file picker!
+    if (task.requires_photo && !taskStates[taskId]?.photoUrl) {
+      const fileInput = document.getElementById(`file_input_${taskId}`);
+      if (fileInput) {
+        fileInput.click();
+      } else {
+        alert('This task requires photo evidence. Please tap the camera icon to take a photo.');
+      }
       return;
     }
 
-    const nextCompleted = !taskStates[taskId].completed;
+    const nextCompleted = !taskStates[taskId]?.completed;
 
     setTaskStates(prev => ({
       ...prev,
@@ -557,7 +562,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         body: JSON.stringify({
           taskId,
           completed: nextCompleted,
-          photoUrl: taskStates[taskId].photoUrl
+          photoUrl: taskStates[taskId]?.photoUrl || null
         })
       }).catch(err => console.error('Failed to sync task status:', err));
     }
@@ -1207,6 +1212,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                                                 <>
                                                   <Camera className={`h-4.5 w-4.5 ${task.requires_photo ? 'text-amber-500' : 'text-neutral-500 hover:text-neutral-350'}`} />
                                                   <input
+                                                    id={`file_input_${task.id}`}
                                                     type="file"
                                                     accept="image/*"
                                                     capture="environment"
