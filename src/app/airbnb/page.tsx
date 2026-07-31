@@ -381,6 +381,24 @@ export default function AirbnbLanding() {
           </div>
         </div>
 
+        {/* Sticky Floating Billing Switcher */}
+        <div className="sticky top-20 z-40 mb-8 flex justify-center pointer-events-none">
+          <div className="pointer-events-auto px-4 py-2 rounded-full bg-neutral-900/95 border border-rose-500/40 shadow-2xl backdrop-blur-md flex items-center gap-3 select-none">
+            <span className="text-[11px] font-extrabold text-neutral-300">Billing Mode:</span>
+            <button
+              type="button"
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="flex items-center gap-2 cursor-pointer"
+            >
+              <span className={`text-xs font-extrabold transition-all ${!isAnnual ? 'text-rose-400' : 'text-neutral-400'}`}>Monthly</span>
+              <div className="w-10 h-5.5 bg-neutral-950 border border-neutral-700 rounded-full p-0.5 transition-colors relative shrink-0">
+                <div className={`w-4.5 h-4.5 bg-rose-500 rounded-full transition-transform ${isAnnual ? 'translate-x-4.5' : 'translate-x-0'}`} />
+              </div>
+              <span className={`text-xs font-extrabold transition-all ${isAnnual ? 'text-emerald-400' : 'text-neutral-400'}`}>Annual (15% OFF)</span>
+            </button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
           {/* Free 14-Day Trial */}
           <div className="p-5 rounded-2xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between relative group hover:border-neutral-700 transition-all">
