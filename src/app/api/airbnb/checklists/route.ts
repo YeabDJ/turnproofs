@@ -12,6 +12,54 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Property ID is required.' }, { status: 400 });
     }
 
+    if (propertyId === 'demo') {
+      const demoTasks = [
+        {
+          id: 'demo-task-1',
+          property_id: 'demo',
+          task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection',
+          requires_photo: true,
+          sort_order: 1
+        },
+        {
+          id: 'demo-task-2',
+          property_id: 'demo',
+          task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners',
+          requires_photo: true,
+          sort_order: 2
+        },
+        {
+          id: 'demo-task-3',
+          property_id: 'demo',
+          task_name: '[Master Bedroom] 🧹 Vacuum rug & wipe down nightstands',
+          requires_photo: false,
+          sort_order: 3
+        },
+        {
+          id: 'demo-task-4',
+          property_id: 'demo',
+          task_name: '[Main Bathroom] 🚿 Scrub shower tile, sanitize toilet & restock paper towels',
+          requires_photo: true,
+          sort_order: 4
+        },
+        {
+          id: 'demo-task-5',
+          property_id: 'demo',
+          task_name: '[Kitchen & Dining] 🍽️ Empty dishwasher, wipe countertops & sanitize sink',
+          requires_photo: true,
+          sort_order: 5
+        },
+        {
+          id: 'demo-task-6',
+          property_id: 'demo',
+          task_name: '[Living Room] 📺 Dust TV stand & arrange decorative couch pillows',
+          requires_photo: false,
+          sort_order: 6
+        }
+      ];
+      return NextResponse.json({ success: true, tasks: demoTasks });
+    }
+
     const { data: tasks, error } = await supabaseAdmin
       .from('airbnb_checklists')
       .select('*')
