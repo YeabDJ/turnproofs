@@ -68,8 +68,8 @@ export default function DedicatedFaqPage() {
       id: 'faq-5',
       category: 'disputes',
       categoryName: lang === 'en' ? 'Dispute Protection & Claims' : 'Protección de Reclamos',
-      q: lang === 'en' ? "How does TurnProofs protect me against false guest cleanliness refund claims?" : "¿Cómo me protege TurnProofs contra reclamos falsos de reembolsos?",
-      a: lang === 'en' ? "Cleaners record timestamped high-resolution photo proofs, room-by-room checklist completions, and verified GPS check-in location coordinates before guest arrival. TurnProofs compiles these into an official PDF Audit Certificate with a shareable verification link to submit directly to Airbnb Support or VRBO resolution centers." : "Los limpiadores registran fotos con marca de tiempo, listas de verificación por habitación y coordenadas GPS verificadas antes de la llegada del huésped. TurnProofs compila esto en un certificado PDF oficial para enviar directamente al soporte de Airbnb o VRBO."
+      q: lang === 'en' ? "How does TurnProofs help protect me against false guest cleanliness refund claims?" : "¿Cómo me ayuda TurnProofs a protegerme contra reclamos falsos?",
+      a: lang === 'en' ? "Cleaners record timestamped high-resolution photo proofs, room-by-room checklist completions, and verified GPS coordinates. TurnProofs compiles these into a professional PDF documentation certificate with a shareable verification link. While comprehensive documentation can strengthen your position in dispute claims, TurnProofs does not guarantee claim outcomes. Airbnb and VRBO make final decisions independently." : "Los limpiadores registran fotos con marca de tiempo, listas de verificación por habitación y coordenadas GPS verificadas. TurnProofs compila esto en un certificado de documentación PDF profesional. Si bien la documentación integral fortalece su posición en reclamos de disputa, TurnProofs no garantiza los resultados de los reclamos. Airbnb y VRBO toman las decisiones finales de forma independiente."
     },
     {
       id: 'faq-6',
@@ -83,7 +83,7 @@ export default function DedicatedFaqPage() {
       category: 'data',
       categoryName: lang === 'en' ? 'Data Retention & File Ownership' : 'Retención de Datos y Archivos',
       q: lang === 'en' ? "Where is my data stored and how long do you keep it?" : "¿Dónde se guardan mis datos y cuánto tiempo los conservan?",
-      a: lang === 'en' ? "TurnProofs doesn't store your photos, videos, or audit logs long-term. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control." : "TurnProofs no almacena sus fotos ni registros a largo plazo. En su lugar, enviamos los certificados PDF directamente a su correo electrónico inmediatamente después de cada rotación. Usted es dueño de todos sus archivos."
+      a: lang === 'en' ? "TurnProofs delivers professional PDF audit certificates directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are automatically deleted after 30 days. You are responsible for maintaining copies of PDF certificates for your own records and dispute submissions. We recommend downloading and archiving PDFs immediately after each turnover." : "TurnProofs entrega certificados PDF profesionales directamente a su correo electrónico. Los borradores incompletos se eliminan automáticamente después de 30 días. Usted es responsable de mantener copias de los certificados PDF para sus propios registros."
     },
     {
       id: 'faq-8',
@@ -125,7 +125,7 @@ export default function DedicatedFaqPage() {
       category: 'data',
       categoryName: lang === 'en' ? 'Data Retention & File Ownership' : 'Retención de Datos y Archivos',
       q: lang === 'en' ? "How long are incomplete non-archived drafts kept?" : "¿Cuánto tiempo se conservan los borradores incompletos no archivados?",
-      a: lang === 'en' ? "Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days (gives you time to re-upload or recover). After 30 days, they are automatically deleted to keep TurnProofs lightweight and your subscription costs low." : "Los informes PDF completados se envían directamente a su correo. Los borradores incompletos se conservan durante 30 días antes de eliminarse automáticamente."
+      a: lang === 'en' ? "Completed PDF audit reports are sent directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are retained for 30 days. After 30 days, they are automatically deleted to keep TurnProofs lightweight and your subscription costs low. You are responsible for downloading and archiving all PDF certificates you wish to retain for dispute purposes." : "Los informes PDF completados se envían directamente a su correo. Los borradores incompletos se conservan durante 30 días antes de eliminarse automáticamente. Usted es responsable de descargar y archivar todos los certificados PDF que desee conservar."
     },
     {
       id: 'faq-14',
@@ -296,8 +296,14 @@ export default function DedicatedFaqPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-900 py-8 px-6 text-center text-xs text-neutral-500 space-y-2">
-        <p>© TurnProofs Knowledge Base. All rights reserved.</p>
+      <footer className="border-t border-neutral-900 py-12 px-6 text-center text-xs text-neutral-500 space-y-6">
+        <div className="max-w-3xl mx-auto space-y-2 text-[10px] text-neutral-500 leading-relaxed border-b border-neutral-900 pb-6">
+          <p className="font-semibold text-neutral-400">⚖️ Legal Disclaimer & Notice:</p>
+          <p>
+            TurnProofs provides documentation and mobile verification tools to help hosts document property cleaning and turnover compliance. TurnProofs is an independent software tool and is not affiliated with, endorsed by, or sponsored by Airbnb, Inc. or VRBO. TurnProofs does not guarantee Airbnb or VRBO claim outcomes. Airbnb and VRBO make final dispute decisions independently. Hosts are solely responsible for downloading, archiving, and submitting documentation to third-party platforms.
+          </p>
+        </div>
+        <p>© TurnProofs Knowledge Base & Compliance Engine. All rights reserved.</p>
         <div className="flex justify-center gap-4 text-[11px] text-neutral-400">
           <Link href="/airbnb" className="hover:text-white">Home</Link>
           <span>•</span>

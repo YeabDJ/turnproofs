@@ -195,9 +195,9 @@ export default function DemoVideoPlayer() {
                 <span className="text-[8px] sm:text-[9px] font-bold text-neutral-400 uppercase">PDF Audit</span>
               </div>
               <div className="max-w-md space-y-1">
-                <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] sm:text-[10px] font-extrabold uppercase">Step 6: Dispute-Proof PDF Certificate</span>
-                <h4 className="text-sm sm:text-xl font-extrabold text-white">Dispute-Proof PDF Delivered to Host</h4>
-                <p className="text-[10px] sm:text-xs text-neutral-400 leading-snug">Auto-generates official compliance record with GPS coordinates, time-stamps, room photo grid, and public dispute link.</p>
+                <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] sm:text-[10px] font-extrabold uppercase">Step 6: Professional PDF Certificate</span>
+                <h4 className="text-sm sm:text-xl font-extrabold text-white">Dispute-Ready PDF Delivered to Host</h4>
+                <p className="text-[10px] sm:text-xs text-neutral-400 leading-snug">Auto-generates professional compliance record with GPS coordinates, time-stamps, room photo grid, and verification link.</p>
               </div>
             </div>
           )}

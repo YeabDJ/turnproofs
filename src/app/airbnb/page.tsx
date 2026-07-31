@@ -114,15 +114,15 @@ export default function AirbnbLanding() {
       <section className="relative pt-24 pb-20 px-6 max-w-7xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-rose-400 mb-8 animate-pulse">
           <Sparkles className="h-3.5 w-3.5" />
-          <span>The Ultimate Airbnb Dispute Resolution Tool</span>
+          <span>Dispute-Ready Cleaning Documentation for Airbnb & VRBO</span>
         </div>
 
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
-          Dispute-Proof Cleaning Proofs For Short-Term Rentals
+          Dispute-Ready Cleaning Documentation For Short-Term Rentals
         </h1>
 
         <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-          Verify checklists, track cleaner GPS coordinates, collect photo proofs, and export beautiful PDF certificates to resolve guest cleanliness claims instantly.
+          Verify checklists, track cleaner GPS coordinates, collect photo proofs, and export professional PDF audit certificates to strengthen your cleanliness claims.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -638,8 +638,8 @@ export default function AirbnbLanding() {
               a: "Annual billing is charged as one discounted upfront payment for 12 months (saving 15%), renewing annually with zero monthly charges."
             },
             {
-              q: "How does TurnProofs protect me against false guest cleanliness refund claims?",
-              a: "Cleaners record timestamped high-resolution photo proofs, room-by-room checklist completions, and verified GPS check-in location coordinates before guest arrival. TurnProofs compiles these into an official PDF Audit Certificate with a shareable verification link to submit directly to Airbnb Support or VRBO resolution centers."
+              q: "How does TurnProofs help protect me against false guest cleanliness refund claims?",
+              a: "Cleaners record timestamped high-resolution photo proofs, room-by-room checklist completions, and verified GPS coordinates. TurnProofs compiles these into a professional PDF documentation certificate with a shareable verification link. While comprehensive documentation can strengthen your position in dispute claims, TurnProofs does not guarantee claim outcomes. Airbnb and VRBO make final dispute decisions independently."
             },
             {
               q: "Do my cleaners need to download an app or create an account?",
@@ -647,11 +647,11 @@ export default function AirbnbLanding() {
             },
             {
               q: "Can I cancel, pause, or re-subscribe anytime?",
-              a: "Yes! Zero contract lock-ins or cancellation fees. You can pause billing for 30 days with $0 charged. While paused, both your Host Dashboard and Cleaner Terminals freeze until resumed. Pause extensions are reserved for active paid subscriptions (unavailable during trial phase). You can also cancel and re-subscribe anytime in 1-click on your previous plan with zero setup fees."
+              a: "Yes! Zero contract lock-ins or cancellation fees. You can pause billing for 30 days with $0 charged. While paused, both your Host Dashboard and Cleaner Terminals freeze until resumed. You can also cancel and re-subscribe anytime in 1-click on your previous plan with zero setup fees."
             },
             {
               q: "Where is my data stored and how long do you keep it?",
-              a: "TurnProofs doesn't store your photos, videos, or audit logs long-term. Instead, we send dispute-proof PDF certificates directly to your email and your cleaners' emails immediately after each turnover. You own all your files — download, share, or archive them however you want. We stay lean, you stay in control."
+              a: "TurnProofs delivers professional PDF audit certificates directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are automatically deleted after 30 days. You are responsible for maintaining copies of PDF certificates for your own records and dispute submissions. We recommend downloading and archiving PDFs immediately after each turnover."
             },
             {
               q: "What payment methods do you accept?",
@@ -699,25 +699,27 @@ export default function AirbnbLanding() {
         <div className="mt-12 p-6 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
             <h4 className="text-sm font-bold text-white">Still have questions before getting started?</h4>
-            <p className="text-xs text-neutral-400">Email our host onboarding team at <a href="mailto:support@turnproofs.com" className="text-rose-400 font-bold underline">support@turnproofs.com</a> — we respond within 24–48 hours! <span className="text-neutral-500 font-medium">(Live chat coming soon)</span></p>
+            <p className="text-xs text-neutral-400">Email our host onboarding team at <a href="mailto:support@turnproofs.com" className="text-rose-400 font-bold underline">support@turnproofs.com</a> — we respond within 24–48 hours!</p>
           </div>
           <a
             href="mailto:support@turnproofs.com"
             className="px-5 py-2.5 rounded-xl bg-neutral-950 border border-rose-500/40 hover:border-rose-500 text-xs font-bold text-rose-400 hover:text-white transition-all shrink-0 cursor-pointer"
           >
-            Email Support (24–48hr Response) &rarr;
+            Email Support
           </a>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-900 py-12 px-6 bg-neutral-950 text-center text-neutral-500 text-sm">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-rose-500" />
-            <span className="font-bold text-white">TurnProofs</span>
-          </div>
-          <p>© {new Date().getFullYear()} TurnProofs. Built for hosts & property managers.</p>
+      <footer className="border-t border-neutral-900 py-12 px-6 text-center text-xs text-neutral-500 space-y-6">
+        <div className="max-w-3xl mx-auto space-y-2 text-[10px] text-neutral-500 leading-relaxed border-b border-neutral-900 pb-6">
+          <p className="font-semibold text-neutral-400">⚖️ Legal Disclaimer & Notice:</p>
+          <p>
+            TurnProofs provides documentation and mobile verification tools to help hosts document property cleaning and turnover compliance. TurnProofs is an independent software tool and is not affiliated with, endorsed by, or sponsored by Airbnb, Inc. or VRBO. TurnProofs does not guarantee Airbnb or VRBO claim outcomes. Airbnb and VRBO make final dispute decisions independently. Hosts are solely responsible for downloading, archiving, and submitting documentation to third-party platforms.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
+          <p>© TurnProofs Systems. Professional Cleaning Verification & Compliance Engine.</p>
           <div className="flex items-center gap-6 text-xs text-neutral-400 font-medium">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>

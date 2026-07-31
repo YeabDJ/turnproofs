@@ -77,7 +77,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
           <h1 style="font-size: 22px; font-weight: 800; color: #064e3b; margin: 12px 0 4px 0;">
             Cleaning Audit & Verification Certificate
           </h1>
-          <p style="font-size: 13px; color: #4b5563; margin: 0;">Dispute-Proof Sanitation Log & Quality Audit Completed</p>
+          <p style="font-size: 13px; color: #4b5563; margin: 0;">Dispute-Ready Sanitation Log & Quality Audit Completed</p>
         </div>
 
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
@@ -88,7 +88,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
 
         <div style="text-align: center; margin: 24px 0;">
           <a href="${reportUrl}" target="_blank" style="display: inline-block; background: #10b981; color: #ffffff; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 800; text-decoration: none;">
-            📄 View & Download Official PDF Certificate
+            📄 View & Download Professional PDF Certificate
           </a>
         </div>
 

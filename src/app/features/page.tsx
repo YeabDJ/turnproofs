@@ -230,7 +230,7 @@ export default function FeaturesPage() {
             Protect Your Vacation Rentals Today
           </h2>
           <p className="text-neutral-300 text-xs sm:text-sm max-w-xl mx-auto">
-            Join hundreds of hosts who defeat false guest cleanliness refund claims and automate cleaner turnovers with TurnProofs.
+            Join hundreds of hosts who strengthen their cleanliness claims and automate cleaner turnovers with TurnProofs.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <Link
@@ -245,8 +245,14 @@ export default function FeaturesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-900 py-8 px-6 text-center text-xs text-neutral-500 space-y-2">
-        <p>© TurnProofs Verification Systems. Dispute-Proof Short-Term Rental Compliance Engine.</p>
+      <footer className="border-t border-neutral-900 py-12 px-6 text-center text-xs text-neutral-500 space-y-6">
+        <div className="max-w-3xl mx-auto space-y-2 text-[10px] text-neutral-500 leading-relaxed border-b border-neutral-900 pb-6">
+          <p className="font-semibold text-neutral-400">⚖️ Legal Disclaimer & Notice:</p>
+          <p>
+            TurnProofs provides documentation and mobile verification tools to help hosts document property cleaning and turnover compliance. TurnProofs is an independent software tool and is not affiliated with, endorsed by, or sponsored by Airbnb, Inc. or VRBO. TurnProofs does not guarantee Airbnb or VRBO claim outcomes. Airbnb and VRBO make final dispute decisions independently. Hosts are solely responsible for downloading, archiving, and submitting documentation to third-party platforms.
+          </p>
+        </div>
+        <p>© TurnProofs Systems. Professional Cleaning Verification & Compliance Engine.</p>
         <div className="flex justify-center gap-4 text-[11px] text-neutral-400">
           <Link href="/airbnb" className="hover:text-white">Home</Link>
           <span>•</span>

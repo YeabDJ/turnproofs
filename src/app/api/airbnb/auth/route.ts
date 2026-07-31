@@ -22,7 +22,7 @@ async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: 
 
       <div style="color: #374151; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
         <p>Hi <strong>${businessName}</strong>,</p>
-        <p>We are thrilled to welcome you to <strong>TurnProofs</strong>! Your host account has been successfully created, and your properties are now protected with dispute-proof cleaning verification.</p>
+        <p>We are thrilled to welcome you to <strong>TurnProofs</strong>! Your host account has been successfully created, and your properties are now equipped with dispute-ready cleaning documentation.</p>
 
         <div style="background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
           <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #1e293b; text-transform: uppercase;">Your Account Credentials:</p>
@@ -34,7 +34,7 @@ async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: 
         <ul style="padding-left: 20px; margin: 0 0 20px 0;">
           <li style="margin-bottom: 8px;"><strong>0-App Cleaner Check-in:</strong> Share your unique QR code or cleaner link. Cleaners require zero app downloads.</li>
           <li style="margin-bottom: 8px;"><strong>Instant Urgent Alerts:</strong> Receive immediate email notifications for broken items, damages, or guest lost & found.</li>
-          <li style="margin-bottom: 8px;"><strong>Dispute-Proof Certificates:</strong> Download official PDF audit certificates for Airbnb & VRBO reimbursement claims.</li>
+          <li style="margin-bottom: 8px;"><strong>Professional PDF Documentation:</strong> Generate professional PDF audit certificates to support your Airbnb & VRBO claims.</li>
         </ul>
 
         <div style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 16px; border-radius: 12px; font-size: 13.5px; line-height: 1.5;">
@@ -43,8 +43,8 @@ async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: 
       </div>
 
       <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center;">
-        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 4px 0;">TurnProofs Automated Mobile Verification System</p>
-        <p style="font-size: 11px; color: #cbd5e1; margin: 0;">Dispute-Proof Cleaning Verification & Real-Time Quality Control</p>
+        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 4px 0;">TurnProofs Mobile Verification System</p>
+        <p style="font-size: 11px; color: #cbd5e1; margin: 0;">Dispute-Ready Cleaning Documentation & Quality Auditing</p>
       </div>
     </div>
   `;
