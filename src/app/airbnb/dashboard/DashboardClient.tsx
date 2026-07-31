@@ -955,6 +955,9 @@ export default function DashboardClient() {
                             const durationMin = Math.round(durationMs / 60000);
 
                             let hasAlert = false;
+                            let isRedFlag = report.notes?.includes('[RED FLAG ALERT]');
+                            let isLostFound = report.notes?.includes('[LOST & FOUND ALERT]');
+
                             if (report.notes && report.notes.trim().startsWith('{')) {
                               try {
                                 const parsed = JSON.parse(report.notes);
@@ -965,15 +968,30 @@ export default function DashboardClient() {
                             return (
                               <tr key={report.id} className="hover:bg-neutral-900/40 transition-colors">
                                 <td className="p-4">
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                     <p className="font-bold text-neutral-200">{report.airbnb_properties?.name || 'Unknown Unit'}</p>
-                                    {hasAlert && (
-                                      <span className="px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-red-450 text-red-400 text-[9px] font-extrabold uppercase tracking-wide shrink-0">
+                                    {isRedFlag && (
+                                      <span className="px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
+                                        🚨 Red Flag Alert
+                                      </span>
+                                    )}
+                                    {isLostFound && (
+                                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
+                                        🎒 Lost & Found Item
+                                      </span>
+                                    )}
+                                    {hasAlert && !isRedFlag && (
+                                      <span className="px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-extrabold uppercase tracking-wide shrink-0">
                                         ⚠️ Maintenance
                                       </span>
                                     )}
                                   </div>
                                   <p className="text-xs text-neutral-500 truncate max-w-[240px]">{report.airbnb_properties?.address}</p>
+                                  {(isRedFlag || isLostFound) && report.notes && (
+                                    <p className="text-xs text-neutral-300 mt-1 italic line-clamp-1 bg-neutral-950/60 p-1.5 rounded-lg border border-neutral-800">
+                                      "{report.notes.replace(/^(🚨 \[RED FLAG ALERT\]:|🎒 \[LOST & FOUND ALERT\]:)\s*/, '').split('|||')[0].trim()}"
+                                    </p>
+                                  )}
                                 </td>
                                 <td className="p-4 font-medium">{report.cleaner_name}</td>
                                 <td className="p-4 text-xs">

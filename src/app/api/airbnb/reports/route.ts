@@ -403,6 +403,23 @@ export async function POST(request: NextRequest) {
       console.log(`Recipients: ${recipientEmails.join(', ')}`);
       console.log(`==================================================\n`);
 
+      // Save alert entry in database so it appears in the Host Dashboard feed
+      const alertPrefix = alertType === 'damage' ? '🚨 [RED FLAG ALERT]' : '🎒 [LOST & FOUND ALERT]';
+      const fullAlertNotes = `${alertPrefix}: ${description}${photoUrl ? ` ||| ${photoUrl}` : ''}`;
+
+      try {
+        await supabaseAdmin.from('airbnb_reports').insert({
+          property_id,
+          cleaner_name: cleaner_name || 'Cleaner Team',
+          started_at: new Date().toISOString(),
+          completed_at: new Date().toISOString(),
+          notes: fullAlertNotes
+        });
+        console.log(`[ALERT SAVED TO DATABASE] Property: ${property_id}, Type: ${alertType}`);
+      } catch (dbErr) {
+        console.error('Failed to save alert in database:', dbErr);
+      }
+
       // Dispatch real email via Resend API!
       await sendResendAlertEmail({
         toEmails: recipientEmails,
@@ -415,7 +432,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Urgent alert dispatched to host email immediately.'
+        message: 'Urgent alert dispatched to host email and saved to dashboard feed immediately.'
       });
     }
 
