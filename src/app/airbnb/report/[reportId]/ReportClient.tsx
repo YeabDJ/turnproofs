@@ -219,8 +219,28 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  useEffect(() => {
+    const beforePrintHandler = () => {
+      setLang('en');
+    };
+    window.addEventListener('beforeprint', beforePrintHandler);
+    return () => {
+      window.removeEventListener('beforeprint', beforePrintHandler);
+    };
+  }, []);
+
+  const handlePrint = async () => {
+    const originalLang = lang;
+    setLang('en');
+    if (notesText && !translatedNotes) {
+      await handleTranslateNotes(notesText);
+    }
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => {
+        setLang(originalLang);
+      }, 1000);
+    }, 150);
   };
 
   if (loading) {
@@ -404,7 +424,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             </button>
 
             <button
-              onClick={() => window.print()}
+              onClick={handlePrint}
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Printer className="h-4 w-4" />
