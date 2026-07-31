@@ -124,7 +124,7 @@ export default function AirbnbLanding() {
             href="/airbnb/login"
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-lg transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/50 hover:scale-[1.03] flex items-center justify-center gap-2 group"
           >
-            <span>Host Control Center</span>
+            <span>Sign In to Dashboard</span>
             <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
