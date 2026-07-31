@@ -207,6 +207,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
   // Pending Touch-Up Request State
   const [pendingTouchup, setPendingTouchup] = useState<{ reportId: string; notes: string; items: string[]; timestamp: string } | null>(null);
+  const [checkedTouchupItems, setCheckedTouchupItems] = useState<string[]>([]);
   const [touchupFixNote, setTouchupFixNote] = useState('');
   const [touchupFixPhotos, setTouchupFixPhotos] = useState<string[]>([]);
   const [uploadingTouchupPhoto, setUploadingTouchupPhoto] = useState(false);
@@ -326,7 +327,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                       })));
                       const preservedStates: Record<string, { completed: boolean; photoUrl: string | null }> = {};
                       origData.tasks.forEach((t: any) => {
-                        preservedStates[t.id] = { completed: !!t.completed, photoUrl: t.photo_url || null };
+                        preservedStates[t.id] = { completed: true, photoUrl: t.photo_url || null };
                       });
                       setTaskStates(preservedStates);
                     }
@@ -1091,18 +1092,55 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                   </span>
                 </div>
 
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-neutral-300">Host Instructions & Notes:</p>
-                  <div className="p-3.5 rounded-xl bg-neutral-950/80 border border-amber-500/30 text-amber-200 text-xs font-semibold leading-relaxed">
-                    "{pendingTouchup.notes || 'Please perform a quick touchup on flagged items.'}"
-                  </div>
+                <div className="space-y-3">
+                  {pendingTouchup.notes && (
+                    <div className="p-3 rounded-xl bg-neutral-950/80 border border-amber-500/30 text-amber-200 text-xs font-semibold leading-relaxed">
+                      💬 Host Notes: "{pendingTouchup.notes}"
+                    </div>
+                  )}
+
                   {pendingTouchup.items.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {pendingTouchup.items.map((item, idx) => (
-                        <span key={idx} className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
-                          • {item}
-                        </span>
-                      ))}
+                    <div className="space-y-2 pt-1">
+                      <p className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center justify-between">
+                        <span>📋 Touch-Up Checklist ({checkedTouchupItems.length}/{pendingTouchup.items.length} Completed):</span>
+                      </p>
+                      <div className="space-y-2">
+                        {pendingTouchup.items.map((item, idx) => {
+                          const isChecked = checkedTouchupItems.includes(item);
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setCheckedTouchupItems(prev =>
+                                  prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
+                                );
+                              }}
+                              className={`p-3.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                                isChecked
+                                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-200'
+                                  : 'bg-neutral-950/90 border-amber-500/40 text-amber-200 hover:border-amber-500/80'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => {}}
+                                  className="h-5 w-5 rounded border-neutral-700 text-emerald-500 focus:ring-emerald-500 bg-neutral-900 cursor-pointer shrink-0"
+                                />
+                                <span className={`text-xs font-bold ${isChecked ? 'line-through opacity-75' : ''}`}>
+                                  {item}
+                                </span>
+                              </div>
+                              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase shrink-0 ${
+                                isChecked ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                              }`}>
+                                {isChecked ? '✓ Fixed' : 'Pending'}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -611,10 +611,20 @@ export async function POST(request: NextRequest) {
         notesObj.cleanerEmail = cleaner_email;
       }
 
+      const allTouchupItems = [...(touchup_items || [])];
+      if (host_notes) {
+        const noteLines = host_notes.split('\n').map((s: string) => s.trim()).filter(Boolean);
+        for (const line of noteLines) {
+          if (!allTouchupItems.includes(line)) {
+            allTouchupItems.push(line);
+          }
+        }
+      }
+
       notesObj.touchupRequest = {
         id: 'touchup_' + Date.now(),
         timestamp: new Date().toISOString(),
-        items: touchup_items || [],
+        items: allTouchupItems,
         notes: host_notes || '',
         status: 'pending'
       };
@@ -835,6 +845,21 @@ export async function POST(request: NextRequest) {
 
       if (updateErr) {
         return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+      }
+
+      // Update task completion states in database
+      if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+        for (const t of tasks) {
+          if (t.id) {
+            await supabaseAdmin
+              .from('airbnb_report_tasks')
+              .update({
+                completed: !!t.completed,
+                photo_url: t.photo_url || null
+              })
+              .eq('id', t.id);
+          }
+        }
       }
 
       if (reportObj) {
