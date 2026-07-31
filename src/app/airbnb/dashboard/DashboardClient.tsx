@@ -1095,11 +1095,11 @@ export default function DashboardClient() {
                       <div className="space-y-1.5 pt-1">
                         <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400">
                           <span>Trial Start: {fmt(createdDate)}</span>
-                          <span className="text-emerald-400 font-mono">Day 1 of 30 (Phase 1: Days 1–14 No Card)</span>
-                          <span className="text-rose-400 font-bold">First Billing Date: {fmt(firstBillingDate)} (Day 31)</span>
+                          <span className="text-emerald-400 font-mono">14-Day Free Trial (Zero Card Required)</span>
+                          <span className="text-rose-400 font-bold">Card Required Day 15: {fmt(phase2UnlockDate)}</span>
                         </div>
                         <div className="w-full h-2.5 bg-neutral-950 rounded-full overflow-hidden border border-neutral-850 p-0.5">
-                          <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[3.3%]" />
+                          <div className="h-full bg-linear-to-r from-emerald-500 to-teal-400 rounded-full w-[10%]" />
                         </div>
                         <div className="flex items-center justify-between text-[10px] text-neutral-400 pt-1">
                           <span>{emailRemindersEnabled ? `📧 Email Reminder Scheduled: ${fmt(phase2UnlockDate)} at 12:00 PM` : '🔕 Trial & Billing Email Reminders Paused by Host'}</span>
