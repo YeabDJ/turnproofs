@@ -149,48 +149,102 @@ async function sendResendAlertEmail({
   const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
   const isDamage = alertType === 'damage';
   const subject = isDamage 
-    ? `🚨 TurnProofs Urgent Alert: Broken Item / Property Damage Reported!`
-    : `🎒 TurnProofs Alert: Guest Lost & Found Item Logged!`;
+    ? `🚨 TurnProofs Urgent Alert: Broken Item / Damage at ${propertyName}`
+    : `🎒 TurnProofs Alert: Guest Lost & Found Item at ${propertyName}`;
 
   const photoHtml = photos.length > 0
-    ? `<div style="margin-top: 15px;">
-        <p style="font-weight: bold; font-size: 12px; color: #4b5563; text-transform: uppercase;">Attached Photo Evidence (${photos.length}):</p>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
-          ${photos.map(p => `<a href="${p}" target="_blank"><img src="${p}" style="height: 120px; width: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #d1d5db;" /></a>`).join('')}
+    ? `<div style="margin-top: 20px;">
+        <p style="font-weight: 800; font-size: 11px; color: #6b7280; text-transform: uppercase; tracking: 0.05em; margin-bottom: 10px;">
+          📷 Attached Photo Evidence (${photos.length}):
+        </p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+          ${photos.map((p, idx) => `
+            <a href="${p}" target="_blank" style="display: inline-block; text-decoration: none;">
+              <img src="${p}" alt="Photo Proof ${idx + 1}" style="height: 140px; width: 140px; object-fit: cover; border-radius: 12px; border: 2px solid ${isDamage ? '#fca5a5' : '#fcd34d'};" />
+            </a>
+          `).join('')}
         </div>
       </div>`
-    : '';
+    : `<div style="margin-top: 15px; padding: 12px; background: #f3f4f6; border-radius: 10px; font-size: 12px; color: #6b7280; font-style: italic;">
+        No photo proof attached for this alert.
+       </div>`;
 
   const html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
-      <div style="border-bottom: 2px solid ${isDamage ? '#ef4444' : '#f59e0b'}; padding-bottom: 16px; margin-bottom: 20px;">
-        <span style="background: ${isDamage ? '#fee2e2' : '#fef3c7'}; color: ${isDamage ? '#991b1b' : '#92400e'}; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
-          ${isDamage ? '⚠️ Immediate Action Required' : '🎒 Guest Belongings Logged'}
-        </span>
-        <h1 style="font-size: 20px; font-weight: 800; color: #111827; margin: 12px 0 4px 0;">
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+      
+      <!-- Top Banner -->
+      <div style="background: ${isDamage ? '#7f1d1d' : '#78350f'}; padding: 24px 28px; text-align: left; color: #ffffff;">
+        <div style="display: inline-block; background: ${isDamage ? 'rgba(239, 68, 68, 0.3)' : 'rgba(245, 158, 11, 0.3)'}; border: 1px solid ${isDamage ? '#f87171' : '#fbbf24'}; padding: 4px 12px; border-radius: 9999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; color: ${isDamage ? '#fca5a5' : '#fef08a'};">
+          ${isDamage ? '⚠️ IMMEDIATE HOST ACTION REQUIRED' : '🎒 GUEST BELONGINGS LOGGED'}
+        </div>
+        <h1 style="font-size: 22px; font-weight: 900; margin: 12px 0 6px 0; color: #ffffff; letter-spacing: -0.02em;">
           ${isDamage ? '🚨 Property Damage / Broken Item Alert' : '🎒 Guest Lost & Found Report'}
         </h1>
-        <p style="font-size: 13px; color: #6b7280; margin: 0;">Dispatched BEFORE checkout from cleaner mobile terminal</p>
+        <p style="font-size: 13px; color: ${isDamage ? '#fca5a5' : '#fde68a'}; margin: 0; font-weight: 500;">
+          Dispatched BEFORE checkout from cleaner mobile terminal
+        </p>
       </div>
 
-      <div style="background: #f9fafb; border: 1px solid #f3f4f6; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
-        <p style="margin: 0 0 8px 0; font-size: 13px; color: #374151;"><strong>Property:</strong> ${propertyName}</p>
-        <p style="margin: 0 0 8px 0; font-size: 13px; color: #374151;"><strong>Cleaner:</strong> ${cleanerName}</p>
-        <p style="margin: 0; font-size: 13px; color: #374151;"><strong>Reported at:</strong> ${new Date().toLocaleString()}</p>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <p style="font-size: 12px; font-weight: bold; color: #4b5563; text-transform: uppercase; margin-bottom: 6px;">Details & Notes:</p>
-        <div style="background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; font-size: 14px; color: #111827; line-height: 1.5; font-weight: 500;">
-          ${description}
+      <div style="padding: 28px;">
+        
+        <!-- Summary Metadata Card -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; margin-bottom: 24px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+            <tr>
+              <td style="padding: 6px 0; color: #64748b; font-weight: 600; width: 120px;">🏠 Property:</td>
+              <td style="padding: 6px 0; color: #0f172a; font-weight: 800;">${propertyName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #64748b; font-weight: 600;">👤 Cleaner Team:</td>
+              <td style="padding: 6px 0; color: #0f172a; font-weight: 800;">${cleanerName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #64748b; font-weight: 600;">⏱️ Logged Time:</td>
+              <td style="padding: 6px 0; color: #0f172a; font-weight: 700;">${new Date().toLocaleString()}</td>
+            </tr>
+            <tr>
+              <td style="padding: 6px 0; color: #64748b; font-weight: 600;">📋 Alert Type:</td>
+              <td style="padding: 6px 0;">
+                <span style="background: ${isDamage ? '#fee2e2' : '#fef3c7'}; color: ${isDamage ? '#991b1b' : '#92400e'}; padding: 3px 10px; border-radius: 6px; font-weight: 800; font-size: 11px;">
+                  ${isDamage ? 'Broken Item / Pre-existing Damage' : 'Guest Belongings Left Behind'}
+                </span>
+              </td>
+            </tr>
+          </table>
         </div>
+
+        <!-- Details & Notes Box -->
+        <div style="margin-bottom: 24px;">
+          <p style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 8px 0;">
+            📝 Cleaner Inspection Notes & Description:
+          </p>
+          <div style="background: #ffffff; border: 2px solid ${isDamage ? '#fecaca' : '#fde68a'}; border-radius: 14px; padding: 18px; font-size: 14px; color: #0f172a; line-height: 1.6; font-weight: 600; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+            ${description || 'No additional notes specified.'}
+          </div>
+        </div>
+
+        <!-- Photo Evidence -->
+        ${photoHtml}
+
+        <!-- Action Button -->
+        <div style="text-align: center; margin: 28px 0 16px 0;">
+          <a href="https://turnproofs.com/airbnb/dashboard" target="_blank" style="display: inline-block; background: ${isDamage ? '#dc2626' : '#d97706'}; color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px ${isDamage ? 'rgba(220,38,38,0.25)' : 'rgba(217,119,6,0.25)'}">
+            🖥️ Open TurnProofs Host Dashboard
+          </a>
+        </div>
+
       </div>
 
-      ${photoHtml}
-
-      <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #f3f4f6; text-align: center;">
-        <p style="font-size: 11px; color: #9ca3af; margin: 0;">TurnProofs Automated Mobile Verification & Host Dispatch System</p>
+      <!-- Footer -->
+      <div style="background: #f8fafc; border-top: 1px solid #f1f5f9; padding: 18px 28px; text-align: center;">
+        <p style="font-size: 11px; color: #94a3b8; margin: 0 0 4px 0; font-weight: 600;">
+          TurnProofs Automated Mobile Verification & Dispute Prevention System
+        </p>
+        <p style="font-size: 10px; color: #cbd5e1; margin: 0;">
+          Cryptographically Verified Pre-Checkout Alert • turnproofs.com
+        </p>
       </div>
+
     </div>
   `;
 
