@@ -529,13 +529,15 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     }
   };
 
-  // Check off a task manually (or trigger camera if photo is required and missing)
+  // Check off a task manually (or trigger camera if photo is MANDATORY required and missing)
   const toggleTask = (taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    // If it requires photo and no photo uploaded yet, automatically trigger the camera file picker!
-    if (task.requires_photo && !taskStates[taskId]?.photoUrl) {
+    const currentStatus = taskStates[taskId] || { completed: false, photoUrl: null };
+
+    // If it MANDATORY requires photo and no photo uploaded yet, trigger camera file picker!
+    if (task.requires_photo && !currentStatus.photoUrl) {
       const fileInput = document.getElementById(`file_input_${taskId}`);
       if (fileInput) {
         fileInput.click();
@@ -545,13 +547,13 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
       return;
     }
 
-    const nextCompleted = !taskStates[taskId]?.completed;
+    const nextCompleted = !currentStatus.completed;
 
     setTaskStates(prev => ({
       ...prev,
       [taskId]: {
-        ...prev[taskId],
-        completed: nextCompleted
+        completed: nextCompleted,
+        photoUrl: currentStatus.photoUrl || null
       }
     }));
 
@@ -562,7 +564,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         body: JSON.stringify({
           taskId,
           completed: nextCompleted,
-          photoUrl: taskStates[taskId]?.photoUrl || null
+          photoUrl: currentStatus.photoUrl || null
         })
       }).catch(err => console.error('Failed to sync task status:', err));
     }
