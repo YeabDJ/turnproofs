@@ -277,18 +277,25 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       {/* Dynamic CSS styles print injection */}
       <style jsx global>{`
         @media print {
+          @page {
+            margin: 12mm;
+            size: auto;
+          }
           body {
             background-color: white !important;
             color: black !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          .no-print {
+          .no-print, .no-print-element {
             display: none !important;
           }
           .print-card {
-            border: 1px solid #e5e7eb !important;
-            background-color: transparent !important;
+            border: 1px solid #d1d5db !important;
+            background-color: white !important;
             box-shadow: none !important;
             color: black !important;
+            padding: 16px !important;
           }
           .print-text-dark {
             color: #111827 !important;
@@ -297,9 +304,26 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             color: #4b5563 !important;
           }
           .print-badge {
-            border: 1px solid #d1d5db !important;
-            background: #f3f4f6 !important;
+            border: 1px solid #e5e7eb !important;
+            background: #f8fafc !important;
             color: #1f2937 !important;
+          }
+          table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+          }
+          tr, td, th {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            color: #111827 !important;
+          }
+          .overflow-x-auto, .overflow-hidden {
+            overflow: visible !important;
+          }
+          .photo-proof-card {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+            border: 1px solid #e2e8f0 !important;
           }
         }
       `}</style>
@@ -337,22 +361,11 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             </button>
 
             <button
-              onClick={() => {
-                document.title = `TurnProofs_Audit_${reportId.substring(0, 8)}.pdf`;
-                window.print();
-              }}
-              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
+              onClick={() => window.print()}
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Download className="h-4 w-4" />
-              <span>{lang === 'en' ? 'Download PDF' : 'Guardar PDF'}</span>
-            </button>
-
-            <button
-              onClick={handlePrint}
-              className="flex-1 sm:flex-initial px-3.5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 font-bold text-xs text-neutral-200 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Printer className="h-4 w-4 text-neutral-400" />
-              <span>{lang === 'en' ? 'Print' : 'Imprimir'}</span>
+              <Printer className="h-4 w-4" />
+              <span>{lang === 'en' ? 'Print / Export PDF' : 'Imprimir / Exportar PDF'}</span>
             </button>
           </div>
         </div>
@@ -384,9 +397,18 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 🌐 {lang === 'en' ? 'Español' : 'English'}
               </button>
 
-              <div className="print-badge md:text-right bg-neutral-900 border border-neutral-800 px-5 py-3 rounded-2xl h-fit">
-                <span className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">{lang === 'en' ? 'Verification ID' : 'ID de Verificación'}</span>
-                <span className="font-mono text-sm font-bold text-neutral-200">{report.id.substring(0, 18).toUpperCase()}</span>
+              {/* Authenticity QR Code & Verification Badge */}
+              <div className="print-badge flex items-center gap-3 bg-neutral-900 border border-neutral-800 p-2.5 rounded-2xl h-fit">
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://turnproofs.com/airbnb/report/${report.id}`}
+                  alt="Scan QR for Airbnb Dispute Authenticity"
+                  className="h-13 w-13 rounded-xl border border-neutral-700 bg-white p-0.5 shrink-0"
+                />
+                <div className="text-left pr-1">
+                  <span className="block text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider">✓ Authenticity QR</span>
+                  <span className="block text-[10px] font-semibold text-neutral-400 print-text-muted uppercase tracking-wider">{lang === 'en' ? 'Verification ID' : 'ID de Verificación'}</span>
+                  <span className="font-mono text-xs font-bold text-neutral-200 print-text-dark">{report.id.substring(0, 18).toUpperCase()}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -578,92 +600,137 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             </div>
           </div>
 
-          {/* Checklist compliance items */}
+          {/* Verified Cleaning Checklist Table */}
           <div className="py-8 border-b border-neutral-800/80 space-y-4">
-            <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
-              <FileCheck2 className="h-4.5 w-4.5 text-neutral-500" />
-              <span>Verified Cleaning Checklist</span>
+            <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="h-4.5 w-4.5 text-neutral-500" />
+                <span>Verified Cleaning Checklist</span>
+              </div>
+              <span className="text-xs font-semibold text-neutral-400 print-text-muted">
+                {tasks.filter(t => t.completed).length} / {tasks.length} Tasks Verified
+              </span>
             </h3>
 
-            <div className="border border-neutral-850 rounded-2xl overflow-hidden bg-neutral-950/20">
+            <div className="border border-neutral-800 rounded-2xl overflow-hidden bg-neutral-950/20 print:border-gray-300">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-neutral-800 bg-neutral-950/80 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                      <th className="p-4">Item Name</th>
-                      <th className="p-4 text-center">Compliance Method</th>
-                      <th className="p-4 text-right">Status</th>
+                    <tr className="border-b border-neutral-800 bg-neutral-950/80 text-xs font-semibold text-neutral-400 uppercase tracking-wider print:bg-gray-100 print:text-gray-700 print:border-gray-300">
+                      <th className="p-3.5">Room & Task Item</th>
+                      <th className="p-3.5 text-center">Compliance Method</th>
+                      <th className="p-3.5 text-center">Photo Proof</th>
+                      <th className="p-3.5 text-right">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-neutral-800/60 text-sm text-neutral-300">
-                    {tasks.map((task) => (
-                      <tr key={task.id} className="hover:bg-neutral-900/10 transition-colors">
-                        <td className="p-4 font-semibold print-text-dark">{task.task_name}</td>
-                        <td className="p-4 text-center text-xs text-neutral-450 print-text-muted">
-                          {task.photo_url ? (
-                            <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md font-semibold">
-                              <Camera className="h-3 w-3" />
-                              <span>Photo Verified</span>
+                  <tbody className="divide-y divide-neutral-800/60 text-sm text-neutral-300 print:divide-gray-200">
+                    {tasks.map((task) => {
+                      let roomName = 'General / Entire Unit';
+                      let cleanTaskName = task.task_name;
+                      const match = task.task_name.match(/^\[(.*?)\]\s*(.*)$/);
+                      if (match) {
+                        roomName = match[1];
+                        cleanTaskName = match[2];
+                      }
+
+                      return (
+                        <tr key={task.id} className="hover:bg-neutral-900/10 transition-colors print:bg-white">
+                          <td className="p-3.5">
+                            <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block print-text-muted">{roomName}</span>
+                            <span className="font-bold text-neutral-100 print-text-dark text-xs sm:text-sm">{cleanTaskName}</span>
+                          </td>
+                          <td className="p-3.5 text-center text-xs">
+                            {task.photo_url ? (
+                              <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg font-bold print:bg-emerald-50 print:border-emerald-300 print:text-emerald-800">
+                                <Camera className="h-3 w-3" />
+                                <span>Photo Verified</span>
+                              </span>
+                            ) : task.requires_photo ? (
+                              <span className="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2.5 py-1 rounded-lg font-bold print:bg-amber-50 print:border-amber-300 print:text-amber-800">
+                                <Camera className="h-3 w-3" />
+                                <span>Photo Required</span>
+                              </span>
+                            ) : (
+                              <span className="text-neutral-500 print-text-muted font-medium">Self Checked</span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-center">
+                            {task.photo_url ? (
+                              <div
+                                onClick={() => setSelectedPhoto(task.photo_url)}
+                                className="inline-block cursor-pointer group"
+                              >
+                                <img
+                                  src={task.photo_url}
+                                  alt={cleanTaskName}
+                                  className="h-10 w-10 object-cover rounded-lg border border-neutral-700 group-hover:border-emerald-400 transition-colors print:border-gray-300 inline-block"
+                                />
+                              </div>
+                            ) : (
+                              <span className="text-neutral-600 text-xs">—</span>
+                            )}
+                          </td>
+                          <td className="p-3.5 text-right">
+                            <span className="inline-flex items-center gap-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 rounded-lg text-xs font-extrabold print:bg-emerald-100 print:border-emerald-400 print:text-emerald-800">
+                              <Check className="h-3.5 w-3.5" />
+                              <span>Completed</span>
                             </span>
-                          ) : task.requires_photo ? (
-                            <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-md font-semibold">
-                              <Camera className="h-3 w-3" />
-                              <span>Photo Required</span>
-                            </span>
-                          ) : (
-                            <span className="text-neutral-500 print-text-muted">Self Checked</span>
-                          )}
-                        </td>
-                        <td className="p-4 text-right">
-                          <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-md text-xs font-bold">
-                            <span>Completed</span>
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
 
-          {/* Photo Evidence Gallery */}
+          {/* Photo Evidence Gallery (Visible in BOTH Web View AND Printed PDF) */}
           {tasks.some(t => t.photo_url) && (
             <div className="py-8 border-b border-neutral-800/80 space-y-4">
-              <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
-                <Camera className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Uploaded Photo Proofs</span>
+              <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Camera className="h-4.5 w-4.5 text-neutral-500" />
+                  <span>High-Resolution Photo Evidence Gallery</span>
+                </div>
+                <span className="text-xs font-semibold text-neutral-400 print-text-muted">
+                  {tasks.filter(t => t.photo_url).length} Photos Logged
+                </span>
               </h3>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {tasks.filter(t => t.photo_url).map((task) => (
-                  <div
-                    key={task.id}
-                    onClick={() => setSelectedPhoto(task.photo_url)}
-                    className="no-print aspect-square rounded-2xl overflow-hidden border border-neutral-800 cursor-zoom-in relative group hover:border-neutral-600 transition-colors"
-                  >
-                    <img
-                      src={task.photo_url || ''}
-                      alt={task.task_name}
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
-                      <span className="text-[10px] font-bold text-white truncate w-full">{task.task_name}</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {tasks.filter(t => t.photo_url).map((task) => {
+                  let roomName = 'General';
+                  let cleanTaskName = task.task_name;
+                  const match = task.task_name.match(/^\[(.*?)\]\s*(.*)$/);
+                  if (match) {
+                    roomName = match[1];
+                    cleanTaskName = match[2];
+                  }
+
+                  return (
+                    <div
+                      key={task.id}
+                      onClick={() => setSelectedPhoto(task.photo_url)}
+                      className="photo-proof-card rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950/80 cursor-zoom-in relative group hover:border-neutral-600 transition-colors flex flex-col justify-between"
+                    >
+                      <div className="aspect-4/3 w-full overflow-hidden relative">
+                        <img
+                          src={task.photo_url || ''}
+                          alt={task.task_name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                        />
+                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider">
+                          ✓ Verified
+                        </div>
+                      </div>
+                      <div className="p-2.5 bg-neutral-900/90 border-t border-neutral-800 print:bg-gray-50 print:border-gray-200">
+                        <span className="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider block truncate print-text-muted">{roomName}</span>
+                        <span className="text-xs font-bold text-neutral-200 block truncate print-text-dark">{cleanTaskName}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-                
-                {/* Print view photos (plain images that display without zoom-in/hover animations) */}
-                {tasks.filter(t => t.photo_url).map((task) => (
-                  <div key={`print-${task.id}`} className="hidden print:block border border-gray-300 rounded-lg p-1.5 space-y-1">
-                    <img
-                      src={task.photo_url || ''}
-                      alt={task.task_name}
-                      className="w-full h-40 object-cover rounded-md"
-                    />
-                    <span className="text-[8px] text-gray-500 font-semibold block truncate">{task.task_name}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
