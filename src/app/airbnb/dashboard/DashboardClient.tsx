@@ -1679,6 +1679,18 @@ export default function DashboardClient() {
                             <p className="text-[11px] text-neutral-300 leading-relaxed font-normal">{item.a}</p>
                           </div>
                         ))}
+                        
+                        <div className="md:col-span-2 pt-2 text-center">
+                          <a
+                            href="/faq"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs font-extrabold text-rose-400 hover:text-rose-300 transition-colors"
+                          >
+                            <span>Need more help? View all 15 platform FAQs on dedicated knowledge base</span>
+                            <ExternalLink className="h-3.5 w-3.5" />
+                          </a>
+                        </div>
                       </div>
                     )}
                   </div>

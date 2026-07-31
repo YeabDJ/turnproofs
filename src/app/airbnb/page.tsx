@@ -678,6 +678,17 @@ export default function AirbnbLanding() {
           })}
         </div>
 
+        {/* View All 15 FAQs Button */}
+        <div className="mt-8 text-center">
+          <Link
+            href="/faq"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-rose-500/40 font-extrabold text-xs text-rose-300 hover:text-white transition-all cursor-pointer shadow-md"
+          >
+            <span>View All 15 Frequently Asked Questions</span>
+            <ChevronRight className="h-4 w-4 text-rose-400" />
+          </Link>
+        </div>
+
         {/* Support Callout Banner */}
         <div className="mt-12 p-6 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div>
