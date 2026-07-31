@@ -310,6 +310,25 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                       items: parsed.touchupRequest.items || [],
                       timestamp: parsed.touchupRequest.timestamp
                     });
+                    setWalkthroughDone(true);
+                    setStarted(true);
+
+                    // Restore original tasks and photo proofs so cleaner doesn't re-do anything!
+                    const origRes = await fetch(`/api/airbnb/reports/${r.id}`);
+                    const origData = await origRes.json();
+                    if (origData.success && origData.tasks && origData.tasks.length > 0) {
+                      setTasks(origData.tasks.map((t: any) => ({
+                        id: t.id,
+                        task_name: t.task_name,
+                        requires_photo: !!t.requires_photo,
+                        sort_order: 0
+                      })));
+                      const preservedStates: Record<string, { completed: boolean; photoUrl: string | null }> = {};
+                      origData.tasks.forEach((t: any) => {
+                        preservedStates[t.id] = { completed: !!t.completed, photoUrl: t.photo_url || null };
+                      });
+                      setTaskStates(preservedStates);
+                    }
                     break;
                   }
                 } catch (e) {}

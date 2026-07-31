@@ -8,8 +8,8 @@ export async function GET(
   try {
     const { reportId } = await params;
 
-    if (!reportId) {
-      return NextResponse.json({ success: false, error: 'Report ID is required.' }, { status: 400 });
+    if (!reportId || reportId === 'undefined' || reportId === 'null') {
+      return NextResponse.json({ success: false, error: 'Invalid Report ID. Please open the report from your Host Dashboard.' }, { status: 400 });
     }
 
     // Fetch the report details joined with property details

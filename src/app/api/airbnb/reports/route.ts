@@ -740,7 +740,7 @@ export async function POST(request: NextRequest) {
         await sendCheckoutReportEmail(reportObj.property_id, reportId, cleaner_email);
       }
 
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ success: true, reportId });
     }
 
     // --- LEGACY SINGLE STEP SUBMISSION ---
