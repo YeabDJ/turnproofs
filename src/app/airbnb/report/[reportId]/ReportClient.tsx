@@ -148,7 +148,26 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           setError(data.error || 'Failed to fetch report details.');
         } else {
           setReport(data.report);
-          setTasks(data.tasks || []);
+          let loadedTasks = data.tasks || [];
+
+          // If report tasks are empty, fetch property template tasks to populate certificate checklist!
+          if (loadedTasks.length === 0 && data.report?.property_id) {
+            try {
+              const propTasksRes = await fetch(`/api/airbnb/checklists?propertyId=${data.report.property_id}`);
+              const propTasksData = await propTasksRes.json();
+              if (propTasksData.success && propTasksData.tasks && propTasksData.tasks.length > 0) {
+                loadedTasks = propTasksData.tasks.map((t: any) => ({
+                  id: t.id,
+                  task_name: t.task_name,
+                  requires_photo: !!t.requires_photo,
+                  photo_url: null,
+                  completed: true
+                }));
+              }
+            } catch (e) {}
+          }
+
+          setTasks(loadedTasks);
         }
         setLoading(false);
       } catch (err) {
@@ -264,6 +283,14 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     } catch (e) {
       console.error('Failed to parse report notes JSON', e);
     }
+  }
+
+  // Parse pipe-delimited alert photos attached to instant notes
+  if (notesText && notesText.includes('|||')) {
+    const parts = notesText.split('|||');
+    notesText = parts[0].trim();
+    const alertPhotoUrls = parts[1].split(',').map(s => s.trim()).filter(Boolean);
+    additionalPhotos = Array.from(new Set([...additionalPhotos, ...alertPhotoUrls]));
   }
 
   // Geolocation comparisons
