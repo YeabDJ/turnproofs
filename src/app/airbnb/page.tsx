@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle } from 'lucide-react';
+import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink } from 'lucide-react';
 import DemoVideoPlayer from './components/DemoVideoPlayer';
 
 export default function AirbnbLanding() {
@@ -128,10 +128,12 @@ export default function AirbnbLanding() {
             <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
-            href="/airbnb/login?demo=true"
+            href="/airbnb/clean/demo"
+            target="_blank"
             className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 font-semibold text-lg transition-all flex items-center justify-center gap-2"
           >
             <span>Try Cleaner Demo</span>
+            <ExternalLink className="h-4 w-4 text-rose-400" />
           </Link>
         </div>
 
