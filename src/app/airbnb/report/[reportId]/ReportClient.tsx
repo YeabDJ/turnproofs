@@ -719,16 +719,19 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                           </td>
                           <td className="p-3.5 text-center">
                             {task.photo_url ? (
-                              <div
-                                onClick={() => setSelectedPhoto(task.photo_url)}
+                              <a
+                                href={task.photo_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="Click to view full-resolution timestamped photo proof"
                                 className="inline-block cursor-pointer group"
                               >
                                 <img
                                   src={task.photo_url}
                                   alt={cleanTaskName}
-                                  className="h-10 w-10 object-cover rounded-lg border border-neutral-700 group-hover:border-emerald-400 transition-colors print:border-gray-300 inline-block"
+                                  className="h-10 w-10 object-cover rounded-lg border border-neutral-700 group-hover:border-emerald-400 transition-colors print:border-gray-300 inline-block shadow-sm"
                                 />
-                              </div>
+                              </a>
                             ) : (
                               <span className="text-neutral-600 text-xs">—</span>
                             )}
@@ -771,11 +774,16 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                     cleanTaskName = match[2];
                   }
 
+                  const photoTimeStr = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
                   return (
-                    <div
+                    <a
                       key={task.id}
-                      onClick={() => setSelectedPhoto(task.photo_url)}
-                      className="photo-proof-card rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950/80 cursor-zoom-in relative group hover:border-neutral-600 transition-colors flex flex-col justify-between"
+                      href={task.photo_url || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Click to view full-resolution timestamped photo proof"
+                      className="photo-proof-card rounded-2xl overflow-hidden border border-neutral-800 bg-neutral-950/80 cursor-pointer relative group hover:border-emerald-500/60 transition-all flex flex-col justify-between shadow-md"
                     >
                       <div className="aspect-4/3 w-full overflow-hidden relative">
                         <img
@@ -783,15 +791,17 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                           alt={task.task_name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
                         />
-                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-xs text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider">
-                          ✓ Verified
+                        <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-xs text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-1 border border-emerald-500/30">
+                          <Clock className="h-2.5 w-2.5 text-emerald-400" />
+                          <span>✓ Verified • {photoTimeStr}</span>
                         </div>
                       </div>
                       <div className="p-2.5 bg-neutral-900/90 border-t border-neutral-800 print:bg-gray-50 print:border-gray-200">
                         <span className="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider block truncate print-text-muted">{roomName}</span>
                         <span className="text-xs font-bold text-neutral-200 block truncate print-text-dark">{cleanTaskName}</span>
+                        <span className="text-[9px] text-emerald-400/90 font-semibold block mt-0.5">🔗 Clickable High-Res PDF Link</span>
                       </div>
-                    </div>
+                    </a>
                   );
                 })}
               </div>
@@ -836,23 +846,24 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="py-8 border-t border-neutral-800/80 space-y-4">
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
                 <Camera className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Additional Property Photos</span>
+                <span>Additional Property & Alert Photos ({additionalPhotos.length})</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {additionalPhotos.map((url, i) => (
-                  <div
+                  <a
                     key={i}
-                    onClick={() => setSelectedPhoto(url)}
-                    className="no-print aspect-square rounded-2xl overflow-hidden border border-neutral-800 cursor-zoom-in relative group hover:border-neutral-600 transition-colors"
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Click to view full-resolution photo proof"
+                    className="aspect-square rounded-2xl overflow-hidden border border-neutral-800 cursor-pointer relative group hover:border-emerald-500/60 transition-all block shadow-md"
                   >
-                    <img src={url} alt="additional proof" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-300" />
-                  </div>
-                ))}
-                {/* Print view additional photos */}
-                {additionalPhotos.map((url, i) => (
-                  <div key={`print-additional-${i}`} className="hidden print:block border border-gray-300 rounded-lg p-1.5">
-                    <img src={url} alt="additional proof" className="w-full h-40 object-cover rounded-md" />
-                  </div>
+                    <img src={url} alt={`Additional proof ${i+1}`} className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300" />
+                    <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-xs text-[9px] font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1 border border-amber-500/30">
+                      <Clock className="h-2.5 w-2.5 text-amber-400" />
+                      <span>Timestamped</span>
+                    </div>
+                  </a>
                 ))}
               </div>
             </div>
@@ -914,25 +925,45 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               </div>
 
               <div className="space-y-4">
-                {retouches.map((item, idx) => (
-                  <div key={item.id || idx} className="p-5 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-neutral-400 border-b border-emerald-500/20 pb-2">
-                      <span className="font-bold text-emerald-300">{item.author}</span>
-                      <span className="font-mono text-[11px]">{new Date(item.timestamp).toLocaleString()}</span>
-                    </div>
-                    <p className="text-sm text-neutral-200 print-text-dark font-medium whitespace-pre-wrap">{item.text}</p>
-                    {item.photoUrl && (
-                      <div className="pt-2">
-                        <img 
-                          src={item.photoUrl} 
-                          alt="retouch resolution proof" 
-                          onClick={() => setSelectedPhoto(item.photoUrl)}
-                          className="h-36 sm:h-48 rounded-xl border border-emerald-500/40 object-cover cursor-zoom-in hover:opacity-90 transition-opacity" 
-                        />
+                {retouches.map((item, idx) => {
+                  const retouchPhotos = item.photoUrl ? item.photoUrl.split('|||').filter(Boolean) : [];
+                  return (
+                    <div key={item.id || idx} className="p-5 rounded-2xl bg-emerald-950/20 border border-emerald-500/40 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs text-neutral-400 border-b border-emerald-500/20 pb-2">
+                        <span className="font-bold text-emerald-300">{item.author}</span>
+                        <span className="font-mono text-[11px] flex items-center gap-1">
+                          <Clock className="h-3 w-3 text-emerald-400" />
+                          <span>{new Date(item.timestamp).toLocaleString()}</span>
+                        </span>
                       </div>
-                    )}
-                  </div>
-                ))}
+                      <p className="text-sm text-neutral-200 print-text-dark font-medium whitespace-pre-wrap">{item.text}</p>
+                      {retouchPhotos.length > 0 && (
+                        <div className="pt-2 flex flex-wrap gap-3">
+                          {retouchPhotos.map((url, pIdx) => (
+                            <a
+                              key={pIdx}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Click to open full-size photo proof in browser"
+                              className="relative rounded-xl overflow-hidden border border-emerald-500/40 group cursor-pointer block"
+                            >
+                              <img 
+                                src={url} 
+                                alt={`Retouch proof ${pIdx+1}`} 
+                                className="h-36 sm:h-44 w-44 object-cover group-hover:scale-105 transition-all duration-300" 
+                              />
+                              <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/80 text-[9px] font-extrabold text-emerald-400 flex items-center gap-1">
+                                <Clock className="h-2.5 w-2.5" />
+                                <span>{new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              </div>
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
