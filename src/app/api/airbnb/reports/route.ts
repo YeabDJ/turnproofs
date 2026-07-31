@@ -445,7 +445,7 @@ export async function POST(request: NextRequest) {
 
       const { data: existingReport } = await supabaseAdmin
         .from('airbnb_reports')
-        .select('notes, property_id')
+        .select('notes, property_id, cleaner_name, airbnb_properties(name, host_id)')
         .eq('id', reportId)
         .maybeSingle();
 
@@ -469,6 +469,12 @@ export async function POST(request: NextRequest) {
 
       notesObj.retouches = retouches;
 
+      // Mark touchup request as completed!
+      if (notesObj.touchupRequest) {
+        notesObj.touchupRequest.status = 'completed';
+        notesObj.touchupRequest.completed_at = new Date().toISOString();
+      }
+
       const { error: updateErr } = await supabaseAdmin
         .from('airbnb_reports')
         .update({ notes: JSON.stringify(notesObj) })
@@ -478,7 +484,86 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, message: 'Follow-up retouch addendum saved to report certificate.' });
+      // Send email alert to host (yeabidj@gmail.com and host email)!
+      const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
+      const propertyName = (existingReport as any)?.airbnb_properties?.name || 'Vacation Rental Unit';
+      const photosList = photoUrl ? photoUrl.split('|||').filter(Boolean) : [];
+
+      const photoHtml = photosList.length > 0
+        ? `<div style="margin-top: 15px;">
+            <p style="font-weight: 800; font-size: 11px; color: #4b5563; text-transform: uppercase; margin-bottom: 8px;">📷 Touch-Up Photo Evidence (${photosList.length}):</p>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              ${photosList.map((p: string, idx: number) => `
+                <a href="${p}" target="_blank">
+                  <img src="${p}" alt="Touchup Proof ${idx+1}" style="height: 120px; width: 120px; object-fit: cover; border-radius: 10px; border: 2px solid #10b981;" />
+                </a>
+              `).join('')}
+            </div>
+          </div>`
+        : '';
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
+          <div style="border-bottom: 2px solid #10b981; padding-bottom: 16px; margin-bottom: 20px;">
+            <span style="background: #d1fae5; color: #065f46; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase;">
+              ✓ Touch-Up Completed & Resolved
+            </span>
+            <h1 style="font-size: 20px; font-weight: 800; color: #064e3b; margin: 12px 0 4px 0;">
+              Quality Control Touch-Up Resolved for ${propertyName}
+            </h1>
+            <p style="font-size: 13px; color: #4b5563; margin: 0;">Completed by cleaner: ${author || 'Cleaner Team'}</p>
+          </div>
+
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
+            <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #166534;">Cleaner Touch-Up Resolution Notes:</p>
+            <p style="margin: 0; font-size: 14px; color: #14532d; font-weight: 600; line-height: 1.5;">"${text.trim()}"</p>
+          </div>
+
+          ${photoHtml}
+
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="https://turnproofs.com/airbnb/report/${reportId}" target="_blank" style="display: inline-block; background: #10b981; color: #ffffff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
+              📄 View Updated PDF Certificate
+            </a>
+          </div>
+
+          <p style="font-size: 11px; color: #9ca3af; text-align: center; margin: 0;">TurnProofs Automated Mobile Verification System</p>
+        </div>
+      `;
+
+      const targetRecipients = ['yeabidj@gmail.com'];
+      if ((existingReport as any)?.airbnb_properties?.host_id) {
+        const { data: hostObj } = await supabaseAdmin
+          .from('airbnb_hosts')
+          .select('email')
+          .eq('id', (existingReport as any).airbnb_properties.host_id)
+          .maybeSingle();
+        if (hostObj?.email && !targetRecipients.includes(hostObj.email)) {
+          targetRecipients.push(hostObj.email);
+        }
+      }
+
+      for (const recipient of targetRecipients) {
+        try {
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'TurnProofs <onboarding@resend.dev>',
+              to: [recipient],
+              subject: `✨ TurnProofs Touch-Up Completed for ${propertyName}`,
+              html
+            })
+          });
+        } catch (e) {
+          console.error('Error sending retouch completion email:', e);
+        }
+      }
+
+      return NextResponse.json({ success: true, message: 'Follow-up retouch addendum saved & host notified via email.' });
     }
 
     // Host Action: Request Touch-Up / Fix from Cleaner

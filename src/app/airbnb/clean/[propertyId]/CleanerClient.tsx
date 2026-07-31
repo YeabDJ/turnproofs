@@ -208,7 +208,8 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   // Pending Touch-Up Request State
   const [pendingTouchup, setPendingTouchup] = useState<{ reportId: string; notes: string; items: string[]; timestamp: string } | null>(null);
   const [touchupFixNote, setTouchupFixNote] = useState('');
-  const [touchupFixPhoto, setTouchupFixPhoto] = useState<string | null>(null);
+  const [touchupFixPhotos, setTouchupFixPhotos] = useState<string[]>([]);
+  const [uploadingTouchupPhoto, setUploadingTouchupPhoto] = useState(false);
   const [submittingTouchupFix, setSubmittingTouchupFix] = useState(false);
   const [touchupResolved, setTouchupResolved] = useState(false);
 
@@ -1119,10 +1120,34 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                     className="w-full p-3 rounded-xl bg-neutral-950 border border-neutral-800 focus:border-amber-500 outline-none text-xs text-white resize-none"
                   />
 
+                  {/* Uploaded Touch-Up Photos Thumbnails */}
+                  {touchupFixPhotos.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {touchupFixPhotos.map((url, idx) => (
+                        <div key={idx} className="relative h-14 w-14 rounded-xl overflow-hidden border border-amber-500/40 shrink-0">
+                          <img src={url} alt={`Touch-Up Fix Photo ${idx + 1}`} className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setTouchupFixPhotos(prev => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-black/80 text-white hover:text-red-400 cursor-pointer"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="flex flex-col sm:flex-row items-stretch gap-3">
                     <label className="px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-amber-500 text-xs font-bold text-neutral-300 cursor-pointer flex items-center justify-center gap-2 transition-all">
                       <Camera className="h-4 w-4 text-amber-400" />
-                      <span>{touchupFixPhoto ? '✓ Photo Evidence Attached' : '📷 Take Touch-Up Photo'}</span>
+                      <span>
+                        {uploadingTouchupPhoto 
+                          ? 'Uploading Photo...' 
+                          : touchupFixPhotos.length > 0 
+                          ? `📷 Add Another Photo (${touchupFixPhotos.length} Attached)` 
+                          : '📷 Take Touch-Up Photo Proof'}
+                      </span>
                       <input
                         type="file"
                         accept="image/*"
@@ -1131,14 +1156,21 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const formData = new FormData();
-                            formData.append('file', file);
-                            const res = await fetch('/api/airbnb/checklists?action=upload_photo', {
-                              method: 'POST',
-                              body: formData
-                            });
-                            const data = await res.json();
-                            if (data.url) setTouchupFixPhoto(data.url);
+                            setUploadingTouchupPhoto(true);
+                            try {
+                              const formData = new FormData();
+                              formData.append('file', file);
+                              const res = await fetch('/api/airbnb/checklists?action=upload_photo', {
+                                method: 'POST',
+                                body: formData
+                              });
+                              const data = await res.json();
+                              if (data.url) setTouchupFixPhotos(prev => [...prev, data.url]);
+                            } catch (err) {
+                              alert('Error uploading photo');
+                            } finally {
+                              setUploadingTouchupPhoto(false);
+                            }
                           }
                         }}
                       />
@@ -1158,13 +1190,13 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                               reportId: pendingTouchup.reportId,
                               author: cleanersList || selectedCleaner || 'Cleaner Team',
                               text: touchupFixNote,
-                              photoUrl: touchupFixPhoto
+                              photoUrl: touchupFixPhotos.join('|||')
                             })
                           });
                           const data = await res.json();
                           if (res.ok && data.success) {
                             setTouchupResolved(true);
-                            alert('✅ Touch-up resolved and host updated!');
+                            alert('✅ Touch-up resolved and host notified via email!');
                           } else {
                             alert('Error: ' + (data.error || 'Failed'));
                           }
