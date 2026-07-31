@@ -127,10 +127,24 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   useEffect(() => {
     async function fetchReportDetails() {
       try {
-        const res = await fetch(`/api/airbnb/reports/${reportId}`);
-        const data = await res.json();
+        let res = await fetch(`/api/airbnb/reports/${reportId}`);
+        let data = await res.json();
         
         if (!res.ok || !data.success) {
+          // Auto-recover fallback to latest report if reportId was undefined or missing
+          const fallbackRes = await fetch('/api/airbnb/reports');
+          const fallbackData = await fallbackRes.json();
+          if (fallbackData.reports && fallbackData.reports.length > 0) {
+            const latest = fallbackData.reports[0];
+            const detailRes = await fetch(`/api/airbnb/reports/${latest.id}`);
+            const detailData = await detailRes.json();
+            if (detailData.success && detailData.report) {
+              setReport(detailData.report);
+              setTasks(detailData.tasks || []);
+              setLoading(false);
+              return;
+            }
+          }
           setError(data.error || 'Failed to fetch report details.');
         } else {
           setReport(data.report);

@@ -25,10 +25,24 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       if (host?.email) hostEmail = host.email;
     }
 
+    let finalReportId = reportId;
+    if (!finalReportId || finalReportId === 'undefined' || finalReportId === 'null') {
+      const { data: latestReport } = await supabaseAdmin
+        .from('airbnb_reports')
+        .select('id')
+        .eq('property_id', propertyId)
+        .order('started_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (latestReport?.id) {
+        finalReportId = latestReport.id;
+      }
+    }
+
     const { data: report } = await supabaseAdmin
       .from('airbnb_reports')
       .select('cleaner_name, started_at, completed_at, notes')
-      .eq('id', reportId)
+      .eq('id', finalReportId || reportId)
       .maybeSingle();
 
     const recipients = new Set<string>();
@@ -48,7 +62,9 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       }
     }
 
-    const reportUrl = `https://turnproofs.com/airbnb/report/${reportId}`;
+    const reportUrl = finalReportId && finalReportId !== 'undefined'
+      ? `https://turnproofs.com/airbnb/report/${finalReportId}`
+      : `https://turnproofs.com/airbnb/dashboard`;
     const propertyName = property?.name || 'Vacation Rental Property';
     const cleanerName = report?.cleaner_name || 'Cleaning Crew';
 
