@@ -14,7 +14,8 @@ import {
   Smartphone, 
   PauseCircle, 
   ExternalLink,
-  Globe
+  Globe,
+  Mail
 } from 'lucide-react';
 
 export default function DedicatedFaqPage() {
@@ -259,10 +260,17 @@ export default function DedicatedFaqPage() {
       <section className="py-16 px-6 max-w-4xl mx-auto w-full text-center">
         <div className="p-8 rounded-3xl bg-neutral-900/60 border border-neutral-800 space-y-4">
           <h3 className="text-xl font-extrabold text-white">Still have questions?</h3>
-          <p className="text-xs text-neutral-400 max-w-md mx-auto">
-            Start your 14-day free trial with zero credit card required and experience dispute-proof turnover verifications firsthand.
+          <p className="text-xs text-neutral-400 max-w-lg mx-auto leading-relaxed">
+            Have a custom request or need help setting up your property portfolio? Email our host onboarding team at <a href="mailto:support@turnproofs.com" className="text-rose-400 font-extrabold underline hover:text-rose-300">support@turnproofs.com</a> — we respond within 24–48 hours!
           </p>
-          <div className="pt-2 flex justify-center gap-4">
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="mailto:support@turnproofs.com"
+              className="px-6 py-3 rounded-xl bg-neutral-950 border border-rose-500/40 hover:border-rose-500 font-extrabold text-xs text-rose-300 hover:text-white transition-all flex items-center gap-2 cursor-pointer shadow-md"
+            >
+              <Mail className="h-4 w-4 text-rose-400" />
+              <span>Email: support@turnproofs.com</span>
+            </a>
             <Link
               href="/airbnb/login"
               className="px-6 py-3 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-extrabold text-xs text-white shadow-md shadow-rose-500/20 transition-all flex items-center gap-2 cursor-pointer"
