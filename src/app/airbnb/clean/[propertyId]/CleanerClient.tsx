@@ -1677,7 +1677,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                         action: 'instant_alert',
                         property_id: propertyId,
                         alertType: instantModalType,
-                        cleaner_name: selectedCleaner === 'custom' ? customCleanerName : selectedCleaner,
+                        cleaner_name: cleanersList || (selectedCleaner === 'custom' ? customCleanerName : selectedCleaner) || 'Cleaner Team',
                         description: instantDesc,
                         photoUrl: instantPhotos.join('|||')
                       })
@@ -1685,11 +1685,14 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                     const data = await res.json();
                     if (data.success) {
                       setInstantAlertSuccess(true);
+                      alert('✅ Instant Alert Sent! Check your email inbox now.');
                       setTimeout(() => {
                         setInstantModalType(null);
                         setInstantAlertSuccess(false);
                         setInstantPhotos([]);
                       }, 2000);
+                    } else {
+                      alert('Failed to send alert: ' + (data.error || 'Unknown error'));
                     }
                   } catch (err) {
                     console.error(err);
