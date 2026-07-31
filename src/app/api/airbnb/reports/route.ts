@@ -483,7 +483,7 @@ export async function POST(request: NextRequest) {
 
     // Host Action: Request Touch-Up / Fix from Cleaner
     if (action === 'request_touchup') {
-      const { reportId, touchup_items, host_notes } = body;
+      const { reportId, touchup_items, host_notes, cleaner_email } = body;
       if (!reportId || (!touchup_items?.length && !host_notes)) {
         return NextResponse.json({ success: false, error: 'Report ID and touch-up items/notes are required.' }, { status: 400 });
       }
@@ -505,7 +505,10 @@ export async function POST(request: NextRequest) {
         notesObj = { rawNotes: existingReport.notes || '' };
       }
 
-      const cleanerEmail = notesObj.cleanerEmail || '';
+      const cleanerEmail = cleaner_email || notesObj.cleanerEmail || '';
+      if (cleaner_email) {
+        notesObj.cleanerEmail = cleaner_email;
+      }
 
       notesObj.touchupRequest = {
         id: 'touchup_' + Date.now(),
@@ -589,7 +592,7 @@ export async function POST(request: NextRequest) {
             body: JSON.stringify({
               from: 'TurnProofs <onboarding@resend.dev>',
               to: [recipient],
-              subject: `🔍 TurnProofs Touch-Up Request from Host`,
+              subject: `🔍 TurnProofs Touch-Up Request for ${existingReport.cleaner_name}`,
               html
             })
           });
@@ -600,11 +603,12 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Touch-up request logged and dispatched.',
+        message: 'Touch-up request logged and emailed.',
         touchupUrl,
         smsLink,
         whatsappLink,
-        shareText
+        shareText,
+        cleanerEmail
       });
     }
 

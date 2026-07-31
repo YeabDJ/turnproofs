@@ -86,9 +86,10 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [showTouchupModal, setShowTouchupModal] = useState(false);
   const [selectedTouchupTasks, setSelectedTouchupTasks] = useState<string[]>([]);
   const [customTouchupNotes, setCustomTouchupNotes] = useState('');
+  const [targetCleanerEmail, setTargetCleanerEmail] = useState('');
   const [submittingTouchup, setSubmittingTouchup] = useState(false);
   const [touchupSuccess, setTouchupSuccess] = useState(false);
-  const [touchupShareInfo, setTouchupShareInfo] = useState<{ smsLink: string; whatsappLink: string; touchupUrl: string; shareText: string } | null>(null);
+  const [touchupShareInfo, setTouchupShareInfo] = useState<{ smsLink: string; whatsappLink: string; touchupUrl: string; shareText: string; cleanerEmail?: string } | null>(null);
 
   // Translation state for Spanish cleaner notes
   const [translatedNotes, setTranslatedNotes] = useState<string | null>(null);
@@ -1080,9 +1081,23 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               />
             </div>
 
+            {/* Direct Email to Cleaner Option */}
+            <div className="space-y-1.5 pt-1">
+              <label className="block text-xs font-bold text-neutral-300">
+                ✉️ {lang === 'en' ? 'Direct Email to Cleaner (Optional):' : 'Enviar Correo al Limpiador (Opcional):'}
+              </label>
+              <input
+                type="email"
+                placeholder={lang === 'en' ? 'cleaner@gmail.com (Sends email notification alert directly)' : 'limpiador@gmail.com'}
+                value={targetCleanerEmail}
+                onChange={(e) => setTargetCleanerEmail(e.target.value)}
+                className="w-full p-3 bg-neutral-950 border border-neutral-800 focus:border-amber-500 rounded-xl outline-none text-xs text-white"
+              />
+            </div>
+
             {touchupSuccess && (
               <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold text-center">
-                ⚡ Touch-Up Request Sent to Cleaner!
+                ⚡ Touch-Up Request Dispatched & Emailed!
               </div>
             )}
 
@@ -1107,7 +1122,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                         action: 'request_touchup',
                         reportId: reportId,
                         touchup_items: selectedTouchupTasks,
-                        host_notes: customTouchupNotes
+                        host_notes: customTouchupNotes,
+                        cleaner_email: targetCleanerEmail
                       })
                     });
                     const data = await res.json();
@@ -1117,7 +1133,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                         smsLink: data.smsLink || `sms:?body=${encodeURIComponent('Please check touchup request: ' + data.touchupUrl)}`,
                         whatsappLink: data.whatsappLink || `https://wa.me/?text=${encodeURIComponent('Please check touchup request: ' + data.touchupUrl)}`,
                         touchupUrl: data.touchupUrl || `https://turnproofs.com/airbnb/clean/${report?.property_id}`,
-                        shareText: data.shareText || 'Please check touchup request'
+                        shareText: data.shareText || 'Please check touchup request',
+                        cleanerEmail: data.cleanerEmail || targetCleanerEmail
                       });
                     } else {
                       alert('Failed: ' + (data.error || 'Error'));
