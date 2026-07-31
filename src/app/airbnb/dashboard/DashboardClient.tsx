@@ -215,6 +215,8 @@ export default function DashboardClient() {
   const [newTaskRefPhoto, setNewTaskRefPhoto] = useState('');
   const [uploadingRefPhoto, setUploadingRefPhoto] = useState(false);
 
+  const isPaidActive = !!(host?.subscription_status === 'active' || host?.stripe_subscription_id);
+
   // Check auth and load initial dashboard data
   useEffect(() => {
     async function checkAuthAndLoad() {
@@ -1035,13 +1037,12 @@ export default function DashboardClient() {
             {/* TAB 4: BILLING & SUBSCRIPTION */}
             {activeTab === 'billing' && (
               <div className="space-y-10">
-                {/* 0. 30-Day Split Trial Banner OR Active Paid Subscription Banner */}
+                {/* 0. Trial Banner OR Active Paid Subscription Banner */}
                 {(() => {
                   const createdDate = host?.created_at ? new Date(host.created_at) : new Date();
                   const phase2UnlockDate = new Date(createdDate.getTime() + 14 * 24 * 60 * 60 * 1000);
                   const firstBillingDate = new Date(createdDate.getTime() + 30 * 24 * 60 * 60 * 1000);
                   const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                  const isPaidActive = host?.subscription_status === 'active' || host?.stripe_subscription_id;
 
                   if (isPaidActive) {
                     return (
@@ -1115,11 +1116,17 @@ export default function DashboardClient() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-850">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>Active Plan</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 ${
+                          isPaidActive 
+                            ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
+                            : 'bg-amber-500/10 border border-amber-500/20 text-amber-400'
+                        }`}>
+                          <span className={`h-2 w-2 rounded-full animate-pulse ${isPaidActive ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+                          <span>{isPaidActive ? 'Active Plan' : '🎁 Free Trial Active'}</span>
                         </span>
-                        <span className="text-xs text-neutral-400 font-semibold">• 14-Day Free Trial (Card Required After Trial)</span>
+                        <span className="text-xs text-neutral-400 font-semibold">
+                          {isPaidActive ? '• Paid Subscription Active' : '• $0.00 Charged Today (Card Required Day 15)'}
+                        </span>
                       </div>
 
                       <h2 className="text-2xl font-black text-white flex items-center gap-3">
@@ -1135,9 +1142,10 @@ export default function DashboardClient() {
                       </h2>
 
                       <p className="text-sm text-neutral-400">
-                        Current portfolio rate: <strong className="text-white font-mono">
+                        {isPaidActive ? 'Current portfolio rate: ' : 'Plan rate when trial ends: '}
+                        <strong className="text-white font-mono">
                           {`$${properties.length <= 1 ? '9.00' : properties.length <= 3 ? '18.99' : (29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)} /mo`}
-                        </strong> ({properties.length} active unit{properties.length === 1 ? '' : 's'})
+                        </strong> {isPaidActive ? `(${properties.length} active unit${properties.length === 1 ? '' : 's'})` : `($0.00 charged during 14-day trial)`}
                       </p>
                     </div>
 
@@ -1274,7 +1282,7 @@ export default function DashboardClient() {
                           {isCurrent && (
                             <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-[10px] font-black uppercase px-3 py-0.5 rounded-full tracking-wider shadow-sm flex items-center gap-1">
                               <Check className="h-3 w-3" />
-                              <span>Current Plan</span>
+                              <span>{isPaidActive ? 'Current Plan' : '🎁 Included in Free Trial'}</span>
                             </span>
                           )}
                           <div className="space-y-4">
@@ -1291,13 +1299,13 @@ export default function DashboardClient() {
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> 1 Managed Property</li>
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Unlimited Cleaners</li>
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Automated Cleaner Receipts</li>
-                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Dispute-Proof PDF Audit Logs</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-rose-400 shrink-0" /> Professional PDF Audit Logs</li>
                             </ul>
                           </div>
                           {isCurrent ? (
                             <button disabled className="w-full py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-black cursor-default flex items-center justify-center gap-1.5">
                               <Check className="h-4 w-4" />
-                              <span>Current Active Plan</span>
+                              <span>{isPaidActive ? 'Current Active Plan' : '✓ Trial Plan (1 Unit Included)'}</span>
                             </button>
                           ) : (
                             <button
