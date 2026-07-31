@@ -2656,7 +2656,7 @@ export default function DashboardClient() {
                     const res = await fetch('/api/airbnb/stripe', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ plan: checkoutPlan.planKey, propertiesCount: checkoutPlan.units })
+                      body: JSON.stringify({ plan: checkoutPlan.planKey, propertiesCount: checkoutPlan.units, cycle: billingCycle })
                     });
                     const data = await res.json();
                     if (data.checkoutUrl) {

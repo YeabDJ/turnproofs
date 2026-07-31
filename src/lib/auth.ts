@@ -6,7 +6,10 @@ export interface Host {
   email: string;
   pin_code: string;
   business_name: string | null;
-  subscription_tier: 'standard' | 'commercial';
+  subscription_tier: string;
+  subscription_status?: string | null;
+  stripe_customer_id?: string | null;
+  stripe_subscription_id?: string | null;
   created_at: string;
 }
 
