@@ -72,6 +72,12 @@ export default function AirbnbLanding() {
             >
               Pricing
             </button>
+            <Link 
+              href="/faq"
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              FAQ
+            </Link>
           </nav>
 
           <div className="flex items-center gap-4">
