@@ -34,8 +34,8 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       .maybeSingle();
 
     const recipients = new Set<string>();
-    recipients.add(hostEmail);
-    recipients.add('support@turnproofs.com');
+    if (hostEmail && hostEmail.includes('@')) recipients.add(hostEmail.trim());
+    recipients.add('yeabidj@gmail.com');
 
     if (cleanerEmail && cleanerEmail.includes('@')) {
       recipients.add(cleanerEmail.trim());
@@ -320,7 +320,7 @@ export async function POST(request: NextRequest) {
         .eq('id', property_id)
         .maybeSingle();
 
-      const recipientEmails: string[] = ['support@turnproofs.com'];
+      const recipientEmails: string[] = ['yeabidj@gmail.com'];
       if (property && property.cover_image_url?.includes('|||')) {
         const custom = property.cover_image_url.split('|||')[1];
         if (custom) {
