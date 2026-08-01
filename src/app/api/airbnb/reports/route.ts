@@ -755,6 +755,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Property ID and cleaner name are required.' }, { status: 400 });
       }
 
+      if (property_id === 'demo') {
+        return NextResponse.json({
+          success: true,
+          reportId: 'demo-report-123',
+          demo: true,
+          message: 'Public demo cleaning session started.'
+        });
+      }
+
       // 1. Create active report
       const { data: report, error: reportError } = await supabaseAdmin
         .from('airbnb_reports')
@@ -850,6 +859,15 @@ export async function POST(request: NextRequest) {
     if (action === 'checkout_session') {
       if (!reportId) {
         return NextResponse.json({ success: false, error: 'Report ID is required.' }, { status: 400 });
+      }
+
+      if (reportId.includes('demo') || property_id === 'demo') {
+        return NextResponse.json({
+          success: true,
+          demo: true,
+          reportId: 'demo-report-123',
+          message: 'Public demo cleaning session checkout completed successfully!'
+        });
       }
 
       // Fetch the property_id of this report before updating
