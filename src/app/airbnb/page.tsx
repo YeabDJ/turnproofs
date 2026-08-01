@@ -251,7 +251,7 @@ export default function AirbnbLanding() {
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
-              <h5 className="font-bold text-sm text-white">Monique R.</h5>
+              <h5 className="font-bold text-sm text-white">M. R.</h5>
               <p className="text-xs text-rose-400 mt-0.5">Professional Cleaner • 12 Turnovers/Wk</p>
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function AirbnbLanding() {
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
-              <h5 className="font-bold text-sm text-white">Primal Home Solutions</h5>
+              <h5 className="font-bold text-sm text-white">P. H. S.</h5>
               <p className="text-xs text-orange-400 mt-0.5">Superhost, 4 Properties</p>
             </div>
           </div>
@@ -273,11 +273,11 @@ export default function AirbnbLanding() {
             <div>
               <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
               <p className="text-sm text-neutral-300 italic leading-relaxed">
-                "I had a guest plant trash and claim a refund. Airbnb denied my review removal twice because loose screenshots in threads get rejected. Official Clean Verification Certificates with GPS plots are the only proof Support accepts."
+                "I had a guest plant trash and claim a refund. Airbnb denied my review removal twice because loose screenshots in threads get rejected. Professional Clean Verification Certificates with GPS plots are the proof Support accepts."
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
-              <h5 className="font-bold text-sm text-white">Donna L.</h5>
+              <h5 className="font-bold text-sm text-white">D. L.</h5>
               <p className="text-xs text-amber-400 mt-0.5">Host, Florida Coast • 3 Properties</p>
             </div>
           </div>
