@@ -158,7 +158,7 @@ export default function DedicatedFaqPage() {
       {/* Header */}
       <header className="border-b border-neutral-800/80 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
-          <Link href="/airbnb" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center gap-2.5 group">
             <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/20 group-hover:scale-105 transition-transform">
               <ShieldCheck className="h-6 w-6 text-white" />
             </div>
@@ -177,14 +177,14 @@ export default function DedicatedFaqPage() {
             </button>
             
             <Link
-              href="/airbnb/login"
+              href="/login"
               className="hidden sm:flex px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-neutral-200 hover:text-white transition-all"
             >
               Host Login
             </Link>
 
             <Link
-              href="/airbnb/login"
+              href="/login"
               className="px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-black text-white shadow-md shadow-rose-500/20 transition-all flex items-center gap-1.5"
             >
               <span>Start 14-Day Free Trial</span>
@@ -285,7 +285,7 @@ export default function DedicatedFaqPage() {
               <span>{copiedEmail ? '✓ Copied support@turnproofs.com!' : 'Email: support@turnproofs.com'}</span>
             </button>
             <Link
-              href="/airbnb/login"
+              href="/login"
               className="px-6 py-3 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-extrabold text-xs text-white shadow-md shadow-rose-500/20 transition-all flex items-center gap-2 cursor-pointer"
             >
               <span>Start 14-Day Free Trial ($0)</span>
@@ -305,7 +305,7 @@ export default function DedicatedFaqPage() {
         </div>
         <p>© TurnProofs Knowledge Base & Compliance Engine. All rights reserved.</p>
         <div className="flex justify-center gap-4 text-[11px] text-neutral-400">
-          <Link href="/airbnb" className="hover:text-white">Home</Link>
+          <Link href="/" className="hover:text-white">Home</Link>
           <span>•</span>
           <Link href="/features" className="hover:text-white">Features</Link>
           <span>•</span>

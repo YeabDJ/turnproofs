@@ -248,7 +248,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     async function loadData() {
       try {
         // Fetch property details (public)
-        const propRes = await fetch(`/api/airbnb/properties?id=${propertyId}`);
+        const propRes = await fetch(`/api/properties?id=${propertyId}`);
         const propData = await propRes.json();
         if (propData.success) {
           setProperty(propData.property);
@@ -260,7 +260,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         }
 
         // Fetch cleaners (by propertyId to identify host)
-        const cleanerRes = await fetch(`/api/airbnb/cleaners?propertyId=${propertyId}`);
+        const cleanerRes = await fetch(`/api/cleaners?propertyId=${propertyId}`);
         const cleanerData = await cleanerRes.json();
         if (cleanerData.success) {
           setCleaners(cleanerData.cleaners || []);
@@ -268,7 +268,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
         // Fetch checklists (either from active session or property template)
         if (sessionId) {
-          const taskRes = await fetch(`/api/airbnb/reports/${sessionId}`);
+          const taskRes = await fetch(`/api/reports/${sessionId}`);
           const taskData = await taskRes.json();
           if (taskData.success) {
             setTasks(taskData.tasks.map((t: any) => ({
@@ -287,7 +287,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
             setGpsError('Collaborative cleaning session not found or expired.');
           }
         } else {
-          const taskRes = await fetch(`/api/airbnb/checklists?propertyId=${propertyId}`);
+          const taskRes = await fetch(`/api/checklists?propertyId=${propertyId}`);
           const taskData = await taskRes.json();
           if (taskData.success) {
             setTasks(taskData.tasks || []);
@@ -301,7 +301,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
         // Check for pending touch-up requests for this property
         try {
-          const touchupRes = await fetch('/api/airbnb/reports');
+          const touchupRes = await fetch('/api/reports');
           const touchupData = await touchupRes.json();
           if (touchupData.reports && touchupData.reports.length > 0) {
             for (const r of touchupData.reports) {
@@ -320,7 +320,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                     setStarted(true);
 
                     // Restore original tasks and photo proofs so cleaner doesn't re-do anything!
-                    const origRes = await fetch(`/api/airbnb/reports/${r.id}`);
+                    const origRes = await fetch(`/api/reports/${r.id}`);
                     const origData = await origRes.json();
                     if (origData.success && origData.tasks && origData.tasks.length > 0) {
                       setTasks(origData.tasks.map((t: any) => ({
@@ -446,7 +446,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
     const pollInterval = setInterval(async () => {
       try {
-        const res = await fetch(`/api/airbnb/reports/${activeReportId}`);
+        const res = await fetch(`/api/reports/${activeReportId}`);
         const data = await res.json();
         if (data.success) {
           // Sync checkoff states and photos
@@ -517,7 +517,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     try {
       if (sessionId) {
         // Join existing session
-        const res = await fetch('/api/airbnb/reports', {
+        const res = await fetch('/api/reports', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -538,7 +538,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
       } else {
         // Start a new collaborative session
         const nowStr = new Date().toISOString();
-        const res = await fetch('/api/airbnb/reports', {
+        const res = await fetch('/api/reports', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -557,7 +557,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
           setStartTime(new Date(nowStr));
           
           // Fetch the newly created report tasks (which contain report_tasks database IDs)
-          const taskRes = await fetch(`/api/airbnb/reports/${data.reportId}`);
+          const taskRes = await fetch(`/api/reports/${data.reportId}`);
           const taskData = await taskRes.json();
           if (taskData.success) {
             setTasks(taskData.tasks.map((t: any) => ({
@@ -614,7 +614,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     }));
 
     if (activeReportId) {
-      fetch('/api/airbnb/reports', {
+      fetch('/api/reports', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -652,7 +652,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
       // Sync to database
       if (activeReportId) {
-        fetch('/api/airbnb/reports', {
+        fetch('/api/reports', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -769,7 +769,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     try {
       let res;
       if (activeReportId) {
-        res = await fetch('/api/airbnb/reports', {
+        res = await fetch('/api/reports', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -783,7 +783,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
           })
         });
       } else {
-        res = await fetch('/api/airbnb/reports', {
+        res = await fetch('/api/reports', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -891,7 +891,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
           {submittedReportId && (
             <a
-              href={`/airbnb/report/${submittedReportId}`}
+              href={`/report/${submittedReportId}`}
               className="w-full py-3.5 px-4 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-center shadow-md shadow-rose-500/10 flex items-center justify-center gap-2 cursor-pointer"
             >
               <FileText className="h-4 w-4" />
@@ -1055,7 +1055,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                   </div>
                   <button
                     onClick={() => {
-                      const shareUrl = `${window.location.origin}/airbnb/clean/${propertyId}?sessionId=${activeReportId}`;
+                      const shareUrl = `${window.location.origin}/clean/${propertyId}?sessionId=${activeReportId}`;
                       navigator.clipboard.writeText(shareUrl);
                       setCopiedSessionLink(true);
                       setTimeout(() => setCopiedSessionLink(false), 2000);
@@ -1226,7 +1226,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                             try {
                               const formData = new FormData();
                               formData.append('file', file);
-                              const res = await fetch('/api/airbnb/checklists?action=upload_photo', {
+                              const res = await fetch('/api/checklists?action=upload_photo', {
                                 method: 'POST',
                                 body: formData
                               });
@@ -1248,7 +1248,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                       onClick={async () => {
                         setSubmittingTouchupFix(true);
                         try {
-                          const res = await fetch('/api/airbnb/reports', {
+                          const res = await fetch('/api/reports', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1949,7 +1949,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                 onClick={async () => {
                   setSendingInstantAlert(true);
                   try {
-                    const res = await fetch('/api/airbnb/reports', {
+                    const res = await fetch('/api/reports', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({

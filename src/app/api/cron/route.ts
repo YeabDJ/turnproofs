@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
                     <p>Hi ${host.name || 'Host'},</p>
                     <p>Phase 1 of your TurnProofs trial is completing today! Enter your payment card now to unlock Phase 2 and continue your trial through Day 30 for <strong>$0 today</strong>.</p>
                     <p>Your selected plan (Pro $9/mo, Growth $18.99/mo) will only begin billing on Day 31.</p>
-                    <p><a href="https://turnproofs.com/airbnb/dashboard" style="background:#f43f5e; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; display:inline-block; font-weight:bold;">Unlock Phase 2 Trial ($0) ➔</a></p>
+                    <p><a href="https://turnproofs.com/dashboard" style="background:#f43f5e; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; display:inline-block; font-weight:bold;">Unlock Phase 2 Trial ($0) ➔</a></p>
                   </div>
                 `
               })

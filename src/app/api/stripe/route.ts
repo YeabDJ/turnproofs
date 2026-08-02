@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
             },
             body: new URLSearchParams({
               'customer': activeCustomerId,
-              'return_url': 'https://turnproofs.com/airbnb/dashboard?tab=billing'
+              'return_url': 'https://turnproofs.com/dashboard?tab=billing'
             })
           });
           const portalSession = await res.json();
@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
           'line_items[0][price_data][unit_amount]': lineItemAmountCents.toString(),
           'line_items[0][quantity]': '1',
           'mode': 'subscription',
-          'success_url': `https://turnproofs.com/airbnb/dashboard?upgraded=true&plan=${plan}`,
-          'cancel_url': 'https://turnproofs.com/airbnb/dashboard?tab=billing',
+          'success_url': `https://turnproofs.com/dashboard?upgraded=true&plan=${plan}`,
+          'cancel_url': 'https://turnproofs.com/dashboard?tab=billing',
           'customer_email': host.email,
           'client_reference_id': host.id,
           'metadata[host_id]': host.id,

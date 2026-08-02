@@ -63,8 +63,8 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
     }
 
     const reportUrl = finalReportId && finalReportId !== 'undefined'
-      ? `https://turnproofs.com/airbnb/report/${finalReportId}`
-      : `https://turnproofs.com/airbnb/dashboard`;
+      ? `https://turnproofs.com/report/${finalReportId}`
+      : `https://turnproofs.com/dashboard`;
     const propertyName = property?.name || 'Vacation Rental Property';
     const cleanerName = report?.cleaner_name || 'Cleaning Crew';
 
@@ -244,7 +244,7 @@ async function sendResendAlertEmail({
 
         <!-- Action Button -->
         <div style="text-align: center; margin: 28px 0 16px 0;">
-          <a href="https://turnproofs.com/airbnb/dashboard" target="_blank" style="display: inline-block; background: ${isDamage ? '#dc2626' : '#d97706'}; color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px ${isDamage ? 'rgba(220,38,38,0.25)' : 'rgba(217,119,6,0.25)'}">
+          <a href="https://turnproofs.com/dashboard" target="_blank" style="display: inline-block; background: ${isDamage ? '#dc2626' : '#d97706'}; color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px ${isDamage ? 'rgba(220,38,38,0.25)' : 'rgba(217,119,6,0.25)'}">
             🖥️ Open TurnProofs Host Dashboard
           </a>
         </div>
@@ -561,7 +561,7 @@ export async function POST(request: NextRequest) {
           ${comparisonHtml}
 
           <div style="text-align: center; margin: 24px 0;">
-            <a href="https://turnproofs.com/airbnb/report/${reportId}" target="_blank" style="display: inline-block; background: #10b981; color: #ffffff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
+            <a href="https://turnproofs.com/report/${reportId}" target="_blank" style="display: inline-block; background: #10b981; color: #ffffff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
               📄 View Updated PDF Certificate
             </a>
           </div>
@@ -664,7 +664,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
       }
 
-      const touchupUrl = `https://turnproofs.com/airbnb/clean/${existingReport.property_id}?reportId=${reportId}&mode=touchup`;
+      const touchupUrl = `https://turnproofs.com/clean/${existingReport.property_id}?reportId=${reportId}&mode=touchup`;
       
       // Fetch cleaner phone number if available
       let cleanerPhone = '';

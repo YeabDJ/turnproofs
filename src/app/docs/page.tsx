@@ -71,7 +71,7 @@ else:
       {/* Header */}
       <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/airbnb/dashboard" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+          <Link href="/dashboard" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
             <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
               <ShieldCheck className="h-6 w-6 text-white" />
             </div>
@@ -81,7 +81,7 @@ else:
           </Link>
           <div className="flex items-center gap-4">
             <Link 
-              href="/airbnb/dashboard" 
+              href="/dashboard" 
               className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold transition-all text-neutral-300 flex items-center gap-1.5"
             >
               <span>Back to Dashboard</span>

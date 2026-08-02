@@ -76,7 +76,7 @@ export default function TermsOfService() {
               3. Third-Party Platform Verification & Disclaimer
             </h2>
             <p>
-              TurnProofs provides independent, timestamped GPS geolocation logging and room photo compliance documentation (`/airbnb/report/[reportId]`).
+              TurnProofs provides independent, timestamped GPS geolocation logging and room photo compliance documentation (`/report/[reportId]`).
             </p>
             <p>
               TurnProofs makes no representations or warranties regarding Airbnb or VRBO claim outcomes. Users accept all risk associated with submitting documentation to third-party platforms. Airbnb and VRBO make final dispute decisions independently. We provide the tools to document your compliance; hosts make all submission decisions.

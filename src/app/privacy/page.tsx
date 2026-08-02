@@ -68,7 +68,7 @@ export default function PrivacyPolicy() {
             </h2>
             <p>Your data is strictly utilized to provide turnover verification services, including:</p>
             <ul className="list-disc pl-5 space-y-1 text-neutral-400">
-              <li>Generating immutable, timestamped PDF verification certificates (`/airbnb/report/[reportId]`).</li>
+              <li>Generating immutable, timestamped PDF verification certificates (`/report/[reportId]`).</li>
               <li>Auto-emailing sanitation reports to registered property managers and cleaners.</li>
               <li>Displaying property turnover status on the host management dashboard.</li>
               <li>Authenticating secure login sessions.</li>

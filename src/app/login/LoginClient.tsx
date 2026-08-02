@@ -28,10 +28,10 @@ function LoginContent() {
   useEffect(() => {
     async function checkExistingAuth() {
       try {
-        const res = await fetch('/api/airbnb/auth');
+        const res = await fetch('/api/auth');
         const data = await res.json();
         if (res.ok && data.success && data.host) {
-          router.push('/airbnb/dashboard');
+          router.push('/dashboard');
         }
       } catch (e) {
         // Not authenticated
@@ -96,7 +96,7 @@ function LoginContent() {
     setError('');
     setInfoMessage('');
     try {
-      const res = await fetch('/api/airbnb/auth', {
+      const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -163,7 +163,7 @@ function LoginContent() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/airbnb/auth', {
+      const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -181,7 +181,7 @@ function LoginContent() {
         // Success
         setInfoMessage(data.isNew ? 'Welcome! Account created successfully.' : 'Welcome back!');
         setTimeout(() => {
-          router.push('/airbnb/dashboard');
+          router.push('/dashboard');
         }, 800);
       }
     } catch (err: any) {
@@ -195,7 +195,7 @@ function LoginContent() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/airbnb/auth', {
+      const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -212,7 +212,7 @@ function LoginContent() {
       } else {
         setInfoMessage('Passcode PIN reset successfully! Signing in...');
         setTimeout(() => {
-          router.push('/airbnb/dashboard');
+          router.push('/dashboard');
         }, 800);
       }
     } catch (err) {

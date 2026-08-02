@@ -129,16 +129,16 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   useEffect(() => {
     async function fetchReportDetails() {
       try {
-        let res = await fetch(`/api/airbnb/reports/${reportId}`);
+        let res = await fetch(`/api/reports/${reportId}`);
         let data = await res.json();
         
         if (!res.ok || !data.success) {
           // Auto-recover fallback to latest report if reportId was undefined or missing
-          const fallbackRes = await fetch('/api/airbnb/reports');
+          const fallbackRes = await fetch('/api/reports');
           const fallbackData = await fallbackRes.json();
           if (fallbackData.reports && fallbackData.reports.length > 0) {
             const latest = fallbackData.reports[0];
-            const detailRes = await fetch(`/api/airbnb/reports/${latest.id}`);
+            const detailRes = await fetch(`/api/reports/${latest.id}`);
             const detailData = await detailRes.json();
             if (detailData.success && detailData.report) {
               setReport(detailData.report);
@@ -155,7 +155,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           // If report tasks are empty, fetch property template tasks to populate certificate checklist!
           if (loadedTasks.length === 0 && data.report?.property_id) {
             try {
-              const propTasksRes = await fetch(`/api/airbnb/checklists?propertyId=${data.report.property_id}`);
+              const propTasksRes = await fetch(`/api/checklists?propertyId=${data.report.property_id}`);
               const propTasksData = await propTasksRes.json();
               if (propTasksData.success && propTasksData.tasks && propTasksData.tasks.length > 0) {
                 loadedTasks = propTasksData.tasks.map((t: any) => ({
@@ -189,7 +189,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     }
     setSubmittingRetouch(true);
     try {
-      const res = await fetch('/api/airbnb/reports', {
+      const res = await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -206,7 +206,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
         setRetouchText('');
         setRetouchPhotoUrl('');
         // Refresh certificate to show newly appended resolution addendum!
-        const refRes = await fetch(`/api/airbnb/reports/${reportId}`);
+        const refRes = await fetch(`/api/reports/${reportId}`);
         const refData = await refRes.json();
         if (refData.success) {
           setReport(refData.report);
@@ -465,7 +465,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               {/* Authenticity QR Code & Verification Badge */}
               <div className="print-badge flex items-center gap-3 bg-neutral-900 border border-neutral-800 p-2.5 rounded-2xl h-fit">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://turnproofs.com/airbnb/report/${report.id}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://turnproofs.com/report/${report.id}`}
                   alt="Scan QR for Airbnb Dispute Authenticity"
                   className="h-13 w-13 rounded-xl border border-neutral-700 bg-white p-0.5 shrink-0"
                 />
@@ -1229,7 +1229,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   try {
                     const formData = new FormData();
                     formData.append('file', file);
-                    const uploadRes = await fetch('/api/airbnb/reports', {
+                    const uploadRes = await fetch('/api/reports', {
                       method: 'PUT',
                       body: formData
                     });
@@ -1306,7 +1306,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 onClick={async () => {
                   setSubmittingTouchup(true);
                   try {
-                    const res = await fetch('/api/airbnb/reports', {
+                    const res = await fetch('/api/reports', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -1324,7 +1324,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                       setTouchupShareInfo({
                         smsLink: data.smsLink || `sms:?body=${encodeURIComponent('Please check touchup request: ' + data.touchupUrl)}`,
                         whatsappLink: data.whatsappLink || `https://wa.me/?text=${encodeURIComponent('Please check touchup request: ' + data.touchupUrl)}`,
-                        touchupUrl: data.touchupUrl || `https://turnproofs.com/airbnb/clean/${report?.property_id}`,
+                        touchupUrl: data.touchupUrl || `https://turnproofs.com/clean/${report?.property_id}`,
                         shareText: data.shareText || 'Please check touchup request',
                         cleanerEmail: data.cleanerEmail || targetCleanerEmail
                       });

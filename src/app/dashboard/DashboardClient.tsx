@@ -183,7 +183,7 @@ export default function DashboardClient() {
       const defaultImg = editPropImage?.trim() || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80';
       const serializedImg = editPropEmails.trim() ? `${defaultImg}|||${editPropEmails.trim()}` : defaultImg;
 
-      const res = await fetch('/api/airbnb/properties', {
+      const res = await fetch('/api/properties', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -235,11 +235,11 @@ export default function DashboardClient() {
   useEffect(() => {
     async function checkAuthAndLoad() {
       try {
-        const authRes = await fetch('/api/airbnb/auth');
+        const authRes = await fetch('/api/auth');
         const authData = await authRes.json();
         
         if (!authRes.ok || !authData.success) {
-          router.push('/airbnb/login');
+          router.push('/login');
           return;
         }
 
@@ -256,7 +256,7 @@ export default function DashboardClient() {
         setLoading(false);
       } catch (err) {
         console.error('Failed to load dashboard', err);
-        router.push('/airbnb/login');
+        router.push('/login');
       }
     }
     
@@ -270,26 +270,26 @@ export default function DashboardClient() {
   }, [activeTab]);
 
   const fetchProperties = async () => {
-    const res = await fetch('/api/airbnb/properties');
+    const res = await fetch('/api/properties');
     const data = await res.json();
     if (data.success) setProperties(data.properties || []);
   };
 
   const fetchCleaners = async () => {
-    const res = await fetch('/api/airbnb/cleaners');
+    const res = await fetch('/api/cleaners');
     const data = await res.json();
     if (data.success) setCleaners(data.cleaners || []);
   };
 
   const fetchReports = async () => {
-    const res = await fetch('/api/airbnb/reports');
+    const res = await fetch('/api/reports');
     const data = await res.json();
     if (data.success) setReports(data.reports || []);
   };
 
   const fetchApiKeys = async () => {
     try {
-      const res = await fetch('/api/airbnb/api-keys');
+      const res = await fetch('/api/api-keys');
       const data = await res.json();
       if (data.success) setApiKeys(data.keys || []);
     } catch (e) {
@@ -300,7 +300,7 @@ export default function DashboardClient() {
   // Copy clean magic link
   const copyCleanerLink = (propertyId: string) => {
     const origin = window.location.origin;
-    const url = `${origin}/airbnb/clean/${propertyId}`;
+    const url = `${origin}/clean/${propertyId}`;
     navigator.clipboard.writeText(url);
     setCopiedId(propertyId);
     setTimeout(() => setCopiedId(null), 2000);
@@ -330,7 +330,7 @@ export default function DashboardClient() {
       const defaultImg = newPropImage?.trim() || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80';
       const serializedImg = `${defaultImg}|||${newPropEmails.trim()}`;
 
-      const res = await fetch('/api/airbnb/properties', {
+      const res = await fetch('/api/properties', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -365,7 +365,7 @@ export default function DashboardClient() {
     if (!confirm('Are you sure you want to delete this property? This will also remove associated checklist templates.')) return;
 
     try {
-      const res = await fetch(`/api/airbnb/properties?id=${id}`, {
+      const res = await fetch(`/api/properties?id=${id}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -385,7 +385,7 @@ export default function DashboardClient() {
     if (!newCleanerName || !newCleanerPhone) return;
 
     try {
-      const res = await fetch('/api/airbnb/cleaners', {
+      const res = await fetch('/api/cleaners', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -412,7 +412,7 @@ export default function DashboardClient() {
     if (!confirm('Are you sure you want to delete this cleaner?')) return;
 
     try {
-      const res = await fetch(`/api/airbnb/cleaners?id=${id}`, {
+      const res = await fetch(`/api/cleaners?id=${id}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -431,7 +431,7 @@ export default function DashboardClient() {
     setActiveChecklistProperty(property);
     setChecklistTasks([]);
     try {
-      const res = await fetch(`/api/airbnb/checklists?propertyId=${property.id}`);
+      const res = await fetch(`/api/checklists?propertyId=${property.id}`);
       const data = await res.json();
       if (data.success) {
         setChecklistTasks(data.tasks || []);
@@ -454,7 +454,7 @@ export default function DashboardClient() {
       }
 
       const sortOrder = checklistTasks.length + 1;
-      const res = await fetch('/api/airbnb/checklists', {
+      const res = await fetch('/api/checklists', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -481,7 +481,7 @@ export default function DashboardClient() {
   // Delete Task
   const handleDeleteTask = async (taskId: string) => {
     try {
-      const res = await fetch(`/api/airbnb/checklists?id=${taskId}`, {
+      const res = await fetch(`/api/checklists?id=${taskId}`, {
         method: 'DELETE'
       });
       const data = await res.json();
@@ -514,7 +514,7 @@ export default function DashboardClient() {
 
     // Save order to API
     try {
-      await fetch('/api/airbnb/checklists', {
+      await fetch('/api/checklists', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -564,7 +564,7 @@ export default function DashboardClient() {
     setChecklistTasks(reorderedTasks);
 
     try {
-      await fetch('/api/airbnb/checklists', {
+      await fetch('/api/checklists', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -579,8 +579,8 @@ export default function DashboardClient() {
   // Logout
   const handleLogout = async () => {
     try {
-      await fetch('/api/airbnb/auth', { method: 'DELETE' });
-      router.push('/airbnb/login');
+      await fetch('/api/auth', { method: 'DELETE' });
+      router.push('/login');
     } catch (err) {
       console.error('Error logging out', err);
     }
@@ -605,7 +605,7 @@ export default function DashboardClient() {
       <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/airbnb" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity" title="Go to TurnProofs Main Landing Page">
+            <Link href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity" title="Go to TurnProofs Main Landing Page">
               <div className="h-9 w-9 rounded-lg bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-md shadow-rose-500/10">
                 <ShieldCheck className="h-5 w-5 text-white" />
               </div>
@@ -615,7 +615,7 @@ export default function DashboardClient() {
             </Link>
 
             <Link
-              href="/airbnb"
+              href="/"
               className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-neutral-300 hover:text-white transition-all cursor-pointer"
             >
               <Home className="h-3.5 w-3.5 text-rose-400" />
@@ -1056,7 +1056,7 @@ export default function DashboardClient() {
                                 <td className="p-4 text-xs font-mono">{durationMin} min</td>
                                 <td className="p-4 text-right">
                                   <a
-                                    href={`/airbnb/report/${report.id}`}
+                                    href={`/report/${report.id}`}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 text-xs font-semibold transition-all"
@@ -1576,7 +1576,7 @@ export default function DashboardClient() {
                       <button
                         onClick={async () => {
                           try {
-                            const res = await fetch('/api/airbnb/stripe', {
+                            const res = await fetch('/api/stripe', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ action: 'portal' })
@@ -1608,7 +1608,7 @@ export default function DashboardClient() {
                       <button
                         onClick={async () => {
                           try {
-                            const res = await fetch('/api/airbnb/stripe', {
+                            const res = await fetch('/api/stripe', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ action: 'portal' })
@@ -1763,7 +1763,7 @@ export default function DashboardClient() {
                     </p>
                   </div>
                   <Link
-                    href="/airbnb/docs"
+                    href="/docs"
                     target="_blank"
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-rose-400 transition-all"
                   >
@@ -1915,7 +1915,7 @@ export default function DashboardClient() {
                       }
                       setCreatingKey(true);
                       try {
-                        const res = await fetch('/api/airbnb/api-keys', {
+                        const res = await fetch('/api/api-keys', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
@@ -2041,7 +2041,7 @@ export default function DashboardClient() {
                                           return;
                                         }
                                         try {
-                                          const res = await fetch(`/api/airbnb/api-keys?id=${key.id}&reason=${encodeURIComponent(reason)}`, {
+                                          const res = await fetch(`/api/api-keys?id=${key.id}&reason=${encodeURIComponent(reason)}`, {
                                             method: 'DELETE'
                                           });
                                           const data = await res.json();
@@ -2501,7 +2501,7 @@ export default function DashboardClient() {
                           try {
                             const formData = new FormData();
                             formData.append('file', file);
-                            const uploadRes = await fetch('/api/airbnb/reports', {
+                            const uploadRes = await fetch('/api/reports', {
                               method: 'PUT',
                               body: formData
                             });
@@ -2780,7 +2780,7 @@ export default function DashboardClient() {
               <div className="bg-white p-4 rounded-2xl inline-block shadow-lg mx-auto">
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                    window.location.origin + '/airbnb/clean/' + activeQrProperty.id
+                    window.location.origin + '/clean/' + activeQrProperty.id
                   )}`}
                   alt="Cleaner Scan QR Code"
                   className="h-44 w-44 object-contain"
@@ -2880,7 +2880,7 @@ export default function DashboardClient() {
                 onClick={async () => {
                   setUpgradingTier(true);
                   try {
-                    const res = await fetch('/api/airbnb/auth', {
+                    const res = await fetch('/api/auth', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -3019,7 +3019,7 @@ export default function DashboardClient() {
                 type="button"
                 onClick={async () => {
                   try {
-                    const res = await fetch('/api/airbnb/stripe', {
+                    const res = await fetch('/api/stripe', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ plan: checkoutPlan.planKey, propertiesCount: checkoutPlan.units, cycle: billingCycle })
@@ -3143,7 +3143,7 @@ export default function DashboardClient() {
                 onClick={async () => {
                   setCancelingSubscription(true);
                   try {
-                    const res = await fetch('/api/airbnb/stripe', {
+                    const res = await fetch('/api/stripe', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ action: 'cancel' })
