@@ -32,7 +32,10 @@ import {
   ChevronRight,
   Clock,
   HelpCircle,
-  Edit3
+  Edit3,
+  Key,
+  Terminal,
+  Code
 } from 'lucide-react';
 
 interface Property {
@@ -86,7 +89,7 @@ export default function DashboardClient() {
   const [lang, setLang] = useState<'en' | 'es'>('en');
 
   // Tabs
-  const [activeTab, setActiveTab] = useState<'properties' | 'cleaners' | 'reports' | 'billing'>('properties');
+  const [activeTab, setActiveTab] = useState<'properties' | 'cleaners' | 'reports' | 'billing' | 'integrations'>('properties');
 
   // Billing & Subscription states
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
@@ -113,6 +116,17 @@ export default function DashboardClient() {
   const [cleaners, setCleaners] = useState<Cleaner[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // API Keys state
+  const [apiKeys, setApiKeys] = useState<any[]>([]);
+  const [newKeyName, setNewKeyName] = useState('');
+  const [newKeyScopes, setNewKeyScopes] = useState<string[]>(['properties:read', 'reports:read']);
+  const [newKeyProperties, setNewKeyProperties] = useState<string[]>([]); // empty = all properties
+  const [newKeyExpiry, setNewKeyExpiry] = useState(''); // empty = never
+  const [newKeyEnv, setNewKeyEnv] = useState<'live' | 'test'>('live');
+  const [generatedKey, setGeneratedKey] = useState<any>(null); // To store newly generated raw key
+  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [creatingKey, setCreatingKey] = useState(false);
 
   // Copy URL indicator
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -236,7 +250,8 @@ export default function DashboardClient() {
         await Promise.all([
           fetchProperties(),
           fetchCleaners(),
-          fetchReports()
+          fetchReports(),
+          fetchApiKeys()
         ]);
         setLoading(false);
       } catch (err) {
@@ -247,6 +262,12 @@ export default function DashboardClient() {
     
     checkAuthAndLoad();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'integrations') {
+      fetchApiKeys();
+    }
+  }, [activeTab]);
 
   const fetchProperties = async () => {
     const res = await fetch('/api/airbnb/properties');
@@ -264,6 +285,16 @@ export default function DashboardClient() {
     const res = await fetch('/api/airbnb/reports');
     const data = await res.json();
     if (data.success) setReports(data.reports || []);
+  };
+
+  const fetchApiKeys = async () => {
+    try {
+      const res = await fetch('/api/airbnb/api-keys');
+      const data = await res.json();
+      if (data.success) setApiKeys(data.keys || []);
+    } catch (e) {
+      console.error('Failed to fetch API keys:', e);
+    }
   };
 
   // Copy clean magic link
@@ -714,6 +745,17 @@ export default function DashboardClient() {
           >
             <CreditCard className="h-4.5 w-4.5" />
             <span>Billing & Subscription</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('integrations')}
+            className={`pb-4 text-base font-semibold border-b-2 transition-all flex items-center gap-2 shrink-0 ${
+              activeTab === 'integrations'
+                ? 'border-rose-500 text-rose-500'
+                : 'border-transparent text-neutral-400 hover:text-neutral-200'
+            }`}
+          >
+            <Terminal className="h-4.5 w-4.5" />
+            <span>Integrations (API)</span>
           </button>
         </div>
 
@@ -1702,6 +1744,330 @@ export default function DashboardClient() {
                       </div>
                     )}
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* TAB: INTEGRATIONS (API) */}
+            {activeTab === 'integrations' && (
+              <div className="space-y-10 font-sans">
+                {/* Integrations Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-900 pb-6">
+                  <div>
+                    <h2 className="text-xl font-bold text-neutral-100 flex items-center gap-2">
+                      <Terminal className="h-5 w-5 text-rose-500" />
+                      <span>API & Property Management Systems (PMS)</span>
+                    </h2>
+                    <p className="text-sm text-neutral-400 mt-1">
+                      Integrate TurnProofs with third-party software like Guesty, Breezeway, or custom applications.
+                    </p>
+                  </div>
+                  <Link
+                    href="/airbnb/docs"
+                    target="_blank"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 text-xs font-bold text-rose-400 transition-all"
+                  >
+                    <span>Developer Documentation</span>
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+
+                {/* API Key Generator Card */}
+                <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-6">
+                  <div>
+                    <h3 className="text-base font-extrabold text-white">Create New API Key</h3>
+                    <p className="text-xs text-neutral-400 mt-0.5">API keys authenticate third-party clients securely using SHA-256 matching.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Form Left */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">API Key Name</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Guesty Connection, Production API"
+                          value={newKeyName}
+                          onChange={(e) => setNewKeyName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Environment</label>
+                        <select
+                          value={newKeyEnv}
+                          onChange={(e) => setNewKeyEnv(e.target.value as 'live' | 'test')}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-neutral-300"
+                        >
+                          <option value="live">Live (Production Data)</option>
+                          <option value="test">Test (Sandbox/Simulation)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Expiration</label>
+                        <select
+                          value={newKeyExpiry}
+                          onChange={(e) => setNewKeyExpiry(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm text-neutral-300"
+                        >
+                          <option value="">Never Expires</option>
+                          <option value="30">30 Days</option>
+                          <option value="90">90 Days</option>
+                          <option value="365">1 Year</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Granular Scopes / Permissions</label>
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={newKeyScopes.includes('properties:read')}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setNewKeyScopes([...newKeyScopes, 'properties:read']);
+                                } else {
+                                  setNewKeyScopes(newKeyScopes.filter(s => s !== 'properties:read'));
+                                }
+                              }}
+                              className="rounded border-neutral-800 text-rose-500 focus:ring-rose-500 bg-neutral-950"
+                            />
+                            <div>
+                              <span className="font-bold text-white">properties:read</span>
+                              <span className="text-neutral-500 ml-1.5">— View list of properties and checklists</span>
+                            </div>
+                          </label>
+                          <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={newKeyScopes.includes('reports:read')}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setNewKeyScopes([...newKeyScopes, 'reports:read']);
+                                } else {
+                                  setNewKeyScopes(newKeyScopes.filter(s => s !== 'reports:read'));
+                                }
+                              }}
+                              className="rounded border-neutral-800 text-rose-500 focus:ring-rose-500 bg-neutral-950"
+                            />
+                            <div>
+                              <span className="font-bold text-white">reports:read</span>
+                              <span className="text-neutral-500 ml-1.5">— View historical reports and photos</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Form Right - Property Scoping */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Property Scope Restriction</label>
+                        <div className="p-4 rounded-2xl bg-neutral-950 border border-neutral-850 space-y-3">
+                          <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer border-b border-neutral-900 pb-2">
+                            <input
+                              type="radio"
+                              name="propScope"
+                              checked={newKeyProperties.length === 0}
+                              onChange={() => setNewKeyProperties([])}
+                              className="text-rose-500 focus:ring-rose-500 bg-neutral-950 border-neutral-850"
+                            />
+                            <span className="font-bold text-white">All Properties</span>
+                          </label>
+
+                          <div className="space-y-2 max-h-40 overflow-y-auto pt-1">
+                            <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block mb-1">Restricted Selection:</span>
+                            {properties.map((p) => (
+                              <label key={p.id} className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={newKeyProperties.includes(p.id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setNewKeyProperties([...newKeyProperties, p.id]);
+                                    } else {
+                                      setNewKeyProperties(newKeyProperties.filter(id => id !== p.id));
+                                    }
+                                  }}
+                                  className="rounded border-neutral-850 text-rose-500 focus:ring-rose-500 bg-neutral-950"
+                                />
+                                <span className="truncate">{p.name}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={async () => {
+                      if (!newKeyName.trim()) {
+                        alert("Please enter a name for the API key.");
+                        return;
+                      }
+                      if (newKeyScopes.length === 0) {
+                        alert("Please check at least one permission scope.");
+                        return;
+                      }
+                      setCreatingKey(true);
+                      try {
+                        const res = await fetch('/api/airbnb/api-keys', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            name: newKeyName,
+                            scopes: newKeyScopes,
+                            property_ids: newKeyProperties.length > 0 ? newKeyProperties : null,
+                            expires_in_days: newKeyExpiry || null,
+                            environment: newKeyEnv
+                          })
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          setGeneratedKey(data.key);
+                          setShowKeyModal(true);
+                          setNewKeyName('');
+                          setNewKeyProperties([]);
+                          fetchApiKeys();
+                        } else {
+                          alert(data.error || "Failed to create API key");
+                        }
+                      } catch (e) {
+                        alert("Error generating API key");
+                      } finally {
+                        setCreatingKey(false);
+                      }
+                    }}
+                    disabled={creatingKey}
+                    className="w-full md:w-auto px-6 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 disabled:bg-rose-500/50 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5"
+                  >
+                    {creatingKey ? (
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Plus className="h-4 w-4" />
+                    )}
+                    <span>Generate API Key</span>
+                  </button>
+                </div>
+
+                {/* API Keys Table Card */}
+                <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-4">
+                  <div>
+                    <h3 className="text-base font-extrabold text-white">Active API Credentials</h3>
+                    <p className="text-xs text-neutral-400 mt-0.5">Manage and revoke credentials generated for integrations.</p>
+                  </div>
+
+                  {apiKeys.length === 0 ? (
+                    <div className="p-8 rounded-2xl bg-neutral-950 border border-neutral-850 text-center space-y-2">
+                      <Key className="h-8 w-8 text-neutral-600 mx-auto" />
+                      <p className="text-xs text-neutral-400">No active API keys found. Generate a key above to start integrating.</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-2xl border border-neutral-850 bg-neutral-950">
+                      <table className="w-full text-left border-collapse text-xs">
+                        <thead>
+                          <tr className="border-b border-neutral-850 text-[10px] font-bold text-neutral-500 uppercase tracking-wider bg-neutral-900/20">
+                            <th className="p-4">Name / ID</th>
+                            <th className="p-4">Prefix</th>
+                            <th className="p-4">Env</th>
+                            <th className="p-4">Scopes</th>
+                            <th className="p-4">Property Restriction</th>
+                            <th className="p-4">Created / Expiry</th>
+                            <th className="p-4 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-neutral-900 font-semibold text-neutral-300 font-sans">
+                          {apiKeys.map((key) => {
+                            const isRevoked = !!key.revoked_at;
+                            const isExpired = key.expires_at && new Date(key.expires_at) < new Date();
+                            return (
+                              <tr key={key.id} className={`hover:bg-neutral-900/10 ${isRevoked || isExpired ? 'opacity-50' : ''}`}>
+                                <td className="p-4">
+                                  <span className="font-extrabold text-white block">{key.name}</span>
+                                  {isRevoked ? (
+                                    <span className="text-[10px] text-red-400 block mt-0.5 max-w-xs truncate">
+                                      Revoked: {key.revocation_reason || 'No reason'} ({new Date(key.revoked_at).toLocaleDateString()})
+                                    </span>
+                                  ) : isExpired ? (
+                                    <span className="text-[10px] text-amber-500 block mt-0.5">Expired</span>
+                                  ) : (
+                                    <span className="text-[10px] text-neutral-500 font-mono select-all block mt-0.5">{key.id}</span>
+                                  )}
+                                </td>
+                                <td className="p-4 font-mono text-neutral-400 select-all">{key.api_key_prefix}...</td>
+                                <td className="p-4 uppercase font-bold text-[10px]">
+                                  <span className={`px-2 py-0.5 rounded border ${
+                                    key.environment === 'test' 
+                                      ? 'bg-amber-500/10 text-amber-400 border-amber-550/20' 
+                                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-550/20'
+                                  }`}>
+                                    {key.environment || 'live'}
+                                  </span>
+                                </td>
+                                <td className="p-4 space-x-1">
+                                  {(key.scopes || []).map((sc: string) => (
+                                    <span key={sc} className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[9px] text-neutral-400 font-bold">
+                                      {sc}
+                                    </span>
+                                  ))}
+                                </td>
+                                <td className="p-4">
+                                  {key.property_ids && Array.isArray(key.property_ids) ? (
+                                    <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px]">
+                                      {key.property_ids.length} Units Restricted
+                                    </span>
+                                  ) : (
+                                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px]">
+                                      All Properties
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="p-4">
+                                  <span className="block text-[11px]">{new Date(key.created_at).toLocaleDateString()}</span>
+                                  <span className="block text-[10px] text-neutral-500">
+                                    {key.expires_at ? `Exp: ${new Date(key.expires_at).toLocaleDateString()}` : 'Never expires'}
+                                  </span>
+                                </td>
+                                <td className="p-4 text-right">
+                                  {!isRevoked && (
+                                    <button
+                                      onClick={async () => {
+                                        const reason = prompt("Enter a reason for revoking this key (optional):") || "Revoked by owner";
+                                        if (!confirm(`Are you sure you want to revoke API key "${key.name}"? Guesty/Breezeway connections using this key will fail immediately.`)) {
+                                          return;
+                                        }
+                                        try {
+                                          const res = await fetch(`/api/airbnb/api-keys?id=${key.id}&reason=${encodeURIComponent(reason)}`, {
+                                            method: 'DELETE'
+                                          });
+                                          const data = await res.json();
+                                          if (data.success) {
+                                            fetchApiKeys();
+                                          } else {
+                                            alert(data.error || "Failed to revoke key");
+                                          }
+                                        } catch (e) {
+                                          alert("Error revoking key");
+                                        }
+                                      }}
+                                      className="p-1.5 rounded-lg border border-red-900/30 bg-red-950/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
+                                      title="Revoke Key"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -2874,6 +3240,62 @@ export default function DashboardClient() {
                 Confirm Plan Downgrade
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: GENERATED API KEY SHOW-ONCE */}
+      {showKeyModal && generatedKey && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-7 shadow-2xl relative space-y-5">
+            <div className="h-12 w-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+              <Key className="h-6 w-6" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="font-black text-xl text-white">API Key Generated</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed">
+                For security reasons, this key will be displayed <strong className="text-white">only once</strong>. Copy it now and save it in a secure password manager. You will not be able to retrieve it again.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-neutral-950 border border-neutral-850 space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block font-sans">Your API Key:</span>
+                <span className="px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-extrabold uppercase font-sans">
+                  {generatedKey.environment === 'test' ? 'tp_test_secret' : 'tp_live_secret'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2 bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-xs text-white select-all break-all">
+                <span>{generatedKey.rawKey}</span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedKey.rawKey);
+                    alert("API Key copied to clipboard!");
+                  }}
+                  className="p-1.5 rounded-lg bg-neutral-950 hover:bg-neutral-800 text-neutral-400 hover:text-white transition-all cursor-pointer border border-neutral-800 shrink-0"
+                  title="Copy to clipboard"
+                >
+                  <Copy className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-red-950/20 border border-red-900/30 text-[11px] text-neutral-400 space-y-1 font-sans">
+              <span className="font-bold text-red-400 block">⚠️ Security Warning:</span>
+              <p>• Do not share this key in public repositories, client-side code, or insecure channels.</p>
+              <p>• If you believe the key has been compromised, revoke it immediately in the panel.</p>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowKeyModal(false);
+                setGeneratedKey(null);
+              }}
+              className="w-full py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-xs transition-all cursor-pointer shadow-md shadow-rose-500/10 font-sans"
+            >
+              I Have Saved This Key
+            </button>
           </div>
         </div>
       )}

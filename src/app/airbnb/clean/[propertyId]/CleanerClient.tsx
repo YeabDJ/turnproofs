@@ -491,7 +491,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
         (error) => {
           let msg = 'Failed to acquire GPS coordinates.';
           if (error.code === error.PERMISSION_DENIED) {
-            msg = 'GPS Location Permission Denied. Please enable GPS permissions for this page.';
+            msg = 'Location access is needed to verify on-site completion — please tap Allow when prompted in your browser settings.';
           }
           setGpsError(msg);
           resolve(null);

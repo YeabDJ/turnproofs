@@ -23,6 +23,31 @@ class SupabaseRestHelper {
             queryParams.push(`${encodeURIComponent(column)}=eq.${encodeURIComponent(val)}`);
             return builder;
           },
+          gte: (column: string, val: any) => {
+            queryParams.push(`${encodeURIComponent(column)}=gte.${encodeURIComponent(val)}`);
+            return builder;
+          },
+          lte: (column: string, val: any) => {
+            queryParams.push(`${encodeURIComponent(column)}=lte.${encodeURIComponent(val)}`);
+            return builder;
+          },
+          gt: (column: string, val: any) => {
+            queryParams.push(`${encodeURIComponent(column)}=gt.${encodeURIComponent(val)}`);
+            return builder;
+          },
+          lt: (column: string, val: any) => {
+            queryParams.push(`${encodeURIComponent(column)}=lt.${encodeURIComponent(val)}`);
+            return builder;
+          },
+          in: (column: string, values: any[]) => {
+            const encodedValues = values.map(v => String(v)).join(',');
+            queryParams.push(`${encodeURIComponent(column)}=in.(${encodedValues})`);
+            return builder;
+          },
+          offset: (count: number) => {
+            queryParams.push(`offset=${count}`);
+            return builder;
+          },
           order: (column: string, { ascending = true }: { ascending?: boolean } = {}) => {
             queryParams.push(`order=${encodeURIComponent(column)}.${ascending ? 'asc' : 'desc'}`);
             return builder;

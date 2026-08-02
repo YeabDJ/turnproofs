@@ -94,15 +94,16 @@ export default function AirbnbLanding() {
               <>
                 <Link 
                   href="/airbnb/login" 
-                  className="text-sm font-medium hover:text-rose-400 transition-colors"
+                  className="hidden sm:inline-block text-sm font-medium hover:text-rose-400 transition-colors"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/airbnb/login"
-                  className="px-4 py-2 rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-sm font-semibold transition-all shadow-md shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02]"
+                  className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 transition-all shadow-md shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02]"
                 >
-                  Get Started Free
+                  <span className="sm:hidden">Start Free</span>
+                  <span className="hidden sm:inline">Get Started Free</span>
                 </Link>
               </>
             )}
@@ -114,15 +115,15 @@ export default function AirbnbLanding() {
       <section className="relative pt-24 pb-20 px-6 max-w-7xl mx-auto text-center">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-rose-400 mb-8 animate-pulse">
           <Sparkles className="h-3.5 w-3.5" />
-          <span>Dispute-Ready Cleaning Documentation for Airbnb & VRBO</span>
+          <span>Audit-Ready Turnover Verification for Short-Term Rental Hosts</span>
         </div>
 
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-500 bg-clip-text text-transparent">
-          Dispute-Ready Cleaning Documentation For Short-Term Rentals
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
+          Organized Turnover Reports, Bilingual Cleaner Checklists & Clear Touch-Up Proof
         </h1>
 
-        <p className="mt-6 text-lg sm:text-xl text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-          Verify checklists, track cleaner GPS coordinates, collect photo proofs, and export professional PDF audit certificates to strengthen your cleanliness claims.
+        <p className="mt-6 text-base sm:text-lg text-neutral-400 max-w-3xl mx-auto leading-relaxed">
+          Say goodbye to endless raw photos and chaotic text messages. TurnProofs handles cleaner checklists in Spanish, generates audit-ready reports in English, tracks location verification, and manages touch-up requests in a closed-loop history.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -135,8 +136,7 @@ export default function AirbnbLanding() {
           </Link>
           <Link
             href="/airbnb/clean/demo"
-            target="_blank"
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 font-semibold text-lg transition-all flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 font-semibold text-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-white"
           >
             <span>Try Cleaner Demo</span>
             <ExternalLink className="h-4 w-4 text-rose-400" />
@@ -230,15 +230,15 @@ export default function AirbnbLanding() {
       {/* Host Voice / Testimonial Section */}
       <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-bold">
             <span>⭐⭐⭐⭐⭐</span>
-            <span>Trusted by 500+ Hosts Managing 10,000+ Clean Turnovers</span>
+            <span>Illustrating Real-World Host & Cleaner Feedback</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
             Loved by Hosts & Professional Cleaners
           </h2>
           <p className="text-neutral-400 text-sm sm:text-base">
-            See how TurnProofs helps solve phone storage issues, automates cleaner receipts, and protects hosts from fake refund claims.
+            * Note: Feedback represents common short-term rental cleaning and claim verification scenarios.
           </p>
         </div>
 
@@ -287,7 +287,7 @@ export default function AirbnbLanding() {
         <div className="mt-16 pt-8 border-t border-neutral-900/80 flex flex-wrap items-center justify-center gap-8 text-neutral-400 text-xs font-bold">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-400" />
-            <span>Airbnb & VRBO Dispute Compatible</span>
+            <span>STR Dispute Document Compatible</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-rose-400" />
@@ -295,7 +295,7 @@ export default function AirbnbLanding() {
           </div>
           <div className="flex items-center gap-2">
             <Sparkles className="h-4 w-4 text-amber-400" />
-            <span>Zero Long-Term Data Storage — Your Files, Your Archive</span>
+            <span>60-Day Data Retention — Download Reports for Permanent Archive</span>
           </div>
         </div>
       </section>
@@ -480,7 +480,7 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-[11px] text-center transition-all block shadow-md shadow-rose-500/10 cursor-pointer text-white"
             >
-              Get Pro Plan ($9)
+              Start Pro Free Trial
             </Link>
           </div>
 
@@ -522,7 +522,7 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2 rounded-xl bg-neutral-950 border border-amber-500/40 hover:border-amber-500 font-bold text-[11px] text-center transition-all block cursor-pointer text-amber-400"
             >
-              Unlock Growth ($18.99)
+              Start Growth Free Trial
             </Link>
           </div>
 
@@ -564,7 +564,7 @@ export default function AirbnbLanding() {
               href="/airbnb/login"
               className="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-[11px] text-center text-white transition-all block cursor-pointer"
             >
-              Get Elite ($29.99)
+              Start Elite Free Trial
             </Link>
           </div>
 
