@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink } from 'lucide-react';
 import DemoVideoPlayer from './components/DemoVideoPlayer';
 
-export default function AirbnbLanding() {
+export default function LandingPage() {
   const [isAnnual, setIsAnnual] = useState(true);
   const [authHost, setAuthHost] = useState<any>(null);
   const [calcUnits, setCalcUnits] = useState(3);
@@ -113,17 +113,17 @@ export default function AirbnbLanding() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 px-6 max-w-7xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-rose-400 mb-8 animate-pulse">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Audit-Ready Turnover Verification for Short-Term Rental Hosts</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-amber-400 mb-8">
+          <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+          <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
-          Organized Turnover Reports, Bilingual Cleaner Checklists & Clear Touch-Up Proof
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-5xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
+          The Modern Turnover Verification Platform for STR, MTR & Commercial Projects
         </h1>
 
-        <p className="mt-6 text-base sm:text-lg text-neutral-400 max-w-3xl mx-auto leading-relaxed">
-          Say goodbye to endless raw photos and chaotic text messages. TurnProofs handles cleaner checklists in Spanish, generates audit-ready reports in English, tracks location verification, and manages touch-up requests in a closed-loop history.
+        <p className="mt-6 text-base sm:text-lg text-neutral-400 max-w-4xl mx-auto leading-relaxed">
+          Coordinate your clean teams and subcontractors without text-thread chaos. TurnProofs manages translation-friendly checklists in Spanish, GPS-timestamped location verification, and touch-up requests in a closed-loop history. Zero app installs required.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -173,14 +173,42 @@ export default function AirbnbLanding() {
         </div>
       </section>
 
+      {/* Audience Target Grid */}
+      <section className="py-24 border-t border-neutral-900 bg-neutral-950/20 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="text-xs font-bold text-rose-400 tracking-wider uppercase">Built For the Entire Ecosystem</span>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">One Dashboard to Align Everyone</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 transition-all">
+            <h4 className="font-bold text-white text-lg mb-3">For Hosts & PMs (STR/MTR)</h4>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Verify turnover completion, receive auto-translated English reports from Spanish cleaner checklist entries, track GPS timestamps, and export audit-ready PDFs to defend against false claims.
+            </p>
+          </div>
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 transition-all">
+            <h4 className="font-bold text-white text-lg mb-3">For Cleaners & Subcontractors</h4>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Easy 1-click mobile terminal in Spanish. Upload photos instantly without using your personal phone storage or installing complex apps. Easily prove you completed the job to get paid instantly.
+            </p>
+          </div>
+          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 transition-all">
+            <h4 className="font-bold text-white text-lg mb-3">For Commercial Project Managers</h4>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Manage multiple properties, coordinate internal cleaner squads or third-party subcontractor handoffs, track real-time check-in coordinates, and dispatch touch-up tickets with closed-loop verification.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section id="features" className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
-            Everything you need to secure your payout
+            Everything you need to run flawless turnovers
           </h2>
           <p className="mt-4 text-neutral-400">
-            Airbnb support requests hard evidence to deny refund requests. TurnProofs arms you with unshakeable compliance certificates.
+            From GPS location verification and Spanish-English auto-translation to instant damage alerts and closed-loop touch-up proof—TurnProofs provides audit-ready records for all your properties.
           </p>
         </div>
 
@@ -209,9 +237,9 @@ export default function AirbnbLanding() {
             <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform mb-6">
               <FileText className="h-6 w-6" />
             </div>
-            <h3 className="font-bold text-lg mb-2">Official PDF Export</h3>
+            <h3 className="font-bold text-lg mb-2">Audit-Ready PDFs</h3>
             <p className="text-sm text-neutral-400 leading-relaxed">
-              Branded, printable certification reports structured specifically to submit to Airbnb Support agents.
+              Branded, printable audit reports structured to support guest disputes and verify quality.
             </p>
           </div>
 
@@ -260,7 +288,7 @@ export default function AirbnbLanding() {
             <div>
               <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
               <p className="text-sm text-neutral-300 italic leading-relaxed">
-                "We used to save photos in folders by property and check-in date on Google Drive so they're easy to retrieve if Airbnb asks. TurnProofs automatically sorts everything and generates a single-click verification URL. It saves us hours."
+                "We used to save photos in folders by property and check-in date on Google Drive so they're easy to retrieve if booking channels request proof. TurnProofs automatically sorts everything and generates a single-click verification URL. It saves us hours."
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
@@ -273,7 +301,7 @@ export default function AirbnbLanding() {
             <div>
               <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
               <p className="text-sm text-neutral-300 italic leading-relaxed">
-                "I had a guest plant trash and claim a refund. Airbnb denied my review removal twice because loose screenshots in threads get rejected. Professional Clean Verification Certificates with GPS plots are the proof Support accepts."
+                "I had a guest plant trash and claim a refund. Support denied my review removal twice because loose screenshots in threads get rejected. Structured verification reports with GPS plots are the evidence they actually accept."
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-neutral-900">
