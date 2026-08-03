@@ -17,7 +17,8 @@ import {
   X,
   FileCheck2,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Mail
 } from 'lucide-react';
 
 interface ReportTask {
@@ -245,6 +246,14 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     }, 150);
   };
 
+  const handleDownloadPDF = async () => {
+    alert(lang === 'en' 
+      ? "To download as PDF, select 'Save as PDF' as the Destination in your browser's print options window."
+      : "Para descargar como PDF, seleccione 'Guardar como PDF' como Destino en el cuadro de impresión de su navegador."
+    );
+    await handlePrint();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-6">
@@ -283,6 +292,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   let retouches: Array<{ id: string; timestamp: string; author: string; text: string; photoUrl: string | null }> = [];
   let touchupRequest: any = null;
   let supplies: Record<string, 'full' | 'low' | 'out'> = { toiletPaper: 'full', soap: 'full', trashBags: 'full', paperTowels: 'full' };
+  let cleanerEmail = '';
   
   let customSupplies: Array<{ name: string; level: 'full' | 'low' | 'out' }> = [];
   
@@ -295,6 +305,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       maintenanceAlert = !!parsed.maintenanceAlert;
       maintenanceDesc = parsed.maintenanceDesc || '';
       retouches = parsed.retouches || [];
+      cleanerEmail = parsed.cleanerEmail || '';
       if (parsed.touchupRequest) {
         touchupRequest = parsed.touchupRequest;
       }
@@ -426,11 +437,19 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             </button>
 
             <button
-              onClick={handlePrint}
-              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
+              onClick={handleDownloadPDF}
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold text-xs text-white transition-all shadow-md shadow-emerald-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Printer className="h-4 w-4" />
-              <span>{lang === 'en' ? 'Print / Export PDF' : 'Imprimir / Exportar PDF'}</span>
+              <Download className="h-4 w-4" />
+              <span>{lang === 'en' ? 'Download PDF' : 'Descargar PDF'}</span>
+            </button>
+
+            <button
+              onClick={handlePrint}
+              className="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:bg-neutral-850 hover:border-neutral-700 font-bold text-xs text-white transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Printer className="h-4 w-4 text-rose-450" />
+              <span>{lang === 'en' ? 'Print Certificate' : 'Imprimir Certificado'}</span>
             </button>
           </div>
         </div>
@@ -465,9 +484,9 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               {/* Authenticity QR Code & Verification Badge */}
               <div className="print-badge flex items-center gap-3 bg-neutral-900 border border-neutral-800 p-2.5 rounded-2xl h-fit">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://turnproofs.com/report/${report.id}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://turnproofs.com/report/${report.id}`}
                   alt="Scan QR for Airbnb Dispute Authenticity"
-                  className="h-13 w-13 rounded-xl border border-neutral-700 bg-white p-0.5 shrink-0"
+                  className="h-20 w-20 rounded-xl border border-neutral-700 bg-white p-0.5 shrink-0"
                 />
                 <div className="text-left pr-1">
                   <span className="block text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider">✓ Authenticity QR</span>
@@ -501,6 +520,21 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               <div className="pl-6.5 space-y-1">
                 <p className="print-text-dark font-extrabold text-neutral-100 text-lg">{report.airbnb_properties?.name || 'Vacation Unit'}</p>
                 <p className="print-text-muted text-sm text-neutral-400 leading-relaxed">{report.airbnb_properties?.address}</p>
+                {(() => {
+                  const urlVal = report.airbnb_properties?.cover_image_url || '';
+                  if (urlVal.includes('|||')) {
+                    const hostEmails = urlVal.split('|||')[1];
+                    if (hostEmails) {
+                      return (
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-400 print-text-muted pt-1">
+                          <Mail className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
+                          <span>Report Dispatched To: <span className="font-mono font-semibold">{hostEmails}</span></span>
+                        </div>
+                      );
+                    }
+                  }
+                  return null;
+                })()}
               </div>
             </div>
 
@@ -520,6 +554,12 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                     <Clock className="h-4 w-4 text-neutral-500 shrink-0" />
                     <span>Duration: {elapsedMinutes} minutes ({startDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} - {endDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })})</span>
                   </div>
+                  {cleanerEmail && (
+                    <div className="flex items-center gap-1.5">
+                      <Mail className="h-4 w-4 text-neutral-500 shrink-0" />
+                      <span>Cleaner Copy: <span className="font-mono text-neutral-300">{cleanerEmail}</span></span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

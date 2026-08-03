@@ -188,6 +188,39 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   const [submittedReportId, setSubmittedReportId] = useState<string | null>(null);
   const [uploadingTaskId, setUploadingTaskId] = useState<string | null>(null);
 
+  // Demo Email States
+  const [demoEmail, setDemoEmail] = useState('');
+  const [demoEmailSent, setDemoEmailSent] = useState(false);
+  const [sendingDemoEmail, setSendingDemoEmail] = useState(false);
+  const [demoEmailError, setDemoEmailError] = useState('');
+
+  const handleDemoEmailSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDemoEmailError('');
+    setSendingDemoEmail(true);
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send_demo_email',
+          email: demoEmail,
+          notes: notes
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setDemoEmailSent(true);
+      } else {
+        setDemoEmailError(data.error || 'Failed to send demo email.');
+      }
+    } catch (err) {
+      setDemoEmailError('Failed to send email.');
+    } finally {
+      setSendingDemoEmail(false);
+    }
+  };
+
   // Collaborative team states
   const searchParams = useSearchParams();
   const sessionId = searchParams ? searchParams.get('sessionId') : null;
@@ -897,6 +930,34 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
               <FileText className="h-4 w-4" />
               <span>{lang === 'en' ? 'View Verification Certificate' : 'Ver Certificado de Verificación'}</span>
             </a>
+          )}
+
+          {propertyId === 'demo' && (
+            <div className="w-full pt-4 mt-2 border-t border-neutral-800 space-y-3">
+              <span className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider text-center">
+                {lang === 'en' ? '📧 Get a Demo Email Report' : '📧 Recibe un Reporte de Demostración'}
+              </span>
+              <form onSubmit={handleDemoEmailSend} className="flex gap-2">
+                <input 
+                  type="email" 
+                  required 
+                  placeholder={lang === 'en' ? "Enter your email address..." : "Tu correo electrónico..."}
+                  value={demoEmail}
+                  onChange={(e) => setDemoEmail(e.target.value)}
+                  className="flex-1 px-3 py-2 rounded-xl bg-neutral-900 border border-neutral-800 text-xs text-white placeholder-neutral-500 outline-none"
+                />
+                <button 
+                  type="submit" 
+                  disabled={sendingDemoEmail}
+                  className="px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs whitespace-nowrap active:scale-95 disabled:opacity-50 text-white cursor-pointer"
+                >
+                  {demoEmailSent ? (lang === 'en' ? 'Sent!' : '¡Enviado!') : sendingDemoEmail ? (lang === 'en' ? 'Sending...' : 'Enviando...') : (lang === 'en' ? 'Send' : 'Enviar')}
+                </button>
+              </form>
+              {demoEmailError && (
+                <p className="text-center text-[10px] font-semibold text-rose-500">{demoEmailError}</p>
+              )}
+            </div>
           )}
 
           <button

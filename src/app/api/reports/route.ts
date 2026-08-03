@@ -373,6 +373,81 @@ export async function POST(request: NextRequest) {
       reportId
     } = body;
 
+    // Send demo email action
+    if (action === 'send_demo_email') {
+      const { email, notes: demoNotes } = body;
+      if (!email || !email.includes('@')) {
+        return NextResponse.json({ success: false, error: 'Valid email is required.' }, { status: 400 });
+      }
+
+      const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
+      const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <onboarding@resend.dev>';
+
+      const html = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
+          <div style="text-align: center; border-bottom: 2px solid #f43f5e; padding-bottom: 20px; margin-bottom: 24px;">
+            <h1 style="font-size: 24px; font-weight: 800; color: #f43f5e; margin: 0 0 8px 0;">
+              ✨ TurnProofs Demo Report
+            </h1>
+            <p style="font-size: 14px; color: #4b5563; margin: 0;">
+              Your Public Demo Turnover Session completed successfully!
+            </p>
+          </div>
+
+          <div style="color: #374151; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
+            <p>Here is what your verified turnover report looks like:</p>
+
+            <div style="background: #f8fafc; border-left: 4px solid #f43f5e; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #1e293b; text-transform: uppercase;">Turnover Details:</p>
+              <p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Property:</strong> Sunset Villa Luxury Suite (Demo)</p>
+              <p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Cleaner:</strong> Sunset Cleaning Crew</p>
+              <p style="margin: 0 0 4px 0; font-size: 14px;"><strong>GPS Location:</strong> Verified (Miami Beach, FL)</p>
+              <p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Duration:</strong> 1h 15m</p>
+              <p style="margin: 0; font-size: 14px;"><strong>Notes:</strong> "${demoNotes || 'Unit in pristine condition, all stock replaced.'}"</p>
+            </div>
+
+            <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 20px 0 10px 0;">Verified Checklist Items:</h3>
+            <ul style="padding-left: 20px; margin: 0 0 20px 0;">
+              <li style="margin-bottom: 8px;"><strong>✓ Living Room & Foyer Sanitize & Vacuum:</strong> Verified photo proof uploaded.</li>
+              <li style="margin-bottom: 8px;"><strong>✓ Master Bedroom Fresh Linen & Pillow Styling:</strong> Verified photo proof uploaded.</li>
+              <li style="margin-bottom: 8px;"><strong>✓ Executive Bathroom Towels & Toiletries:</strong> Verified photo proof uploaded.</li>
+              <li style="margin-bottom: 8px;"><strong>✓ Kitchen Appliance Disinfection:</strong> Verified photo proof uploaded.</li>
+            </ul>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 16px; border-radius: 12px; font-size: 13px; line-height: 1.5;">
+              💡 <strong>Next Steps:</strong> Integrate TurnProofs with your PMS (Guesty, Hostaway) to automatically trigger cleaner checklists on guest checkout and send verified reports to your email!
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center;">
+            <a href="https://turnproofs.com/report/sample-report" target="_blank" style="display: inline-block; background: #f43f5e; color: #ffffff; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 800; text-decoration: none;">
+              📄 View Live Sample Verification Report
+            </a>
+            <p style="font-size: 11px; color: #cbd5e1; margin: 10px 0 0 0;">TurnProofs Mobile Verification System</p>
+          </div>
+        </div>
+      `;
+
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: fromAddress,
+            to: [email],
+            subject: `✨ TurnProofs Demo Checkout Verification Report`,
+            html
+          })
+        });
+        return NextResponse.json({ success: true });
+      } catch (err: any) {
+        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+      }
+    }
+
     // Instant Alert Action: Send Red Flag or Lost & Found Email BEFORE Checkout
     if (action === 'instant_alert') {
       const { property_id, alertType, cleaner_name, description, photoUrl } = body;
