@@ -278,6 +278,86 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     );
   }
 
+  const t = lang === 'en' ? {
+    propertyDetails: 'Property Details',
+    reportDispatchedTo: 'Report Dispatched To',
+    cleaningExecution: 'Cleaning Execution',
+    completedOn: 'Completed on',
+    duration: 'Duration',
+    cleanerCopy: 'Cleaner Copy',
+    minutes: 'minutes',
+    geolocationEvidence: 'Geolocation Evidence Logging',
+    startCoordinates: 'Start Coordinates',
+    endCoordinates: 'End Coordinates',
+    viewOnMaps: 'View on Maps',
+    gpsDenied: 'GPS Access Denied/Unavailable',
+    supplyInventory: 'Supply Inventory Levels',
+    toiletPaper: 'Toilet Paper',
+    handSoap: 'Hand Soap',
+    trashLiners: 'Trash Liners',
+    paperTowels: 'Paper Towels',
+    cleaningPace: 'Cleaning Pace Timeline',
+    checkIn: 'Check In',
+    checkOutSign: 'Check Out & Sign',
+    minutesActive: 'Minutes Active Clean',
+    checklist: 'Verified Cleaning Checklist',
+    tasksVerified: 'Tasks Verified',
+    colRoomTask: 'Room & Task Item',
+    colMethod: 'Compliance Method',
+    colPhoto: 'Photo Proof',
+    colStatus: 'Status',
+    photoVerified: 'Photo Verified',
+    photoRequired: 'Photo Required',
+    selfChecked: 'Self Checked',
+    passed: 'Passed',
+    required: 'Required',
+    noPhotos: 'No Photo Proof Logged',
+    commentsNotes: 'Checkout Comments & Notes',
+    noComments: 'No comments left by cleaning crew.',
+    translated: 'Translated from Spanish',
+    showOriginal: 'Show Original',
+    showTranslation: 'Show Translation'
+  } : {
+    propertyDetails: 'Detalles de la Propiedad',
+    reportDispatchedTo: 'Reporte Enviado A',
+    cleaningExecution: 'Ejecución de Limpieza',
+    completedOn: 'Completado el',
+    duration: 'Duración',
+    cleanerCopy: 'Copia del Limpiador',
+    minutes: 'minutos',
+    geolocationEvidence: 'Registro de Evidencia de Geolocalización',
+    startCoordinates: 'Coordenadas de Inicio',
+    endCoordinates: 'Coordenadas de Fin',
+    viewOnMaps: 'Ver en Mapa',
+    gpsDenied: 'Acceso GPS Denegado/No Disponible',
+    supplyInventory: 'Niveles de Inventario de Suministros',
+    toiletPaper: 'Papel Higiénico',
+    handSoap: 'Jabón de Manos',
+    trashLiners: 'Bolsas de Basura',
+    paperTowels: 'Toallas de Papel',
+    cleaningPace: 'Línea de Tiempo del Ritmo de Limpieza',
+    checkIn: 'Entrada (Check In)',
+    checkOutSign: 'Salida y Firma (Check Out)',
+    minutesActive: 'Minutos de Limpieza Activa',
+    checklist: 'Lista de Verificación de Limpieza Verificada',
+    tasksVerified: 'Tareas Verificadas',
+    colRoomTask: 'Habitación y Tarea',
+    colMethod: 'Método de Cumplimiento',
+    colPhoto: 'Prueba Fotográfica',
+    colStatus: 'Estado',
+    photoVerified: 'Foto Verificada',
+    photoRequired: 'Foto Requerida',
+    selfChecked: 'Autocomprobado',
+    passed: 'Aprobado',
+    required: 'Requerido',
+    noPhotos: 'No se registraron pruebas fotográficas',
+    commentsNotes: 'Comentarios y Notas de Salida',
+    noComments: 'No se dejaron comentarios por el equipo de limpieza.',
+    translated: 'Traducido del Español',
+    showOriginal: 'Ver Original',
+    showTranslation: 'Ver Traducción'
+  };
+
   const startDate = new Date(report.started_at);
   const endDate = new Date(report.completed_at);
   const elapsedMs = endDate.getTime() - startDate.getTime();
@@ -336,14 +416,14 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     if (report.start_latitude && report.start_longitude) {
       const dStart = getDistanceMeters(targetLat, targetLng, report.start_latitude, report.start_longitude);
       distanceStartStr = dStart < 1000 
-        ? `${dStart.toFixed(0)}m from target property`
-        : `${(dStart / 1000).toFixed(2)}km from target property`;
+        ? `${dStart.toFixed(0)}m ${lang === 'en' ? 'from target property' : 'de la propiedad de destino'}`
+        : `${(dStart / 1000).toFixed(2)}km ${lang === 'en' ? 'from target property' : 'de la propiedad de destino'}`;
     }
     if (report.end_latitude && report.end_longitude) {
       const dEnd = getDistanceMeters(targetLat, targetLng, report.end_latitude, report.end_longitude);
       distanceEndStr = dEnd < 1000
-        ? `${dEnd.toFixed(0)}m from target property`
-        : `${(dEnd / 1000).toFixed(2)}km from target property`;
+        ? `${dEnd.toFixed(0)}m ${lang === 'en' ? 'from target property' : 'de la propiedad de destino'}`
+        : `${(dEnd / 1000).toFixed(2)}km ${lang === 'en' ? 'from target property' : 'de la propiedad de destino'}`;
     }
   }
 
@@ -486,7 +566,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://turnproofs.com/report/${report.id}`}
                   alt="Scan QR for Airbnb Dispute Authenticity"
-                  className="h-20 w-20 rounded-xl border border-neutral-700 bg-white p-0.5 shrink-0"
+                  className="h-24 w-24 rounded-xl border border-neutral-700 bg-white p-0.5 shrink-0"
                 />
                 <div className="text-left pr-1">
                   <span className="block text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider">✓ Authenticity QR</span>
@@ -515,7 +595,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="space-y-4">
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
                 <MapPin className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Property Details</span>
+                <span>{t.propertyDetails}</span>
               </h3>
               <div className="pl-6.5 space-y-1">
                 <p className="print-text-dark font-extrabold text-neutral-100 text-lg">{report.airbnb_properties?.name || 'Vacation Unit'}</p>
@@ -528,7 +608,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                       return (
                         <div className="flex items-center gap-1.5 text-xs text-neutral-400 print-text-muted pt-1">
                           <Mail className="h-3.5 w-3.5 text-neutral-500 shrink-0" />
-                          <span>Report Dispatched To: <span className="font-mono font-semibold">{hostEmails}</span></span>
+                          <span>{t.reportDispatchedTo}: <span className="font-mono font-semibold">{hostEmails}</span></span>
                         </div>
                       );
                     }
@@ -541,23 +621,23 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="space-y-4">
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
                 <User className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Cleaning Execution</span>
+                <span>{t.cleaningExecution}</span>
               </h3>
               <div className="pl-6.5 space-y-1">
                 <p className="print-text-dark font-extrabold text-neutral-100 text-lg">{report.cleaner_name}</p>
                 <div className="flex flex-col gap-1 mt-1 text-sm text-neutral-400 print-text-muted">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-4 w-4 text-neutral-500 shrink-0" />
-                    <span>Completed on {endDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                    <span>{t.completedOn} {endDate.toLocaleDateString(lang === 'en' ? 'en-US' : 'es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-4 w-4 text-neutral-500 shrink-0" />
-                    <span>Duration: {elapsedMinutes} minutes ({startDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })} - {endDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })})</span>
+                    <span>{t.duration}: {elapsedMinutes} {t.minutes} ({startDate.toLocaleTimeString(lang === 'en' ? 'en-US' : 'es-ES', { hour: '2-digit', minute: '2-digit' })} - {endDate.toLocaleTimeString(lang === 'en' ? 'en-US' : 'es-ES', { hour: '2-digit', minute: '2-digit' })})</span>
                   </div>
                   {cleanerEmail && (
                     <div className="flex items-center gap-1.5">
                       <Mail className="h-4 w-4 text-neutral-500 shrink-0" />
-                      <span>Cleaner Copy: <span className="font-mono text-neutral-300">{cleanerEmail}</span></span>
+                      <span>{t.cleanerCopy}: <span className="font-mono text-neutral-300">{cleanerEmail}</span></span>
                     </div>
                   )}
                 </div>
@@ -569,14 +649,14 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           <div className="py-8 border-b border-neutral-800/80 space-y-4">
             <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
               <CheckCircle className="h-4.5 w-4.5 text-emerald-500" />
-              <span>Geolocation Evidence Logging</span>
+              <span>{t.geolocationEvidence}</span>
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Start Coordinates */}
               <div className="print-badge p-4 rounded-2xl bg-neutral-950 border border-neutral-800 flex justify-between items-center group">
                 <div className="space-y-1">
-                  <span className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">Start Coordinates</span>
+                  <span className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">{t.startCoordinates}</span>
                   {report.start_latitude && report.start_longitude ? (
                     <>
                       <span className="font-mono text-sm font-bold block text-neutral-200">
@@ -587,7 +667,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                       )}
                     </>
                   ) : (
-                    <span className="text-sm text-neutral-500 font-medium">GPS Access Denied/Unavailable</span>
+                    <span className="text-sm text-neutral-500 font-medium">{t.gpsDenied}</span>
                   )}
                 </div>
                 {report.start_latitude && report.start_longitude && (
@@ -599,7 +679,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                     title="Open GPS Start Location on Google Maps"
                   >
                     <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
-                    <span>🗺️ View on Maps</span>
+                    <span>🗺️ {t.viewOnMaps}</span>
                   </a>
                 )}
               </div>
@@ -607,7 +687,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               {/* End Coordinates */}
               <div className="print-badge p-4 rounded-2xl bg-neutral-950 border border-neutral-800 flex justify-between items-center group">
                 <div className="space-y-1">
-                  <span className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">End Coordinates</span>
+                  <span className="block text-[10px] font-semibold text-neutral-500 uppercase tracking-wider">{t.endCoordinates}</span>
                   {report.end_latitude && report.end_longitude ? (
                     <>
                       <span className="font-mono text-sm font-bold block text-neutral-200">
@@ -618,7 +698,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                       )}
                     </>
                   ) : (
-                    <span className="text-sm text-neutral-500 font-medium">GPS Access Denied/Unavailable</span>
+                    <span className="text-sm text-neutral-500 font-medium">{t.gpsDenied}</span>
                   )}
                 </div>
                 {report.end_latitude && report.end_longitude && (
@@ -630,11 +710,11 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                     title="Open GPS End Location on Google Maps"
                   >
                     <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
-                    <span>🗺️ View on Maps</span>
+                    <span>🗺️ {t.viewOnMaps}</span>
                   </a>
                 )}
+              </div>
             </div>
-          </div>
           </div>
 
           {/* Supplies & Time Audit Grid */}
@@ -643,15 +723,15 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="space-y-4">
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
                 <FileCheck2 className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Supply Inventory Levels</span>
+                <span>{t.supplyInventory}</span>
               </h3>
               
               <div className="grid grid-cols-2 gap-3.5 pl-6.5">
                 {[
-                  { name: 'Toilet Paper', val: supplies.toiletPaper },
-                  { name: 'Hand Soap', val: supplies.soap },
-                  { name: 'Trash Liners', val: supplies.trashBags },
-                  { name: 'Paper Towels', val: supplies.paperTowels },
+                  { name: t.toiletPaper, val: supplies.toiletPaper },
+                  { name: t.handSoap, val: supplies.soap },
+                  { name: t.trashLiners, val: supplies.trashBags },
+                  { name: t.paperTowels, val: supplies.paperTowels },
                   ...customSupplies.map(c => ({ name: c.name, val: c.level }))
                 ].map((item, index) => {
                   const badgeColor = 
@@ -665,7 +745,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                     <div key={index} className="print-badge p-3 rounded-xl bg-neutral-950 border border-neutral-800/85 flex items-center justify-between gap-2">
                       <span className="text-xs font-semibold text-neutral-400 truncate">{item.name}</span>
                       <span className={`px-2 py-0.5 border rounded-md text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${badgeColor}`}>
-                        {item.val || 'full'}
+                        {item.val === 'full' ? (lang === 'en' ? 'full' : 'Lleno') : item.val === 'low' ? (lang === 'en' ? 'low' : 'Bajo') : (lang === 'en' ? 'out' : 'Agotado')}
                       </span>
                     </div>
                   );
@@ -677,7 +757,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="space-y-4">
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
                 <Clock className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Cleaning Pace Timeline</span>
+                <span>{t.cleaningPace}</span>
               </h3>
               
               <div className="pl-6.5 space-y-3.5">
@@ -685,22 +765,22 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   {/* Start timeline bubble */}
                   <div className="relative">
                     <span className="absolute -left-[20.5px] top-1 h-3.5 w-3.5 rounded-full bg-neutral-900 border-2 border-rose-500" />
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Check In</span>
-                    <span className="text-xs font-semibold text-neutral-250 text-neutral-200">{startDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">{t.checkIn}</span>
+                    <span className="text-xs font-semibold text-neutral-250 text-neutral-200">{startDate.toLocaleTimeString(lang === 'en' ? 'en-US' : 'es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                   </div>
                   
                   {/* Elapsed timeline bubble */}
                   <div className="relative">
                     <span className="absolute -left-[20.5px] top-1 h-3.5 w-3.5 rounded-full bg-neutral-900 border-2 border-amber-500" />
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Duration</span>
-                    <span className="text-xs font-bold text-amber-400">{elapsedMinutes} Minutes Active Clean</span>
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">{t.duration}</span>
+                    <span className="text-xs font-bold text-amber-400">{elapsedMinutes} {lang === 'en' ? 'Minutes Active Clean' : 'Minutos de Limpieza Activa'}</span>
                   </div>
 
                   {/* Checkout timeline bubble */}
                   <div className="relative">
                     <span className="absolute -left-[20.5px] top-1 h-3.5 w-3.5 rounded-full bg-neutral-900 border-2 border-emerald-500" />
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">Check Out & Sign</span>
-                    <span className="text-xs font-semibold text-neutral-250 text-neutral-200">{endDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider block">{t.checkOutSign}</span>
+                    <span className="text-xs font-semibold text-neutral-250 text-neutral-200">{endDate.toLocaleTimeString(lang === 'en' ? 'en-US' : 'es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                   </div>
                 </div>
               </div>
@@ -712,10 +792,10 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileCheck2 className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Verified Cleaning Checklist</span>
+                <span>{t.checklist}</span>
               </div>
               <span className="text-xs font-semibold text-neutral-400 print-text-muted">
-                {tasks.filter(t => t.completed).length} / {tasks.length} Tasks Verified
+                {tasks.filter(t => t.completed).length} / {tasks.length} {t.tasksVerified}
               </span>
             </h3>
 
@@ -724,15 +804,15 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-neutral-800 bg-neutral-950/80 text-xs font-semibold text-neutral-400 uppercase tracking-wider print:bg-gray-100 print:text-gray-700 print:border-gray-300">
-                      <th className="p-3.5">Room & Task Item</th>
-                      <th className="p-3.5 text-center">Compliance Method</th>
-                      <th className="p-3.5 text-center">Photo Proof</th>
-                      <th className="p-3.5 text-right">Status</th>
+                      <th className="p-3.5">{t.colRoomTask}</th>
+                      <th className="p-3.5 text-center">{t.colMethod}</th>
+                      <th className="p-3.5 text-center">{t.colPhoto}</th>
+                      <th className="p-3.5 text-right">{t.colStatus}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-800/60 text-sm text-neutral-300 print:divide-gray-200">
                     {tasks.map((task) => {
-                      let roomName = 'General / Entire Unit';
+                      let roomName = lang === 'en' ? 'General / Entire Unit' : 'General / Toda la Unidad';
                       let cleanTaskName = task.task_name;
                       const match = task.task_name.match(/^\[(.*?)\]\s*(.*)$/);
                       if (match) {
@@ -750,15 +830,15 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                             {task.photo_url ? (
                               <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-lg font-bold print:bg-emerald-50 print:border-emerald-300 print:text-emerald-800">
                                 <Camera className="h-3 w-3" />
-                                <span>Photo Verified</span>
+                                <span>{t.photoVerified}</span>
                               </span>
                             ) : task.requires_photo ? (
                               <span className="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 px-2.5 py-1 rounded-lg font-bold print:bg-amber-50 print:border-amber-300 print:text-amber-800">
                                 <Camera className="h-3 w-3" />
-                                <span>Photo Required</span>
+                                <span>{t.photoRequired}</span>
                               </span>
                             ) : (
-                              <span className="text-neutral-500 print-text-muted font-medium">Self Checked</span>
+                              <span className="text-neutral-500 print-text-muted font-medium">{t.selfChecked}</span>
                             )}
                           </td>
                           <td className="p-3.5 text-center">
@@ -783,7 +863,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                           <td className="p-3.5 text-right">
                             <span className="inline-flex items-center gap-1 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 px-2.5 py-1 rounded-lg text-xs font-extrabold print:bg-emerald-100 print:border-emerald-400 print:text-emerald-800">
                               <Check className="h-3.5 w-3.5" />
-                              <span>Completed</span>
+                              <span>{lang === 'en' ? 'Completed' : 'Completado'}</span>
                             </span>
                           </td>
                         </tr>
@@ -801,16 +881,16 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Camera className="h-4.5 w-4.5 text-neutral-500" />
-                  <span>High-Resolution Photo Evidence Gallery</span>
+                  <span>{lang === 'en' ? 'High-Resolution Photo Evidence Gallery' : 'Galería de Evidencias Fotográficas de Alta Resolución'}</span>
                 </div>
                 <span className="text-xs font-semibold text-neutral-400 print-text-muted">
-                  {tasks.filter(t => t.photo_url).length} Photos Logged
+                  {tasks.filter(t => t.photo_url).length} {lang === 'en' ? 'Photos Logged' : 'Fotos Registradas'}
                 </span>
               </h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {tasks.filter(t => t.photo_url).map((task) => {
-                  let roomName = 'General';
+                  let roomName = lang === 'en' ? 'General' : 'General';
                   let cleanTaskName = task.task_name;
                   const match = task.task_name.match(/^\[(.*?)\]\s*(.*)$/);
                   if (match) {
@@ -837,13 +917,13 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                         />
                         <div className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/80 backdrop-blur-xs text-[9px] font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-1 border border-emerald-500/30">
                           <Clock className="h-2.5 w-2.5 text-emerald-400" />
-                          <span>✓ Verified • {photoTimeStr}</span>
+                          <span>✓ {lang === 'en' ? 'Verified' : 'Verificado'} • {photoTimeStr}</span>
                         </div>
                       </div>
                       <div className="p-2.5 bg-neutral-900/90 border-t border-neutral-800 print:bg-gray-50 print:border-gray-200">
                         <span className="text-[9px] font-extrabold text-neutral-500 uppercase tracking-wider block truncate print-text-muted">{roomName}</span>
                         <span className="text-xs font-bold text-neutral-200 block truncate print-text-dark">{cleanTaskName}</span>
-                        <span className="text-[9px] text-emerald-400/90 font-semibold block mt-0.5">🔗 Clickable High-Res PDF Link</span>
+                        <span className="text-[9px] text-emerald-400/90 font-semibold block mt-0.5">🔗 {lang === 'en' ? 'Clickable High-Res PDF Link' : 'Enlace de PDF de Alta Resolución'}</span>
                       </div>
                     </a>
                   );
@@ -856,18 +936,18 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           {notesText && (
             <div className="py-8 space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="print-text-dark font-bold text-base text-neutral-200">Cleaner Notes</h3>
+                <h3 className="print-text-dark font-bold text-base text-neutral-200">{lang === 'en' ? 'Cleaner Notes' : 'Notas del Limpiador'}</h3>
                 <button
                   type="button"
                   onClick={() => handleTranslateNotes(notesText)}
                   className="no-print px-3 py-1 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 text-xs font-bold text-rose-400 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
                 >
                   {isTranslatingNotes ? (
-                    <span>Translating...</span>
+                    <span>{lang === 'en' ? 'Translating...' : 'Traduciendo...'}</span>
                   ) : showEnglishNotes ? (
-                    <span>🌐 Show Original Note</span>
+                    <span>🌐 {lang === 'en' ? 'Show Original Note' : 'Ver Nota Original'}</span>
                   ) : (
-                    <span>🌐 Translate Note to English</span>
+                    <span>🌐 {lang === 'en' ? 'Translate Note to English' : 'Traducir Nota al Inglés'}</span>
                   )}
                 </button>
               </div>
@@ -878,7 +958,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 </p>
                 {showEnglishNotes && (
                   <span className="inline-block text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                    ✓ Translated to English
+                    ✓ {lang === 'en' ? 'Translated to English' : 'Traducido al Inglés'}
                   </span>
                 )}
               </div>
@@ -890,7 +970,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             <div className="py-8 border-t border-neutral-800/80 space-y-4">
               <h3 className="print-text-dark font-bold text-base text-neutral-200 flex items-center gap-2">
                 <Camera className="h-4.5 w-4.5 text-neutral-500" />
-                <span>Additional Property & Alert Photos ({additionalPhotos.length})</span>
+                <span>{lang === 'en' ? 'Additional Property & Alert Photos' : 'Fotos Adicionales de la Propiedad'} ({additionalPhotos.length})</span>
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {additionalPhotos.map((url, i) => (
