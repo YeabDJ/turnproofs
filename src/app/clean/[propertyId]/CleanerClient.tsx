@@ -182,6 +182,7 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
   const [maintenanceAlert, setMaintenanceAlert] = useState(false);
   const [maintenanceDesc, setMaintenanceDesc] = useState('');
   const [hostMessage, setHostMessage] = useState('');
+  const [finalWalkthroughDone, setFinalWalkthroughDone] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -760,6 +761,15 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
     if (missingPhotos.length > 0) {
       const missingNames = missingPhotos.map(m => m.task_name.replace(/^\[.*?\]\s*/, '')).join(', ');
       alert(`${t.missingPhotosAlert}${missingNames}`);
+      return;
+    }
+
+    // Verify mandatory Final Walkthrough is completed
+    if (!finalWalkthroughDone) {
+      alert(lang === 'en'
+        ? 'Checkout blocked: You must verify that you completed the final walkthrough check before checking out.'
+        : 'Salida bloqueada: Debe verificar que completó la inspección final antes de registrar la salida.'
+      );
       return;
     }
 
@@ -1852,6 +1862,31 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Final Walkthrough Verification Checkbox */}
+            <div className="p-5 rounded-2xl bg-neutral-900/40 border border-neutral-850 space-y-3 backdrop-blur-md">
+              <span className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                {lang === 'en' ? '🏁 Final Checkout Check' : '🏁 Control de Salida Final'}
+              </span>
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={finalWalkthroughDone}
+                  onChange={(e) => setFinalWalkthroughDone(e.target.checked)}
+                  className="rounded border-neutral-800 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-neutral-950 bg-neutral-950 h-5 w-5 mt-0.5 cursor-pointer"
+                />
+                <div className="space-y-0.5">
+                  <span className={`text-xs font-extrabold block ${finalWalkthroughDone ? 'text-emerald-300' : 'text-neutral-200'}`}>
+                    {lang === 'en' ? 'Do a final walkthrough' : 'Realizar inspección final'}
+                  </span>
+                  <span className="text-[10px] text-neutral-400 block leading-normal">
+                    {lang === 'en' 
+                      ? 'I verify that the unit is in pristine checkout condition, lights are off, and keys are secure.'
+                      : 'Verifico que la unidad esté en perfectas condiciones de salida, las luces estén apagadas y las llaves seguras.'}
+                  </span>
+                </div>
+              </label>
             </div>
 
             {/* Submit checkout */}
