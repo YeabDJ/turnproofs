@@ -1,5 +1,5 @@
-const VALID_SUPABASE_URL = "https://knjafkrildnehfbbmrqa.supabase.co";
-const VALID_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuamFma3JpbGRuZWhmYmJtcnFhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NDQ4MzExNCwiZXhwIjoyMDkwMDU5MTE0fQ.xVrMuo4bTBbN7J71zUMdBcCCdmu1fmkburd_4V0sFrY";
+const VALID_SUPABASE_URL = process.env.SUPABASE_URL || "https://vtcjypssthnmkbvbrpjq.supabase.co";
+const VALID_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0Y2p5cHNzdGhubWtidmJycGpxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTI3MDEwMSwiZXhwIjoyMTAwODQ2MTAxfQ.XAI-5oXSk1EFzgJSQKFis7WVleue74Wa0E8zfSr07z0";
 
 class SupabaseRestHelper {
   private url: string;

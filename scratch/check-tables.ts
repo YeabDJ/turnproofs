@@ -16,6 +16,14 @@ async function check() {
   } else {
     console.log("airbnb_api_logs table exists! Data:", logsData);
   }
+
+  console.log("Checking if turnproofs_leads table exists...");
+  const { data: leadsData, error: leadsError } = await supabaseAdmin.from('turnproofs_leads').select('*').limit(1);
+  if (leadsError) {
+    console.error("Error or Table does not exist:", leadsError);
+  } else {
+    console.log("turnproofs_leads table exists! Data:", leadsData);
+  }
 }
 
 check();
