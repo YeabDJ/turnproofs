@@ -13,7 +13,7 @@ export async function GET(
     }
 
     // Public Demo Fallback
-    if (reportId.includes('demo')) {
+    if (reportId.includes('demo') || reportId.includes('sample')) {
       return NextResponse.json({
         success: true,
         report: {

@@ -124,3 +124,14 @@ ALTER TABLE airbnb_api_outbox ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow all" ON airbnb_api_outbox;
 CREATE INDEX IF NOT EXISTS idx_api_outbox_status_created ON airbnb_api_outbox(status, created_at);
 
+-- 8. Lead Capture for PDF Examples
+CREATE TABLE IF NOT EXISTS turnproofs_leads (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE turnproofs_leads ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all" ON turnproofs_leads;
+
+

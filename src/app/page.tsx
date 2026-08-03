@@ -19,6 +19,37 @@ export default function LandingPage() {
     ? (isAnnual ? '$25.49' : '$29.99') 
     : (isAnnual ? `$${((29.99 + (calcUnits - 6) * 4.99) * 0.85).toFixed(2)}` : `$${(29.99 + (calcUnits - 6) * 4.99).toFixed(2)}`);
 
+  const [leadEmail, setLeadEmail] = useState('');
+  const [submittedLead, setSubmittedLead] = useState(false);
+  const [leadError, setLeadError] = useState('');
+  const [isSubmittingLead, setIsSubmittingLead] = useState(false);
+
+  const handlePdfRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLeadError('');
+    setIsSubmittingLead(true);
+    try {
+      const res = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: leadEmail })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubmittedLead(true);
+        setLeadEmail('');
+        // Open sample report in a new tab
+        window.open('/report/sample-report', '_blank');
+      } else {
+        setLeadError(data.error || 'Failed to submit email.');
+      }
+    } catch (err) {
+      setLeadError('Network error. Please try again.');
+    } finally {
+      setIsSubmittingLead(false);
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
     async function checkAuth() {
@@ -118,8 +149,8 @@ export default function LandingPage() {
           <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-5xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
-          The Modern Turnover Verification Platform for STR, MTR & Commercial Projects
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
+          One Scan. Proof Forever.
         </h1>
 
         <p className="mt-6 text-base sm:text-lg text-neutral-400 max-w-4xl mx-auto leading-relaxed">
@@ -141,6 +172,30 @@ export default function LandingPage() {
             <span>Try Cleaner Demo</span>
             <ExternalLink className="h-4 w-4 text-rose-400" />
           </Link>
+        </div>
+
+        {/* Lead Capture form for Free PDF Example */}
+        <div className="mt-10 max-w-md mx-auto">
+          <form onSubmit={handlePdfRequest} className="p-1 rounded-xl bg-neutral-900 border border-neutral-850 focus-within:border-amber-500/50 transition-all flex items-center shadow-lg shadow-amber-500/5">
+            <input 
+              type="email" 
+              required
+              placeholder="Enter email to get a free PDF report example..." 
+              value={leadEmail}
+              onChange={(e) => setLeadEmail(e.target.value)}
+              className="w-full bg-transparent pl-4 pr-2 py-2 outline-none text-xs text-white placeholder-neutral-500"
+            />
+            <button 
+              type="submit"
+              disabled={isSubmittingLead}
+              className="px-4 py-2 rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs whitespace-nowrap transition-all shadow-md shadow-rose-500/20 active:scale-95 text-white disabled:opacity-50 cursor-pointer"
+            >
+              {submittedLead ? '✓ Sent! Check Tab' : isSubmittingLead ? 'Sending...' : 'Get Free PDF Example'}
+            </button>
+          </form>
+          {leadError && (
+            <p className="mt-2 text-rose-500 text-[10px] font-semibold text-center">{leadError}</p>
+          )}
         </div>
 
         {/* Dashboard Preview Box */}
