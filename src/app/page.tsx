@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink, Clock } from 'lucide-react';
+import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink, Clock, Lock, Share, Plus, Copy, ChevronLeft } from 'lucide-react';
 import DemoVideoPlayer from './components/DemoVideoPlayer';
 
 export default function LandingPage() {
@@ -65,96 +65,20 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white selection:bg-rose-500 selection:text-white overflow-hidden relative">
-      {/* Decorative background glows */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-rose-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen bg-[#080A0E] text-white selection:bg-rose-500 selection:text-white overflow-y-auto overflow-x-hidden relative flex flex-col items-center justify-start py-10 md:py-16 px-4 md:px-6">
+      {/* Ambient glows behind browser window frame */}
+      <div className="absolute top-[20%] left-[-150px] w-[350px] h-[550px] bg-[#FF4F2B]/20 rounded-full blur-[110px] pointer-events-none -z-10 animate-pulse" />
+      <div className="absolute top-[20%] right-[-150px] w-[350px] h-[550px] bg-[#FF4F2B]/20 rounded-full blur-[110px] pointer-events-none -z-10 animate-pulse" />
 
-      {/* Header */}
-      <header className="border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-            <div className="h-10 w-10 rounded-xl bg-linear-to-tr from-rose-500 to-orange-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
-              <ShieldCheck className="h-6 w-6 text-white" />
-            </div>
-            <span className="font-bold text-xl tracking-tight bg-linear-to-r from-rose-400 to-orange-400 bg-clip-text text-transparent">
-              TurnProofs
-            </span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-neutral-400">
-            <button 
-              type="button"
-              onClick={() => document.getElementById('workflow')?.scrollIntoView({ behavior: 'smooth' })}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              How it Works
-            </button>
-            <Link 
-              href="/features"
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Features
-            </Link>
-            <button 
-              type="button"
-              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              Pricing
-            </button>
-            <Link 
-              href="/faq"
-              className="hover:text-white transition-colors cursor-pointer"
-            >
-              FAQ
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            {authHost ? (
-              <Link 
-                href="/dashboard" 
-                className="px-4 py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-xs font-bold transition-all shadow-md shadow-rose-500/20 flex items-center gap-2"
-              >
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span>Dashboard ({authHost.email})</span>
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            ) : (
-              <>
-                <Link 
-                  href="/login" 
-                  className="hidden sm:inline-block text-sm font-medium hover:text-rose-400 transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/login"
-                  className="px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 transition-all shadow-md shadow-rose-500/20 hover:shadow-rose-500/40 hover:scale-[1.02]"
-                >
-                  <span className="sm:hidden">Start Free</span>
-                  <span className="hidden sm:inline">Get Started Free</span>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Custom Keyframe Styles for Hero Visual Elements */}
+      {/* Style block for animations */}
       <style>{`
         @keyframes float-left {
-          0%, 100% { transform: translateY(0px) rotate(-1deg); }
-          50% { transform: translateY(-12px) rotate(1deg); }
+          0%, 100% { transform: translateY(0px) rotate(-6deg); }
+          50% { transform: translateY(-10px) rotate(-4deg); }
         }
         @keyframes float-right {
-          0%, 100% { transform: translateY(0px) rotate(1deg); }
-          50% { transform: translateY(-15px) rotate(-1deg); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.2; filter: blur(120px); }
-          50% { opacity: 0.35; filter: blur(140px); }
+          0%, 100% { transform: translateY(0px) rotate(6deg); }
+          50% { transform: translateY(-12px) rotate(4deg); }
         }
         .animate-float-left {
           animation: float-left 6s ease-in-out infinite;
@@ -162,180 +86,283 @@ export default function LandingPage() {
         .animate-float-right {
           animation: float-right 7s ease-in-out infinite;
         }
-        .animate-pulse-slow {
-          animation: pulse-slow 8s ease-in-out infinite;
-        }
       `}</style>
 
-      {/* Redesigned Hero Section */}
-      <section className="relative pt-20 pb-12 px-6 max-w-7xl mx-auto">
-        {/* Ambient glow behind hero */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-rose-500/10 rounded-full blur-[130px] pointer-events-none -z-10 animate-pulse-slow" />
-        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse-slow" />
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2.5fr_1fr] gap-8 items-center">
-          
-          {/* Left Flank: Floating QR Card with timestamps */}
-          <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-left">
-            <div className="relative p-4 rounded-3xl bg-neutral-900/90 border border-orange-500/20 shadow-2xl shadow-orange-500/5">
-              <div className="h-32 w-32 rounded-2xl bg-white p-2 flex items-center justify-center border border-neutral-800">
-                <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
-                  alt="QR Code"
-                  className="h-full w-full object-contain"
-                />
-              </div>
-              
-              {/* Floating timestamps */}
-              <div className="absolute -top-4 -left-4 px-2 py-1 rounded-lg bg-black/95 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
-                <Clock className="h-2.5 w-2.5" />
-                <span>11:30 PM</span>
-              </div>
-              <div className="absolute -bottom-4 -right-4 px-2 py-1 rounded-lg bg-black/95 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
-                <Clock className="h-2.5 w-2.5" />
-                <span>11:50 AM</span>
-              </div>
+      {/* The Central Browser Window Mockup Frame */}
+      <div className="w-full max-w-6xl rounded-3xl border border-neutral-800/90 bg-[#0F1219] overflow-hidden shadow-2xl relative shadow-orange-500/5 mb-16">
+        
+        {/* Browser Top Navigation Bar */}
+        <div className="h-12 bg-[#161B26] border-b border-neutral-850 px-4 flex items-center justify-between text-xs text-neutral-500 select-none">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-full bg-[#FF5F56]" />
+            <div className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
+            <div className="h-3 w-3 rounded-full bg-[#27C93F]" />
+            <div className="flex gap-2 ml-4">
+              <ChevronLeft className="h-4 w-4 opacity-50" />
+              <ChevronRight className="h-4 w-4 opacity-50" />
             </div>
           </div>
+          
+          {/* Address Bar */}
+          <div className="w-56 sm:w-96 bg-[#0F1219] border border-neutral-800 py-1 px-3 rounded-md flex items-center justify-center gap-1.5 text-neutral-400">
+            <Lock className="h-3 w-3 text-neutral-500 shrink-0" />
+            <span className="font-semibold tracking-wide truncate">turnproofs.com</span>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Share className="h-4 w-4 opacity-70" />
+            <Plus className="h-4 w-4 opacity-70" />
+            <Copy className="h-4 w-4 opacity-70" />
+          </div>
+        </div>
 
-          {/* Center Column: Hero Content & Forms */}
-          <div className="text-center space-y-6">
-            {/* Small Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/90 border border-neutral-805 border-neutral-800 text-[10px] font-extrabold uppercase tracking-wider text-rose-400 mb-2 shadow-sm">
-              <span className="flex h-1.5 w-1.5 rounded-full bg-rose-500 shrink-0" />
-              <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
+        {/* Website Navigation Header */}
+        <header className="border-b border-neutral-900 bg-neutral-950/40 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
+            <div className="h-7 w-7 rounded-lg bg-[#FF4F2B] flex items-center justify-center font-black text-white text-base select-none">
+              T
             </div>
+            <span className="font-extrabold text-lg text-white tracking-tight">TurnProofs</span>
+          </Link>
 
-            {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1] text-white">
-              One Scan. Proof Forever.
-            </h1>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-neutral-400">
+            <span className="flex items-center gap-1 hover:text-white transition-colors cursor-pointer">
+              Product <ChevronDown className="h-3.5 w-3.5" />
+            </span>
+            <button 
+              type="button"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hover:text-white transition-colors cursor-pointer font-semibold"
+            >
+              Features
+            </button>
+            <button 
+              type="button"
+              onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
+              className="hover:text-white transition-colors cursor-pointer font-semibold"
+            >
+              Pricing
+            </button>
+          </nav>
 
-            {/* Subtitle */}
-            <p className="text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto leading-relaxed">
-              Seamlessly coordinate clean teams and subcontractors with immutable digital documentation.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link
-                href="/login"
-                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-white transition-all shadow-lg shadow-rose-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+          <div className="flex items-center gap-4">
+            {authHost ? (
+              <Link 
+                href="/dashboard" 
+                className="px-4 py-1.5 rounded-lg bg-[#FF4F2B] text-xs font-bold transition-all flex items-center gap-1.5"
               >
-                <span>Start Your Free Trial</span>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span>Dashboard</span>
               </Link>
-              <Link
-                href="/clean/demo"
-                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-855 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 font-semibold text-sm text-neutral-300 hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Book a Demo</span>
-              </Link>
-            </div>
+            ) : (
+              <>
+                <Link 
+                  href="/login" 
+                  className="text-xs font-semibold text-neutral-400 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 text-xs font-bold text-white rounded-lg bg-[#FF4F2B] hover:bg-[#e04322] transition-all shadow-md shadow-orange-500/10 active:scale-95"
+                >
+                  Try For Free
+                </Link>
+              </>
+            )}
+          </div>
+        </header>
 
-            {/* Lead Capture form */}
-            <div className="pt-4">
-              <div className="p-1.5 rounded-2xl bg-neutral-900/60 border border-orange-500/40 focus-within:border-orange-500 max-w-xl mx-auto shadow-xl shadow-orange-500/5 transition-all">
-                <form onSubmit={handlePdfRequest} className="flex flex-col sm:flex-row gap-2">
-                  <input 
-                    type="email" 
-                    required
-                    placeholder="Enter email to get a free PDF report example..." 
-                    value={leadEmail}
-                    onChange={(e) => setLeadEmail(e.target.value)}
-                    className="flex-1 bg-white px-4 py-3 rounded-xl outline-none text-sm text-neutral-900 placeholder-neutral-500 font-medium"
+        {/* Hero Area */}
+        <div className="relative pt-16 pb-10 px-6 max-w-7xl mx-auto">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_2.5fr_1fr] gap-4 items-center">
+            
+            {/* Left Flank: Floating QR Card with timestamps */}
+            <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-left">
+              <div className="relative p-3.5 rounded-2xl bg-[#131720]/75 border border-[#FF4F2B]/35 shadow-2xl shadow-orange-500/10">
+                <div className="h-28 w-28 rounded-xl bg-white p-2 flex items-center justify-center border border-neutral-800">
+                  <img
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
+                    alt="QR Code"
+                    className="h-full w-full object-contain"
                   />
-                  <button 
-                    type="submit"
-                    disabled={isSubmittingLead}
-                    className="px-6 py-3 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-white whitespace-nowrap transition-all shadow-md shadow-rose-500/25 active:scale-95 disabled:opacity-50 cursor-pointer"
-                  >
-                    {submittedLead ? '✓ Sent! Check Tab' : isSubmittingLead ? 'Sending...' : 'Get Free PDF Example'}
-                  </button>
-                </form>
-              </div>
-              {leadError && (
-                <p className="mt-2 text-rose-500 text-[10px] font-semibold text-center">{leadError}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Right Flank: Floating QR Card with document badges */}
-          <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-right">
-            <div className="relative p-4 rounded-3xl bg-neutral-900/90 border border-orange-500/20 shadow-2xl shadow-orange-500/5">
-              <div className="h-32 w-32 rounded-2xl bg-white p-2 flex items-center justify-center border border-neutral-800">
-                <img
-                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
-                  alt="QR Code"
-                  className="h-full w-full object-contain"
-                />
-              </div>
-
-              {/* Floating Documents */}
-              <div className="absolute -top-4 -right-4 px-2 py-1.5 rounded-lg bg-neutral-950 border border-neutral-850 text-[10px] font-bold text-neutral-200 shadow-md flex items-center gap-1 animate-bounce">
-                📄 <span className="text-[9px] text-neutral-400">PDF</span>
-              </div>
-              <div className="absolute top-1/2 -left-8 px-2 py-1.5 rounded-lg bg-neutral-950 border border-neutral-855 text-[10px] font-bold text-neutral-200 shadow-md flex items-center gap-1 animate-bounce">
-                📄 <span className="text-[9px] text-neutral-400">Cert</span>
-              </div>
-              <div className="absolute -bottom-4 -left-4 px-2 py-1 rounded-lg bg-black/95 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
-                <Clock className="h-2.5 w-2.5" />
-                <span>12:00 AM</span>
+                </div>
+                
+                {/* Floating timestamps */}
+                <div className="absolute -top-3 -left-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[6deg] animate-pulse">
+                  <Clock className="h-2.5 w-2.5" />
+                  <span>11:30 PM</span>
+                </div>
+                <div className="absolute -bottom-3 -right-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[6deg] animate-pulse">
+                  <Clock className="h-2.5 w-2.5" />
+                  <span>11:50 AM</span>
+                </div>
               </div>
             </div>
-          </div>
 
+            {/* Center Column: Hero details */}
+            <div className="text-center space-y-6">
+              {/* Checkpill badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1E222B] border border-neutral-800 text-[10px] font-extrabold uppercase tracking-wider text-neutral-300 shadow-sm mx-auto">
+                <span className="h-4 w-4 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                  <Check className="h-2.5 w-2.5 text-emerald-400" />
+                </span>
+                <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
+              </div>
+
+              {/* Headline */}
+              <h1 className="text-4xl sm:text-5xl md:text-[52px] font-extrabold tracking-tight max-w-3xl mx-auto leading-[1.1] text-white">
+                One Scan. Proof Forever.
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-xs sm:text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
+                Seamlessly coordinate clean teams and subcontractors with immutable digital documentation.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
+                <Link
+                  href="/login"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#FF512F] to-[#DD2476] hover:scale-105 font-bold text-xs text-white transition-all shadow-lg shadow-[#FF512F]/20 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Start Your Free Trial</span>
+                </Link>
+                <Link
+                  href="/clean/demo"
+                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-transparent hover:bg-neutral-900 border border-neutral-700 font-bold text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Book a Demo</span>
+                </Link>
+              </div>
+
+              {/* Email capture field */}
+              <div className="pt-2">
+                <div className="p-1 rounded-2xl bg-neutral-950/60 border border-[#FF4F2B]/40 focus-within:border-[#FF4F2B] max-w-md mx-auto shadow-xl shadow-orange-500/5 transition-all">
+                  <form onSubmit={handlePdfRequest} className="flex gap-2">
+                    <input 
+                      type="email" 
+                      required
+                      placeholder="Enter email to get a free PDF report example..." 
+                      value={leadEmail}
+                      onChange={(e) => setLeadEmail(e.target.value)}
+                      className="flex-1 bg-white px-3 py-2.5 rounded-xl outline-none text-xs text-neutral-900 placeholder-neutral-500 font-semibold"
+                    />
+                    <button 
+                      type="submit"
+                      disabled={isSubmittingLead}
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF512F] to-[#DD2476] hover:scale-102 font-bold text-xs text-white whitespace-nowrap transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+                    >
+                      {submittedLead ? '✓ Sent! Check Tab' : isSubmittingLead ? 'Sending...' : 'Get Free PDF Example'}
+                    </button>
+                  </form>
+                </div>
+                {leadError && (
+                  <p className="mt-2 text-rose-500 text-[10px] font-semibold text-center">{leadError}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Right Flank: Floating QR Card with documents */}
+            <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-right">
+              <div className="relative p-3.5 rounded-2xl bg-[#131720]/75 border border-[#FF4F2B]/35 shadow-2xl shadow-orange-500/10">
+                <div className="h-28 w-28 rounded-xl bg-white p-2 flex items-center justify-center border border-neutral-800">
+                  <img
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
+                    alt="QR Code"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
+
+                {/* Floating Documents */}
+                <div className="absolute -top-3 -right-3 px-2 py-1 rounded-lg bg-neutral-950 border border-neutral-800 text-[9px] font-extrabold text-neutral-200 shadow-md flex items-center gap-1 rotate-[-6deg] animate-bounce">
+                  📄 <span className="text-[8px] text-neutral-400 font-semibold">PDF</span>
+                </div>
+                <div className="absolute top-1/2 -left-6 px-2 py-1 rounded-lg bg-neutral-950 border border-neutral-800 text-[9px] font-extrabold text-neutral-200 shadow-md flex items-center gap-1 rotate-[-6deg] animate-bounce">
+                  📄 <span className="text-[8px] text-neutral-400 font-semibold">Cert</span>
+                </div>
+                <div className="absolute -bottom-3 -left-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[-6deg] animate-pulse">
+                  <Clock className="h-2.5 w-2.5" />
+                  <span>12:00 AM</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-      </section>
 
-      {/* Target Audience Segment Cards (Mockup Style) */}
-      <section className="py-6 max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* Card 1 */}
-          <div className="bg-[#131720]/80 border border-neutral-850 rounded-3xl p-6 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/20">
-            <div className="absolute top-4 right-4 h-2.5 w-2.5 rounded-full bg-blue-500" />
-            <div className="h-16 w-16 shrink-0 rounded-2xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-805 border-neutral-800 flex items-center justify-center text-3xl shadow-inner relative overflow-hidden">
-              <span className="z-10 drop-shadow-md">🏢</span>
-              <span className="absolute bottom-1 right-1 text-base z-20">🧑‍💼</span>
+        {/* Target Audience Grid (Bottom segment of browser card) */}
+        <div className="px-6 pb-8 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            {/* Card 1 */}
+            <div className="bg-[#131720]/80 border border-neutral-850 rounded-2xl p-4.5 p-4 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/10">
+              <div className="absolute top-4 right-4 h-2.5 w-2.5 rounded-full bg-[#0052FF]" />
+              <div className="h-14 w-14 shrink-0 rounded-xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-800 flex items-center justify-center shadow-inner relative overflow-hidden">
+                <svg viewBox="0 0 64 64" className="w-9 h-9 drop-shadow-[0_4px_10px_rgba(244,63,94,0.3)]">
+                  <path d="M32 8 L54 20 L32 32 L10 20 Z" fill="#FDA4AF" />
+                  <path d="M10 20 L32 32 L32 58 L10 46 Z" fill="#E11D48" opacity="0.9" />
+                  <path d="M32 32 L54 20 L54 46 L32 58 Z" fill="#BE123C" />
+                  <circle cx="48" cy="46" r="6" fill="#F59E0B" />
+                  <path d="M42 52 L54 52 L54 60 L42 60 Z" fill="#3B82F6" />
+                </svg>
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Hosts & PMs</h4>
+                <p className="text-[11px] text-neutral-400 leading-normal font-medium">
+                  Manage multiple properties. Ensure unit readiness to your management.
+                </p>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h4 className="font-extrabold text-white text-base">For Hosts & PMs</h4>
-              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                Manage multiple properties. Ensure unit readiness to your management.
-              </p>
+
+            {/* Card 2 */}
+            <div className="bg-[#131720]/80 border border-neutral-850 rounded-2xl p-4.5 p-4 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/10">
+              <div className="h-14 w-14 shrink-0 rounded-xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-800 flex items-center justify-center shadow-inner relative overflow-hidden">
+                <svg viewBox="0 0 64 64" className="w-9 h-9 drop-shadow-[0_4px_10px_rgba(245,158,11,0.3)]">
+                  <rect x="12" y="28" width="24" height="24" rx="6" fill="#F59E0B" />
+                  <circle cx="20" cy="44" r="5" fill="#1F2937" />
+                  <circle cx="28" cy="44" r="5" fill="#1F2937" />
+                  <path d="M24 28 C24 16, 44 16, 44 28 L44 54" stroke="#9CA3AF" strokeWidth="4" fill="none" strokeLinecap="round" />
+                  <path d="M38 52 L50 52 L48 58 L40 58 Z" fill="#EF4444" />
+                </svg>
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Cleaners & Subcontractors</h4>
+                <p className="text-[11px] text-neutral-400 leading-normal font-medium">
+                  Proof of work completed. Avoid disputes, and maintenance. Streamlined invoicing.
+                </p>
+              </div>
             </div>
+
+            {/* Card 3 */}
+            <div className="bg-[#131720]/80 border border-neutral-850 rounded-2xl p-4.5 p-4 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/10">
+              <div className="h-14 w-14 shrink-0 rounded-xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-800 flex items-center justify-center shadow-inner relative overflow-hidden">
+                <svg viewBox="0 0 64 64" className="w-9 h-9 drop-shadow-[0_4px_10px_rgba(59,130,246,0.3)]">
+                  <rect x="14" y="10" width="18" height="48" rx="2" fill="#3B82F6" />
+                  <rect x="36" y="22" width="16" height="36" rx="2" fill="#2563EB" opacity="0.8" />
+                  <circle cx="20" cy="18" r="1.5" fill="#fff" opacity="0.9" />
+                  <circle cx="26" cy="18" r="1.5" fill="#fff" opacity="0.9" />
+                  <circle cx="20" cy="26" r="1.5" fill="#fff" opacity="0.9" />
+                  <circle cx="26" cy="26" r="1.5" fill="#fff" opacity="0.9" />
+                  <circle cx="20" cy="34" r="1.5" fill="#fff" opacity="0.9" />
+                  <circle cx="26" cy="34" r="1.5" fill="#fff" opacity="0.9" />
+                  <path d="M38 46 C38 40, 52 40, 52 46 L36 46 Z" fill="#FBBF24" />
+                  <rect x="34" y="46" width="20" height="2" rx="0.5" fill="#F59E0B" />
+                </svg>
+              </div>
+              <div className="space-y-0.5">
+                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Commercial Project Managers</h4>
+                <p className="text-[11px] text-neutral-400 leading-normal font-medium">
+                  High-volume turnover verification. Simplified compliance reporting.
+                </p>
+              </div>
+            </div>
+
           </div>
-
-          {/* Card 2 */}
-          <div className="bg-[#131720]/80 border border-neutral-850 rounded-3xl p-6 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/20">
-            <div className="h-16 w-16 shrink-0 rounded-2xl bg-linear-to-b from-neutral-855 to-neutral-900 border border-neutral-805 border-neutral-800 flex items-center justify-center text-3xl shadow-inner relative overflow-hidden">
-              <span className="z-10 drop-shadow-md">🧹</span>
-              <span className="absolute bottom-1 right-1 text-base z-20">🧰</span>
-            </div>
-            <div className="space-y-1">
-              <h4 className="font-extrabold text-white text-base">For Cleaners & Subcontractors</h4>
-              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                Proof of work completed. Avoid disputes, and maintenance. Streamlined invoicing.
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-[#131720]/80 border border-neutral-855 border-neutral-850 rounded-3xl p-6 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/20">
-            <div className="h-16 w-16 shrink-0 rounded-2xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-805 border-neutral-800 flex items-center justify-center text-3xl shadow-inner relative overflow-hidden">
-              <span className="z-10 drop-shadow-md">🏢</span>
-              <span className="absolute bottom-1 right-1 text-base z-20">👷</span>
-            </div>
-            <div className="space-y-1">
-              <h4 className="font-extrabold text-white text-base">For Commercial Project Managers</h4>
-              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                High-volume turnover verification. Simplified compliance reporting.
-              </p>
-            </div>
-          </div>
-
         </div>
-      </section>
+
+      </div>
 
       {/* Dashboard Preview Workflow Section */}
       <section id="workflow" className="py-16 max-w-7xl mx-auto px-6 scroll-mt-20">
