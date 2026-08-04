@@ -208,17 +208,17 @@ export default function LandingPage() {
                 <span className="h-4 w-4 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
                   <Check className="h-2.5 w-2.5 text-emerald-400" />
                 </span>
-                <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
+                <span>Turnover verification for hosts, managers, cleaners &amp; subcontractors</span>
               </div>
 
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl md:text-[52px] font-extrabold tracking-tight max-w-3xl mx-auto leading-[1.1] text-white">
-                One Scan. Proof Forever.
+                One Scan. One Complete Turnover Record.
               </h1>
 
               {/* Subtitle */}
               <p className="text-xs sm:text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
-                Seamlessly coordinate clean teams and subcontractors with immutable digital documentation.
+                Coordinate cleaners and subcontractors with bilingual checklists, photo proof, location verification, and closed-loop touch-up requests—before the next check-in.
               </p>
 
               {/* Action Buttons */}
@@ -233,34 +233,22 @@ export default function LandingPage() {
                   href="/clean/demo"
                   className="w-full sm:w-auto px-6 py-3 rounded-xl bg-transparent hover:bg-neutral-900 border border-neutral-700 font-bold text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>Book a Demo</span>
+                  <span>Try Cleaner Demo</span>
                 </Link>
               </div>
 
-              {/* Email capture field */}
-              <div className="pt-2">
-                <div className="p-1 rounded-2xl bg-neutral-950/60 border border-[#FF4F2B]/40 focus-within:border-[#FF4F2B] max-w-md mx-auto shadow-xl shadow-orange-500/5 transition-all">
-                  <form onSubmit={handlePdfRequest} className="flex gap-2">
-                    <input 
-                      type="email" 
-                      required
-                      placeholder="Enter email to get a free PDF report example..." 
-                      value={leadEmail}
-                      onChange={(e) => setLeadEmail(e.target.value)}
-                      className="flex-1 bg-white px-3 py-2.5 rounded-xl outline-none text-xs text-neutral-900 placeholder-neutral-500 font-semibold"
-                    />
-                    <button 
-                      type="submit"
-                      disabled={isSubmittingLead}
-                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF512F] to-[#DD2476] hover:scale-102 font-bold text-xs text-white whitespace-nowrap transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
-                    >
-                      {submittedLead ? '✓ Sent! Check Tab' : isSubmittingLead ? 'Sending...' : 'Get Free PDF Example'}
-                    </button>
-                  </form>
-                </div>
-                {leadError && (
-                  <p className="mt-2 text-rose-500 text-[10px] font-semibold text-center">{leadError}</p>
-                )}
+              {/* Sample report — direct link, no email gate */}
+              <div className="pt-1">
+                <Link
+                  href="/report/sample-report"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-neutral-400 hover:text-white transition-colors group"
+                >
+                  <FileText className="h-3.5 w-3.5 text-neutral-500 group-hover:text-rose-400 transition-colors" />
+                  <span>View a sample audit-ready report</span>
+                  <ChevronRight className="h-3 w-3 text-neutral-600 group-hover:text-rose-400 transition-colors" />
+                </Link>
               </div>
             </div>
 
@@ -309,9 +297,9 @@ export default function LandingPage() {
                 </svg>
               </div>
               <div className="space-y-0.5">
-                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Hosts & PMs</h4>
+                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Hosts &amp; Property Managers</h4>
                 <p className="text-[11px] text-neutral-400 leading-normal font-medium">
-                  Manage multiple properties. Ensure unit readiness to your management.
+                  Know every property is guest-ready before check-in.
                 </p>
               </div>
             </div>
@@ -328,9 +316,9 @@ export default function LandingPage() {
                 </svg>
               </div>
               <div className="space-y-0.5">
-                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Cleaners & Subcontractors</h4>
+                <h4 className="font-extrabold text-white text-xs sm:text-sm">For Cleaners &amp; Subcontractors</h4>
                 <p className="text-[11px] text-neutral-400 leading-normal font-medium">
-                  Proof of work completed. Avoid disputes, and maintenance. Streamlined invoicing.
+                  Document completed work, resolve touch-ups, and keep every handoff clear.
                 </p>
               </div>
             </div>
@@ -354,7 +342,7 @@ export default function LandingPage() {
               <div className="space-y-0.5">
                 <h4 className="font-extrabold text-white text-xs sm:text-sm">For Commercial Project Managers</h4>
                 <p className="text-[11px] text-neutral-400 leading-normal font-medium">
-                  High-volume turnover verification. Simplified compliance reporting.
+                  Track high-volume site work and subcontractor accountability in one place.
                 </p>
               </div>
             </div>
@@ -387,7 +375,7 @@ export default function LandingPage() {
               <p className="text-sm text-neutral-400">Cleaners click to start/finish with zero login. The system logs exact coordinates to verify they cleaned on-site.</p>
             </div>
             <div className="p-5 rounded-xl bg-neutral-950/80 border border-neutral-800/80">
-              <span className="text-xs font-semibold text-emerald-400 tracking-wider uppercase block mb-1">Step 3: Export Support Certs</span>
+              <span className="text-xs font-semibold text-emerald-400 tracking-wider uppercase block mb-1">Step 3: Export Audit-Ready Reports</span>
               <h4 className="font-bold text-lg text-white mb-2">Export Professional Reports</h4>
               <p className="text-sm text-neutral-400">Generate a branded PDF report showing timestamps, cleaner information, photo grid, and Google Maps verification link.</p>
             </div>
@@ -449,58 +437,46 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Host Voice / Testimonial Section */}
+      {/* Common Turnover Scenarios Section */}
       <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-bold">
-            <span>⭐⭐⭐⭐⭐</span>
-            <span>Illustrating Real-World Host & Cleaner Feedback</span>
+            <span>📋</span>
+            <span>Common Turnover Scenarios</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
-            Loved by Hosts & Professional Cleaners
+            Common Turnover Scenarios
           </h2>
           <p className="text-neutral-400 text-sm sm:text-base">
-            * Note: Feedback represents common short-term rental cleaning and claim verification scenarios.
+            Examples of common short-term-rental turnover documentation challenges that TurnProofs is designed to help teams manage.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-rose-500/20 transition-all flex flex-col justify-between">
             <div>
-              <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
-              <p className="text-sm text-neutral-300 italic leading-relaxed">
-                "My host uses Breezeway so none of the pictures take any storage on my phone... as a cleaner this is becoming very common for hosts to ask. TurnProofs is even better because I don't have to download any app!"
+              <div className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-3">Scenario: App Fatigue</div>
+              <p className="text-sm text-neutral-300 leading-relaxed">
+                A cleaner's host requires photo proof after each turnover. Managing that through personal storage and manual uploads is time-consuming. A zero-install browser link removes that friction.
               </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-neutral-900">
-              <h5 className="font-bold text-sm text-white">M. R.</h5>
-              <p className="text-xs text-rose-400 mt-0.5">Professional Cleaner • 12 Turnovers/Wk</p>
             </div>
           </div>
 
           <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-orange-500/20 transition-all flex flex-col justify-between">
             <div>
-              <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
-              <p className="text-sm text-neutral-300 italic leading-relaxed">
-                "We used to save photos in folders by property and check-in date on Google Drive so they're easy to retrieve if booking channels request proof. TurnProofs automatically sorts everything and generates a single-click verification URL. It saves us hours."
+              <div className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-3">Scenario: Manual Photo Folders</div>
+              <p className="text-sm text-neutral-300 leading-relaxed">
+                Teams managing multiple properties often store photos in separate Google Drive folders per unit and date. Locating the right photo when a booking platform requests documentation can take hours.
               </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-neutral-900">
-              <h5 className="font-bold text-sm text-white">P. H. S.</h5>
-              <p className="text-xs text-orange-400 mt-0.5">Superhost, 4 Properties</p>
             </div>
           </div>
 
           <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-amber-500/20 transition-all flex flex-col justify-between">
             <div>
-              <div className="text-amber-400 text-xs mb-3">⭐⭐⭐⭐⭐ 5/5</div>
-              <p className="text-sm text-neutral-300 italic leading-relaxed">
-                "I had a guest plant trash and claim a refund. Support denied my review removal twice because loose screenshots in threads get rejected. Structured verification reports with GPS plots are the evidence they actually accept."
+              <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">Scenario: Guest Dispute Documentation</div>
+              <p className="text-sm text-neutral-300 leading-relaxed">
+                When a guest files a cleanliness claim, booking platforms typically require structured documentation. Loose screenshots shared in message threads are often not accepted. Structured turnover reports with GPS and timestamps give hosts the documentation to support quality reviews and guest disputes.
               </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-neutral-900">
-              <h5 className="font-bold text-sm text-white">D. L.</h5>
-              <p className="text-xs text-amber-400 mt-0.5">Host, Florida Coast • 3 Properties</p>
             </div>
           </div>
         </div>
@@ -533,7 +509,7 @@ export default function LandingPage() {
             See How TurnProofs Works in 60 Seconds
           </h2>
           <p className="mt-4 text-neutral-400 text-sm sm:text-base">
-            Watch how cleaners scan door QR codes, check off room accordions, and generate dispute-proof PDF certificates in under a minute.
+            Watch how cleaners scan door QR codes, check off room accordions, and generate audit-ready PDF reports in under a minute.
           </p>
         </div>
 
@@ -694,7 +670,7 @@ export default function LandingPage() {
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-rose-400 shrink-0" />
-                  <span>Dispute-Proof PDF Audit Logs</span>
+                  <span>Audit-Ready PDF Turnover Reports</span>
                 </li>
               </ul>
             </div>
@@ -842,7 +818,7 @@ export default function LandingPage() {
             <span>Got Questions?</span>
           </div>
           <h2 className="text-3xl font-black text-white">Frequently Asked Questions</h2>
-          <p className="text-sm text-neutral-400 max-w-lg mx-auto">Everything you need to know about dispute proofing, cleaner tracking, and property audits.</p>
+          <p className="text-sm text-neutral-400 max-w-lg mx-auto">Everything you need to know about turnover documentation, cleaner tracking, and property audits.</p>
         </div>
 
         <div className="space-y-4">
