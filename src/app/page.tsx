@@ -191,7 +191,7 @@ export default function LandingPage() {
                 
                 {/* Floating timestamps */}
                 <div className="absolute -top-3 -left-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[6deg] animate-pulse">
-                  <MapPin className="h-2.5 w-2.5" />
+                  <span>📍</span>
                   <span>3:45 PM</span>
                 </div>
                 <div className="absolute -bottom-3 -right-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[6deg] animate-pulse">
