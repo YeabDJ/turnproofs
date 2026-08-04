@@ -191,7 +191,10 @@ export default function LandingPage() {
                 
                 {/* Floating timestamps */}
                 <div className="absolute -top-3 -left-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[6deg] animate-pulse">
-                  <span>📍</span>
+                  <svg width="9" height="13" viewBox="0 0 9 13" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                    <path d="M4.5 0C2.015 0 0 2.015 0 4.5C0 7.875 4.5 13 4.5 13C4.5 13 9 7.875 9 4.5C9 2.015 6.985 0 4.5 0Z" fill="#FF4F2B"/>
+                    <circle cx="4.5" cy="4.5" r="1.8" fill="white"/>
+                  </svg>
                   <span>3:45 PM</span>
                 </div>
                 <div className="absolute -bottom-3 -right-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[6deg] animate-pulse">
