@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TurnProofs — One Scan. Proof Forever.",
-  description: "Coordinate clean teams and subcontractors without text-thread chaos. Translation-friendly checklists, GPS-timestamped locations, and audit-ready PDF reports. Zero app installs required.",
+  title: "TurnProofs — One Scan. One Complete Turnover Record.",
+  description: "Coordinate cleaners and subcontractors with bilingual checklists, photo proof, location verification, and closed-loop touch-up requests—before the next check-in. Zero app installs required.",
   icons: {
     icon: [
       { url: '/icon.png?v=2', type: 'image/png' },
