@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink } from 'lucide-react';
+import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink, Clock } from 'lucide-react';
 import DemoVideoPlayer from './components/DemoVideoPlayer';
 
 export default function LandingPage() {
@@ -142,64 +142,204 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative pt-24 pb-20 px-6 max-w-7xl mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-amber-400 mb-8">
-          <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-          <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
+      {/* Custom Keyframe Styles for Hero Visual Elements */}
+      <style>{`
+        @keyframes float-left {
+          0%, 100% { transform: translateY(0px) rotate(-1deg); }
+          50% { transform: translateY(-12px) rotate(1deg); }
+        }
+        @keyframes float-right {
+          0%, 100% { transform: translateY(0px) rotate(1deg); }
+          50% { transform: translateY(-15px) rotate(-1deg); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.2; filter: blur(120px); }
+          50% { opacity: 0.35; filter: blur(140px); }
+        }
+        .animate-float-left {
+          animation: float-left 6s ease-in-out infinite;
+        }
+        .animate-float-right {
+          animation: float-right 7s ease-in-out infinite;
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 8s ease-in-out infinite;
+        }
+      `}</style>
+
+      {/* Redesigned Hero Section */}
+      <section className="relative pt-20 pb-12 px-6 max-w-7xl mx-auto">
+        {/* Ambient glow behind hero */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-rose-500/10 rounded-full blur-[130px] pointer-events-none -z-10 animate-pulse-slow" />
+        <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] bg-orange-500/5 rounded-full blur-[100px] pointer-events-none -z-10 animate-pulse-slow" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2.5fr_1fr] gap-8 items-center">
+          
+          {/* Left Flank: Floating QR Card with timestamps */}
+          <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-left">
+            <div className="relative p-4 rounded-3xl bg-neutral-900/90 border border-orange-500/20 shadow-2xl shadow-orange-500/5">
+              <div className="h-32 w-32 rounded-2xl bg-white p-2 flex items-center justify-center border border-neutral-800">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
+                  alt="QR Code"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              
+              {/* Floating timestamps */}
+              <div className="absolute -top-4 -left-4 px-2 py-1 rounded-lg bg-black/95 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
+                <Clock className="h-2.5 w-2.5" />
+                <span>11:30 PM</span>
+              </div>
+              <div className="absolute -bottom-4 -right-4 px-2 py-1 rounded-lg bg-black/95 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
+                <Clock className="h-2.5 w-2.5" />
+                <span>11:50 AM</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Center Column: Hero Content & Forms */}
+          <div className="text-center space-y-6">
+            {/* Small Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/90 border border-neutral-805 border-neutral-800 text-[10px] font-extrabold uppercase tracking-wider text-rose-400 mb-2 shadow-sm">
+              <span className="flex h-1.5 w-1.5 rounded-full bg-rose-500 shrink-0" />
+              <span>Turnover Verification for Managers, Cleaners & Subcontractors</span>
+            </div>
+
+            {/* Headline */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-[1.1] text-white">
+              One Scan. Proof Forever.
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto leading-relaxed">
+              Seamlessly coordinate clean teams and subcontractors with immutable digital documentation.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+              <Link
+                href="/login"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-white transition-all shadow-lg shadow-rose-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Start Your Free Trial</span>
+              </Link>
+              <Link
+                href="/clean/demo"
+                className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-neutral-900/60 hover:bg-neutral-855 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 font-semibold text-sm text-neutral-300 hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>Book a Demo</span>
+              </Link>
+            </div>
+
+            {/* Lead Capture form */}
+            <div className="pt-4">
+              <div className="p-1.5 rounded-2xl bg-neutral-900/60 border border-orange-500/40 focus-within:border-orange-500 max-w-xl mx-auto shadow-xl shadow-orange-500/5 transition-all">
+                <form onSubmit={handlePdfRequest} className="flex flex-col sm:flex-row gap-2">
+                  <input 
+                    type="email" 
+                    required
+                    placeholder="Enter email to get a free PDF report example..." 
+                    value={leadEmail}
+                    onChange={(e) => setLeadEmail(e.target.value)}
+                    className="flex-1 bg-white px-4 py-3 rounded-xl outline-none text-sm text-neutral-900 placeholder-neutral-500 font-medium"
+                  />
+                  <button 
+                    type="submit"
+                    disabled={isSubmittingLead}
+                    className="px-6 py-3 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm text-white whitespace-nowrap transition-all shadow-md shadow-rose-500/25 active:scale-95 disabled:opacity-50 cursor-pointer"
+                  >
+                    {submittedLead ? '✓ Sent! Check Tab' : isSubmittingLead ? 'Sending...' : 'Get Free PDF Example'}
+                  </button>
+                </form>
+              </div>
+              {leadError && (
+                <p className="mt-2 text-rose-500 text-[10px] font-semibold text-center">{leadError}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Right Flank: Floating QR Card with document badges */}
+          <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-right">
+            <div className="relative p-4 rounded-3xl bg-neutral-900/90 border border-orange-500/20 shadow-2xl shadow-orange-500/5">
+              <div className="h-32 w-32 rounded-2xl bg-white p-2 flex items-center justify-center border border-neutral-800">
+                <img
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
+                  alt="QR Code"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+
+              {/* Floating Documents */}
+              <div className="absolute -top-4 -right-4 px-2 py-1.5 rounded-lg bg-neutral-950 border border-neutral-850 text-[10px] font-bold text-neutral-200 shadow-md flex items-center gap-1 animate-bounce">
+                📄 <span className="text-[9px] text-neutral-400">PDF</span>
+              </div>
+              <div className="absolute top-1/2 -left-8 px-2 py-1.5 rounded-lg bg-neutral-950 border border-neutral-855 text-[10px] font-bold text-neutral-200 shadow-md flex items-center gap-1 animate-bounce">
+                📄 <span className="text-[9px] text-neutral-400">Cert</span>
+              </div>
+              <div className="absolute -bottom-4 -left-4 px-2 py-1 rounded-lg bg-black/95 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md animate-pulse">
+                <Clock className="h-2.5 w-2.5" />
+                <span>12:00 AM</span>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </section>
 
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-tight bg-linear-to-b from-white via-neutral-100 to-neutral-300 bg-clip-text text-transparent">
-          One Scan. Proof Forever.
-        </h1>
+      {/* Target Audience Segment Cards (Mockup Style) */}
+      <section className="py-6 max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Card 1 */}
+          <div className="bg-[#131720]/80 border border-neutral-850 rounded-3xl p-6 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/20">
+            <div className="absolute top-4 right-4 h-2.5 w-2.5 rounded-full bg-blue-500" />
+            <div className="h-16 w-16 shrink-0 rounded-2xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-805 border-neutral-800 flex items-center justify-center text-3xl shadow-inner relative overflow-hidden">
+              <span className="z-10 drop-shadow-md">🏢</span>
+              <span className="absolute bottom-1 right-1 text-base z-20">🧑‍💼</span>
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-extrabold text-white text-base">For Hosts & PMs</h4>
+              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                Manage multiple properties. Ensure unit readiness to your management.
+              </p>
+            </div>
+          </div>
 
-        <p className="mt-6 text-base sm:text-lg text-neutral-400 max-w-4xl mx-auto leading-relaxed">
-          Coordinate your clean teams and subcontractors without text-thread chaos. TurnProofs manages translation-friendly checklists in Spanish, GPS-timestamped location verification, and touch-up requests in a closed-loop history. Zero app installs required.
-        </p>
+          {/* Card 2 */}
+          <div className="bg-[#131720]/80 border border-neutral-850 rounded-3xl p-6 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/20">
+            <div className="h-16 w-16 shrink-0 rounded-2xl bg-linear-to-b from-neutral-855 to-neutral-900 border border-neutral-805 border-neutral-800 flex items-center justify-center text-3xl shadow-inner relative overflow-hidden">
+              <span className="z-10 drop-shadow-md">🧹</span>
+              <span className="absolute bottom-1 right-1 text-base z-20">🧰</span>
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-extrabold text-white text-base">For Cleaners & Subcontractors</h4>
+              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                Proof of work completed. Avoid disputes, and maintenance. Streamlined invoicing.
+              </p>
+            </div>
+          </div>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href="/login"
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-lg transition-all shadow-lg shadow-rose-500/25 hover:shadow-rose-500/50 hover:scale-[1.03] flex items-center justify-center gap-2 group"
-          >
-            <span>Sign In to Dashboard</span>
-            <ChevronRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            href="/clean/demo"
-            className="w-full sm:w-auto px-8 py-4 rounded-xl bg-neutral-900 hover:bg-neutral-850 border border-neutral-800 hover:border-neutral-700 font-semibold text-lg transition-all flex items-center justify-center gap-2 cursor-pointer text-white"
-          >
-            <span>Try Cleaner Demo</span>
-            <ExternalLink className="h-4 w-4 text-rose-400" />
-          </Link>
+          {/* Card 3 */}
+          <div className="bg-[#131720]/80 border border-neutral-855 border-neutral-850 rounded-3xl p-6 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/20">
+            <div className="h-16 w-16 shrink-0 rounded-2xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-805 border-neutral-800 flex items-center justify-center text-3xl shadow-inner relative overflow-hidden">
+              <span className="z-10 drop-shadow-md">🏢</span>
+              <span className="absolute bottom-1 right-1 text-base z-20">👷</span>
+            </div>
+            <div className="space-y-1">
+              <h4 className="font-extrabold text-white text-base">For Commercial Project Managers</h4>
+              <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                High-volume turnover verification. Simplified compliance reporting.
+              </p>
+            </div>
+          </div>
+
         </div>
+      </section>
 
-        {/* Lead Capture form for Free PDF Example */}
-        <div className="mt-10 max-w-md mx-auto">
-          <form onSubmit={handlePdfRequest} className="p-1 rounded-xl bg-neutral-900 border border-neutral-850 focus-within:border-amber-500/50 transition-all flex items-center shadow-lg shadow-amber-500/5">
-            <input 
-              type="email" 
-              required
-              placeholder="Enter email to get a free PDF report example..." 
-              value={leadEmail}
-              onChange={(e) => setLeadEmail(e.target.value)}
-              className="w-full bg-transparent pl-4 pr-2 py-2 outline-none text-xs text-white placeholder-neutral-500"
-            />
-            <button 
-              type="submit"
-              disabled={isSubmittingLead}
-              className="px-4 py-2 rounded-lg bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs whitespace-nowrap transition-all shadow-md shadow-rose-500/20 active:scale-95 text-white disabled:opacity-50 cursor-pointer"
-            >
-              {submittedLead ? '✓ Sent! Check Tab' : isSubmittingLead ? 'Sending...' : 'Get Free PDF Example'}
-            </button>
-          </form>
-          {leadError && (
-            <p className="mt-2 text-rose-500 text-[10px] font-semibold text-center">{leadError}</p>
-          )}
-        </div>
-
-        {/* Dashboard Preview Box */}
-        <div className="mt-16 relative mx-auto max-w-5xl rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4 backdrop-blur-md shadow-2xl">
+      {/* Dashboard Preview Workflow Section */}
+      <section id="workflow" className="py-16 max-w-7xl mx-auto px-6 scroll-mt-20">
+        <div className="relative mx-auto max-w-5xl rounded-2xl border border-neutral-800 bg-neutral-900/50 p-4 backdrop-blur-md shadow-2xl">
           <div className="absolute -inset-0.5 bg-linear-to-r from-rose-500/20 to-orange-500/20 rounded-2xl blur-md -z-10" />
           <div className="flex items-center gap-2 pb-3 mb-3 border-b border-neutral-800">
             <div className="h-3 w-3 rounded-full bg-red-500/80" />
@@ -224,34 +364,6 @@ export default function LandingPage() {
               <h4 className="font-bold text-lg text-white mb-2">Export Professional Reports</h4>
               <p className="text-sm text-neutral-400">Generate a branded PDF report showing timestamps, cleaner information, photo grid, and Google Maps verification link.</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Audience Target Grid */}
-      <section className="py-24 border-t border-neutral-900 bg-neutral-950/20 max-w-7xl mx-auto px-6">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-bold text-rose-400 tracking-wider uppercase">Built For the Entire Ecosystem</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-2">One Dashboard to Align Everyone</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 transition-all">
-            <h4 className="font-bold text-white text-lg mb-3">For Hosts & PMs (STR/MTR)</h4>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Verify turnover completion, receive auto-translated English reports from Spanish cleaner checklist entries, track GPS timestamps, and export audit-ready PDFs to defend against false claims.
-            </p>
-          </div>
-          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 transition-all">
-            <h4 className="font-bold text-white text-lg mb-3">For Cleaners & Subcontractors</h4>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Easy 1-click mobile terminal in Spanish. Upload photos instantly without using your personal phone storage or installing complex apps. Easily prove you completed the job to get paid instantly.
-            </p>
-          </div>
-          <div className="p-8 rounded-2xl bg-neutral-900/40 border border-neutral-800 hover:border-neutral-700 transition-all">
-            <h4 className="font-bold text-white text-lg mb-3">For Commercial Project Managers</h4>
-            <p className="text-sm text-neutral-400 leading-relaxed">
-              Manage multiple properties, coordinate internal cleaner squads or third-party subcontractor handoffs, track real-time check-in coordinates, and dispatch touch-up tickets with closed-loop verification.
-            </p>
           </div>
         </div>
       </section>
