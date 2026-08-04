@@ -448,7 +448,7 @@ export default function LandingPage() {
       </section>
 
       {/* Common Turnover Scenarios Section */}
-      <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-6">
+      <section className="py-24 border-t border-neutral-900 bg-neutral-950 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 text-xs font-bold">
             <span>📋</span>
@@ -587,13 +587,13 @@ export default function LandingPage() {
           <p className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">⚡ Interactive Pricing Calculator</p>
           <h3 className="text-xl font-extrabold text-white mb-4">How many properties do you manage?</h3>
           
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4">
             <button
               type="button"
               onClick={() => setCalcUnits(u => Math.max(1, u - 1))}
-              className="h-9 w-9 rounded-xl bg-neutral-800 border border-neutral-700 hover:border-rose-500/50 flex items-center justify-center text-neutral-300 hover:text-white transition-all shrink-0 cursor-pointer active:scale-95"
+              className="h-11 w-11 rounded-xl bg-neutral-800 border border-neutral-700 hover:border-rose-500/50 flex items-center justify-center text-neutral-300 hover:text-white transition-all shrink-0 cursor-pointer active:scale-95"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-4 w-4" />
             </button>
             <input
               type="range"
@@ -606,9 +606,9 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setCalcUnits(u => Math.min(25, u + 1))}
-              className="h-9 w-9 rounded-xl bg-neutral-800 border border-neutral-700 hover:border-rose-500/50 flex items-center justify-center text-neutral-300 hover:text-white transition-all shrink-0 cursor-pointer active:scale-95"
+              className="h-11 w-11 rounded-xl bg-neutral-800 border border-neutral-700 hover:border-rose-500/50 flex items-center justify-center text-neutral-300 hover:text-white transition-all shrink-0 cursor-pointer active:scale-95"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-4 w-4" />
             </button>
           </div>
           <div className="mb-4 text-center">
@@ -644,7 +644,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4 sm:gap-5">
           {/* Free 14-Day Trial */}
           <div className="p-5 rounded-2xl bg-neutral-900/40 border border-neutral-800 flex flex-col justify-between relative group hover:border-neutral-700 transition-all">
             <div>
@@ -774,7 +774,7 @@ export default function LandingPage() {
             </div>
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-base text-neutral-200">Growing Portfolio</h3>
+                <h3 className="font-bold text-base text-neutral-200 truncate">Growing Portfolio</h3>
                 <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold text-purple-400 uppercase tracking-wider">4-6 Props</span>
               </div>
               <div className="flex items-baseline gap-1 mb-1">
@@ -865,7 +865,7 @@ export default function LandingPage() {
           <p className="mt-3 text-neutral-400 text-sm">No app installs. No cleaner onboarding. Just scan and go.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto relative">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-6 max-w-4xl mx-auto relative">
           {/* connecting line desktop */}
           <div className="hidden md:block absolute top-9 left-[calc(33%+1rem)] right-[calc(33%+1rem)] h-px bg-neutral-800" />
 
@@ -880,7 +880,7 @@ export default function LandingPage() {
                 <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold flex items-center justify-center">{step}</span>
               </div>
               <h3 className="font-bold text-white text-sm">{title}</h3>
-              <p className="text-xs text-neutral-400 leading-relaxed max-w-[200px]">{body}</p>
+              <p className="text-xs text-neutral-400 leading-relaxed max-w-xs sm:max-w-[200px]">{body}</p>
               {cta && href && (
                 <Link href={href} className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-white transition-colors">
                   {cta} <ChevronRight className="h-3.5 w-3.5" />
@@ -958,7 +958,7 @@ export default function LandingPage() {
                   <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 mt-0.5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isOpen && (
-                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-2 text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60">
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-2 text-sm sm:text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60">
                     {faq.a}
                   </div>
                 )}
@@ -998,7 +998,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto">
 
           {/* Footer link columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="h-6 w-6 rounded-md bg-[#FF4F2B] flex items-center justify-center font-black text-white text-xs">T</div>
