@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TurnProofs — Dispute-Ready Cleaning Documentation & Auditing",
-  description: "GPS-timestamped photo verification, 0-app mobile cleaner terminal, and automated PDF audit certificates for Airbnb hosts and commercial property managers.",
+  title: "TurnProofs — One Scan. Proof Forever.",
+  description: "Coordinate clean teams and subcontractors without text-thread chaos. Translation-friendly checklists, GPS-timestamped locations, and audit-ready PDF reports. Zero app installs required.",
   icons: {
     icon: [
       { url: '/icon.png?v=2', type: 'image/png' },
