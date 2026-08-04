@@ -196,7 +196,7 @@ export default function DemoVideoPlayer() {
               </div>
               <div className="max-w-md space-y-1">
                 <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] sm:text-[10px] font-extrabold uppercase">Step 6: Professional PDF Certificate</span>
-                <h4 className="text-sm sm:text-xl font-extrabold text-white">Dispute-Ready PDF Delivered to Host</h4>
+                <h4 className="text-sm sm:text-xl font-extrabold text-white">Audit-Ready PDF Delivered to Host</h4>
                 <p className="text-[10px] sm:text-xs text-neutral-400 leading-snug">Auto-generates professional compliance record with GPS coordinates, time-stamps, room photo grid, and verification link.</p>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function DemoVideoPlayer() {
           className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer ${activeStep === 6 ? 'border-emerald-500/60 bg-emerald-500/15 shadow-md shadow-emerald-500/10' : 'border-neutral-850 bg-neutral-950/60 hover:border-neutral-750'}`}
         >
           <p className="text-[10px] sm:text-xs font-extrabold text-emerald-400">6. PDF Audit</p>
-          <p className="text-[9px] sm:text-[10px] text-neutral-400 truncate mt-0.5">Dispute proof</p>
+          <p className="text-[9px] sm:text-[10px] text-neutral-400 truncate mt-0.5">Audit-ready PDF</p>
         </div>
       </div>
     </div>

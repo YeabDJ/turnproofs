@@ -213,7 +213,7 @@ export default function LandingPage() {
 
               {/* Headline */}
               <h1 className="text-4xl sm:text-5xl md:text-[52px] font-extrabold tracking-tight max-w-3xl mx-auto leading-[1.1] text-white">
-                One Scan. One Complete Turnover Record.
+                One Scan. Proof Forever.
               </h1>
 
               {/* Subtitle */}
@@ -811,7 +811,7 @@ export default function LandingPage() {
       </section>
 
       {/* Frequently Asked Questions (FAQ) Section */}
-      <section className="py-20 px-6 max-w-4xl mx-auto border-t border-neutral-900">
+      <section className="py-20 px-4 sm:px-6 max-w-4xl mx-auto border-t border-neutral-900">
         <div className="text-center space-y-3 mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-extrabold uppercase tracking-wider">
             <HelpCircle className="h-3.5 w-3.5" />
@@ -852,6 +852,10 @@ export default function LandingPage() {
               a: "TurnProofs delivers professional PDF audit certificates directly to your email and your cleaners' emails immediately after each turnover. Incomplete draft photos are automatically deleted after 30 days. You are responsible for maintaining copies of PDF certificates for your own records and dispute submissions. We recommend downloading and archiving PDFs immediately after each turnover."
             },
             {
+              q: "What does \"Proof Forever\" mean if TurnProofs only keeps data for 60 days?",
+              a: "Great question. \"Proof Forever\" refers to the PDF report — not our servers. The moment a turnover is completed, TurnProofs automatically emails a timestamped PDF audit report to you and your cleaners. That PDF is yours permanently: save it, forward it, archive it in Google Drive, or attach it to a dispute submission. TurnProofs keeps the underlying data on our servers for 60 days to allow re-downloads, after which it is purged. The proof lives in your inbox, not ours."
+            },
+            {
               q: "What payment methods do you accept?",
               a: "We process payments securely via Stripe accepting Visa, Mastercard, American Express, Discover, Apple Pay, and Google Pay."
             }
@@ -867,13 +871,13 @@ export default function LandingPage() {
                 <button
                   type="button"
                   onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-extrabold text-sm text-white cursor-pointer"
+                  className="w-full p-4 sm:p-5 text-left flex items-start justify-between gap-3 font-extrabold text-xs sm:text-sm text-white cursor-pointer"
                 >
-                  <span>{faq.q}</span>
-                  <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                  <span className="leading-snug">{faq.q}</span>
+                  <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 mt-0.5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-5 pt-1 text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60 animate-fade-in">
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-2 text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60 animate-fade-in">
                     {faq.a}
                   </div>
                 )}
