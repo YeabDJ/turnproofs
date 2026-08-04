@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink, Clock, Lock, Share, Plus, Copy, ChevronLeft } from 'lucide-react';
+import { ShieldCheck, MapPin, Camera, FileText, CheckCircle2, ChevronRight, Sparkles, Check, ChevronDown, HelpCircle, ExternalLink, Clock, Lock, Share, Plus, Copy, ChevronLeft, Minus } from 'lucide-react';
 import DemoVideoPlayer from './components/DemoVideoPlayer';
 
 export default function LandingPage() {
   const [isAnnual, setIsAnnual] = useState(true);
   const [authHost, setAuthHost] = useState<any>(null);
   const [calcUnits, setCalcUnits] = useState(3);
-  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [openFaqIndexes, setOpenFaqIndexes] = useState<Set<number>>(new Set([0, 1, 2]));
+  const toggleFaq = (idx: number) => setOpenFaqIndexes(prev => { const s = new Set(prev); s.has(idx) ? s.delete(idx) : s.add(idx); return s; });
 
   const calcPrice = calcUnits === 1 
     ? (isAnnual ? '$7.65' : '$9.00') 
@@ -227,7 +228,7 @@ export default function LandingPage() {
 
               {/* Subtitle */}
               <p className="text-xs sm:text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
-                Coordinate cleaners and subcontractors with bilingual checklists, photo proof, location verification, and closed-loop touch-up requests—before the next check-in.
+                Turnover verification without the app friction. GPS proof, photo evidence, and audit-ready PDFs—before the next check-in.
               </p>
 
               {/* Action Buttons */}
@@ -462,30 +463,45 @@ export default function LandingPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-rose-500/20 transition-all flex flex-col justify-between">
+          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-rose-500/30 transition-all flex flex-col gap-4">
+            <div className="h-10 w-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-xl">😰</div>
             <div>
-              <div className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-3">Scenario: App Fatigue</div>
+              <div className="text-xs font-bold text-rose-400 uppercase tracking-wider mb-2">Scenario: App Fatigue</div>
               <p className="text-sm text-neutral-300 leading-relaxed">
-                A cleaner's host requires photo proof after each turnover. Managing that through personal storage and manual uploads is time-consuming. A zero-install browser link removes that friction.
+                A cleaner's host requires photo proof after each turnover. Managing that through personal storage and manual uploads is time-consuming.
               </p>
+            </div>
+            <div className="flex items-start gap-2 pt-2 border-t border-neutral-800">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-emerald-300 font-semibold">Zero-install QR link — cleaners tap once, checklist opens instantly in any browser.</p>
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-orange-500/20 transition-all flex flex-col justify-between">
+          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-orange-500/30 transition-all flex flex-col gap-4">
+            <div className="h-10 w-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-xl">📁</div>
             <div>
-              <div className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-3">Scenario: Manual Photo Folders</div>
+              <div className="text-xs font-bold text-orange-400 uppercase tracking-wider mb-2">Scenario: Manual Photo Folders</div>
               <p className="text-sm text-neutral-300 leading-relaxed">
-                Teams managing multiple properties often store photos in separate Google Drive folders per unit and date. Locating the right photo when a booking platform requests documentation can take hours.
+                Teams managing multiple properties often store photos in separate Drive folders per unit and date. Locating the right photo when a booking platform asks can take hours.
               </p>
+            </div>
+            <div className="flex items-start gap-2 pt-2 border-t border-neutral-800">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-emerald-300 font-semibold">Photos auto-organized by property and date. One-click PDF with full photo grid, ready to share.</p>
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-amber-500/20 transition-all flex flex-col justify-between">
+          <div className="p-6 rounded-2xl bg-neutral-900/30 border border-neutral-850 hover:border-amber-500/30 transition-all flex flex-col gap-4">
+            <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-xl">⚖️</div>
             <div>
-              <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">Scenario: Guest Dispute Documentation</div>
+              <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">Scenario: Guest Dispute Documentation</div>
               <p className="text-sm text-neutral-300 leading-relaxed">
-                When a guest files a cleanliness claim, booking platforms typically require structured documentation. Loose screenshots shared in message threads are often not accepted. Structured turnover reports with GPS and timestamps give hosts the documentation to support quality reviews and guest disputes.
+                When a guest files a cleanliness claim, booking platforms typically require structured documentation. Loose screenshots in message threads are often not accepted.
               </p>
+            </div>
+            <div className="flex items-start gap-2 pt-2 border-t border-neutral-800">
+              <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-emerald-300 font-semibold">Structured turnover reports with GPS and timestamps give you documentation to support quality reviews.</p>
             </div>
           </div>
         </div>
@@ -571,7 +587,14 @@ export default function LandingPage() {
           <p className="text-xs font-bold uppercase tracking-wider text-rose-400 mb-2">⚡ Interactive Pricing Calculator</p>
           <h3 className="text-xl font-extrabold text-white mb-4">How many properties do you manage?</h3>
           
-          <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              type="button"
+              onClick={() => setCalcUnits(u => Math.max(1, u - 1))}
+              className="h-9 w-9 rounded-xl bg-neutral-800 border border-neutral-700 hover:border-rose-500/50 flex items-center justify-center text-neutral-300 hover:text-white transition-all shrink-0 cursor-pointer active:scale-95"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
             <input
               type="range"
               min="1"
@@ -580,8 +603,17 @@ export default function LandingPage() {
               onChange={(e) => setCalcUnits(parseInt(e.target.value, 10))}
               className="w-full h-2 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-rose-500"
             />
-            <span className="px-3.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-extrabold text-sm shrink-0 min-w-[70px]">
-              {calcUnits} {calcUnits === 1 ? 'Unit' : 'Units'}
+            <button
+              type="button"
+              onClick={() => setCalcUnits(u => Math.min(25, u + 1))}
+              className="h-9 w-9 rounded-xl bg-neutral-800 border border-neutral-700 hover:border-rose-500/50 flex items-center justify-center text-neutral-300 hover:text-white transition-all shrink-0 cursor-pointer active:scale-95"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <div className="mb-4 text-center">
+            <span className="px-3.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 font-extrabold text-sm">
+              {calcUnits} {calcUnits === 1 ? 'Property' : 'Properties'}
             </span>
           </div>
 
@@ -652,18 +684,19 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Pro Plan ($9/mo for 1 Property) */}
+          {/* Solo Plan ($9/mo for 1 Property) */}
           <div className="p-5 rounded-2xl bg-neutral-900/60 border border-rose-500/40 flex flex-col justify-between relative group hover:border-rose-500 transition-all shadow-lg shadow-rose-500/5">
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-base text-neutral-200">Pro</h3>
+                <h3 className="font-bold text-base text-neutral-200">Solo</h3>
                 <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-[9px] font-bold text-rose-400 uppercase tracking-wider">1 Property</span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-2xl font-extrabold text-white">{isAnnual ? '$7.65' : '$9.00'}</span>
                 <span className="text-neutral-500 text-xs">/ month</span>
               </div>
-              <p className="text-[10px] text-neutral-500 mb-4">{isAnnual ? 'Billed annually ($91.80/yr)' : 'Billed monthly'}</p>
+              <p className="text-[10px] text-neutral-500 mb-1">{isAnnual ? 'Billed annually ($91.80/yr)' : 'Billed monthly'}</p>
+              <p className="text-[10px] text-neutral-400 italic mb-4">Perfect for a single Airbnb or STR. Unlimited cleaner access.</p>
               <ul className="space-y-2.5 text-[11px] text-neutral-400 mb-6">
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-rose-400 shrink-0" />
@@ -687,25 +720,26 @@ export default function LandingPage() {
               href="/login"
               className="w-full py-2 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-[11px] text-center transition-all block shadow-md shadow-rose-500/10 cursor-pointer text-white"
             >
-              Start Pro Free Trial
+              Start Solo Free Trial
             </Link>
           </div>
 
-          {/* Growth Plan ($18.99/mo for 2-3 Properties) */}
+          {/* Small Team Plan ($18.99/mo for 2-3 Properties) */}
           <div className="p-5 rounded-2xl bg-neutral-900/60 border border-amber-500/50 flex flex-col justify-between relative group hover:border-amber-500 transition-all shadow-lg shadow-amber-500/5">
             <div className="absolute -top-3 right-4 px-2 py-0.5 rounded-full bg-linear-to-r from-rose-500 to-amber-500 text-[8px] font-extrabold text-white uppercase tracking-wider">
-              Popular
+              Most Popular
             </div>
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-base text-neutral-200">Growth</h3>
+                <h3 className="font-bold text-base text-neutral-200">Small Team</h3>
                 <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-[9px] font-bold text-amber-400 uppercase tracking-wider">2-3 Props</span>
               </div>
               <div className="flex items-baseline gap-1 mb-2">
                 <span className="text-2xl font-extrabold text-white">{isAnnual ? '$16.14' : '$18.99'}</span>
                 <span className="text-neutral-500 text-xs">/ month</span>
               </div>
-              <p className="text-[10px] text-neutral-500 mb-4">{isAnnual ? 'Billed annually ($193.68/yr)' : 'Billed monthly ($6.33/unit)'}</p>
+              <p className="text-[10px] text-neutral-500 mb-1">{isAnnual ? 'Billed annually ($193.68/yr)' : 'Billed monthly ($6.33/unit)'}</p>
+              <p className="text-[10px] text-neutral-400 italic mb-4">Best for small teams managing 2-3 properties. Adds supply alerts and damage tracking.</p>
               <ul className="space-y-2.5 text-[11px] text-neutral-400 mb-6">
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
@@ -729,25 +763,26 @@ export default function LandingPage() {
               href="/login"
               className="w-full py-2 rounded-xl bg-neutral-950 border border-amber-500/40 hover:border-amber-500 font-bold text-[11px] text-center transition-all block cursor-pointer text-amber-400"
             >
-              Start Growth Free Trial
+              Start Small Team Trial
             </Link>
           </div>
 
-          {/* Elite Plan ($29.99/mo for 4-6 Properties) */}
+          {/* Growing Portfolio Plan ($29.99/mo for 4-6 Properties) */}
           <div className="p-5 rounded-2xl bg-neutral-900/60 border border-purple-500/50 flex flex-col justify-between relative group hover:border-purple-500 transition-all shadow-lg shadow-purple-500/5">
             <div className="absolute -top-3 right-4 px-2 py-0.5 rounded-full bg-purple-500 text-[8px] font-extrabold text-white uppercase tracking-wider">
               Scaling
             </div>
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-bold text-base text-neutral-200">Elite</h3>
+                <h3 className="font-bold text-base text-neutral-200">Growing Portfolio</h3>
                 <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold text-purple-400 uppercase tracking-wider">4-6 Props</span>
               </div>
               <div className="flex items-baseline gap-1 mb-1">
                 <span className="text-2xl font-extrabold text-white">{isAnnual ? '$25.49' : '$29.99'}</span>
                 <span className="text-neutral-500 text-xs">/ month</span>
               </div>
-              <p className="text-[10px] text-purple-400 font-semibold mb-4">+$4.99/mo per unit beyond 6</p>
+              <p className="text-[10px] text-purple-400 font-semibold mb-1">+$4.99/mo per unit beyond 6</p>
+              <p className="text-[10px] text-neutral-400 italic mb-4">For growing portfolios with 4+ properties. SMS alerts, CRM integration, QR sign generator.</p>
               <ul className="space-y-2.5 text-[11px] text-neutral-400 mb-6">
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-purple-400 shrink-0" />
@@ -771,7 +806,7 @@ export default function LandingPage() {
               href="/login"
               className="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-[11px] text-center text-white transition-all block cursor-pointer"
             >
-              Start Elite Free Trial
+              Start Portfolio Trial
             </Link>
           </div>
 
@@ -789,7 +824,7 @@ export default function LandingPage() {
                 <span className="text-2xl font-extrabold text-white">{isAnnual ? '$76.49' : '$89.99'}</span>
                 <span className="text-neutral-500 text-xs">/ mo (1 Bldg)</span>
               </div>
-              <p className="text-[10px] text-emerald-400 font-semibold mb-4">Separate billing for multi-tenant complexes</p>
+              <p className="text-[10px] text-neutral-400 italic mb-4">For facility managers tracking high-volume site work and subcontractor accountability.</p>
               <ul className="space-y-2.5 text-[11px] text-neutral-400 mb-6">
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
@@ -816,6 +851,43 @@ export default function LandingPage() {
               Get Commercial ($89.99)
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Get Started Section */}
+      <section className="py-20 border-t border-neutral-900 bg-neutral-950/60 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-extrabold uppercase tracking-wider mb-4">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>Ready to start?</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">Up and running in under 5 minutes</h2>
+          <p className="mt-3 text-neutral-400 text-sm">No app installs. No cleaner onboarding. Just scan and go.</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto relative">
+          {/* connecting line desktop */}
+          <div className="hidden md:block absolute top-9 left-[calc(33%+1rem)] right-[calc(33%+1rem)] h-px bg-neutral-800" />
+
+          {[
+            { step: '1', icon: '🆓', title: 'Start free trial', body: 'Sign up in 30 seconds. No credit card required for 14 days.', cta: 'Sign Up Free', href: '/login' },
+            { step: '2', icon: '📋', title: 'Build your first checklist', body: 'Create a room-by-room checklist in about 2 minutes. Mark tasks that need photos.', cta: null, href: null },
+            { step: '3', icon: '📱', title: 'Share QR with cleaners', body: 'Print or text the QR code. Cleaners tap once — no login, no download, just work.', cta: 'Try Cleaner Demo', href: '/clean/demo' },
+          ].map(({ step, icon, title, body, cta, href }) => (
+            <div key={step} className="flex flex-col items-center text-center gap-3">
+              <div className="relative">
+                <div className="h-16 w-16 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-2xl shadow-lg">{icon}</div>
+                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-rose-500 text-white text-[10px] font-extrabold flex items-center justify-center">{step}</span>
+              </div>
+              <h3 className="font-bold text-white text-sm">{title}</h3>
+              <p className="text-xs text-neutral-400 leading-relaxed max-w-[200px]">{body}</p>
+              {cta && href && (
+                <Link href={href} className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-rose-400 hover:text-white transition-colors">
+                  {cta} <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -869,7 +941,7 @@ export default function LandingPage() {
               a: "We process payments securely via Stripe accepting Visa, Mastercard, American Express, Discover, Apple Pay, and Google Pay."
             }
           ].map((faq, idx) => {
-            const isOpen = openFaqIndex === idx;
+            const isOpen = openFaqIndexes.has(idx);
             return (
               <div
                 key={idx}
@@ -879,14 +951,14 @@ export default function LandingPage() {
               >
                 <button
                   type="button"
-                  onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                  onClick={() => toggleFaq(idx)}
                   className="w-full p-4 sm:p-5 text-left flex items-start justify-between gap-3 font-extrabold text-xs sm:text-sm text-white cursor-pointer"
                 >
                   <span className="leading-snug">{faq.q}</span>
                   <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 mt-0.5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isOpen && (
-                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-2 text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60 animate-fade-in">
+                  <div className="px-4 sm:px-5 pb-4 sm:pb-5 pt-2 text-xs text-neutral-400 leading-relaxed border-t border-neutral-850/60">
                     {faq.a}
                   </div>
                 )}
@@ -922,18 +994,59 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-900 py-12 px-6 text-center text-xs text-neutral-500 space-y-6">
-        <div className="max-w-3xl mx-auto space-y-2 text-[10px] text-neutral-500 leading-relaxed border-b border-neutral-900 pb-6">
-          <p className="font-semibold text-neutral-400">⚖️ Legal Disclaimer & Notice:</p>
-          <p>
-            TurnProofs provides documentation and mobile verification tools to help hosts document property cleaning and turnover compliance. TurnProofs is an independent software tool and is not affiliated with, endorsed by, or sponsored by Airbnb, Inc. or VRBO. TurnProofs does not guarantee Airbnb or VRBO claim outcomes. Airbnb and VRBO make final dispute decisions independently. Hosts are solely responsible for downloading, archiving, and submitting documentation to third-party platforms.
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-7xl mx-auto">
-          <p>© TurnProofs Systems. Professional Cleaning Verification & Compliance Engine.</p>
-          <div className="flex items-center gap-6 text-xs text-neutral-400 font-medium">
-            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+      <footer className="border-t border-neutral-900 pt-14 pb-8 px-6 text-xs text-neutral-500">
+        <div className="max-w-7xl mx-auto">
+
+          {/* Footer link columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 mb-12">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-6 w-6 rounded-md bg-[#FF4F2B] flex items-center justify-center font-black text-white text-xs">T</div>
+                <span className="font-extrabold text-white text-sm">TurnProofs</span>
+              </div>
+              <p className="text-[11px] text-neutral-500 leading-relaxed">Turnover verification for hosts, managers, cleaners &amp; subcontractors.</p>
+            </div>
+
+            <div>
+              <p className="font-bold text-neutral-300 mb-3 text-[11px] uppercase tracking-wider">Product</p>
+              <ul className="space-y-2">
+                <li><button type="button" onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors cursor-pointer">Features</button></li>
+                <li><button type="button" onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-white transition-colors cursor-pointer">Pricing</button></li>
+                <li><Link href="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
+                <li><Link href="/clean/demo" className="hover:text-white transition-colors">Cleaner Demo</Link></li>
+                <li><Link href="/report/sample-report" className="hover:text-white transition-colors">Sample Report</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-bold text-neutral-300 mb-3 text-[11px] uppercase tracking-wider">Support</p>
+              <ul className="space-y-2">
+                <li><a href="mailto:support@turnproofs.com" className="hover:text-white transition-colors">support@turnproofs.com</a></li>
+                <li><Link href="/docs" className="hover:text-white transition-colors">Documentation</Link></li>
+                <li><Link href="/login" className="hover:text-white transition-colors">Sign In</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <p className="font-bold text-neutral-300 mb-3 text-[11px] uppercase tracking-wider">Legal</p>
+              <ul className="space-y-2">
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+              </ul>
+              <p className="font-bold text-neutral-300 mt-5 mb-3 text-[11px] uppercase tracking-wider">Follow</p>
+              <ul className="space-y-2">
+                <li><a href="https://www.facebook.com/groups/3368145073503788" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Facebook Group</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="border-t border-neutral-900 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-[10px] text-neutral-600">© {new Date().getFullYear()} TurnProofs Systems. All rights reserved.</p>
+            <p className="text-[10px] text-neutral-600 text-center">
+              TurnProofs is independent of Airbnb &amp; VRBO and does not guarantee dispute outcomes.{' '}
+              <Link href="/terms" className="underline hover:text-neutral-400 transition-colors">Read full disclaimer →</Link>
+            </p>
           </div>
         </div>
       </footer>
