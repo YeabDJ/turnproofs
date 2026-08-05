@@ -203,6 +203,41 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // ACTION: Update White-Label Branding Settings
+    if (action === 'update_branding') {
+      if (!host) {
+        return NextResponse.json({ success: false, error: 'Host account not found.' }, { status: 404 });
+      }
+
+      const { company_logo_url, custom_footer, hide_branding, company_name } = body;
+      const cleanName = company_name && typeof company_name === 'string' && company_name.trim() 
+        ? company_name.trim() 
+        : host.business_name;
+
+      const updateData: any = {};
+      if (company_name !== undefined) updateData.business_name = cleanName;
+      if (company_logo_url !== undefined) updateData.company_logo_url = company_logo_url || null;
+      if (custom_footer !== undefined) updateData.custom_footer = custom_footer || null;
+      if (hide_branding !== undefined) updateData.hide_branding = !!hide_branding;
+
+      const { data: updatedHost, error: updateErr } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .update(updateData)
+        .eq('id', host.id)
+        .select('*')
+        .single();
+
+      if (updateErr) {
+        return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        host: updatedHost,
+        message: 'White-label branding settings saved successfully!'
+      });
+    }
+
     // ACTION: Send Security Verification Code to Email
     if (action === 'request_reset_code') {
       if (!host) {

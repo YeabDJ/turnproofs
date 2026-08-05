@@ -120,20 +120,25 @@ export default function DashboardClient() {
   // API Keys state
   const [apiKeys, setApiKeys] = useState<any[]>([]);
   const [newKeyName, setNewKeyName] = useState('');
-  const [newKeyScopes, setNewKeyScopes] = useState<string[]>(['properties:read', 'reports:read']);
-  const [newKeyProperties, setNewKeyProperties] = useState<string[]>([]); // empty = all properties
-  const [newKeyExpiry, setNewKeyExpiry] = useState(''); // empty = never
   const [newKeyEnv, setNewKeyEnv] = useState<'live' | 'test'>('live');
-  const [generatedKey, setGeneratedKey] = useState<any>(null); // To store newly generated raw key
-  const [showKeyModal, setShowKeyModal] = useState(false);
+  const [newKeyExpiry, setNewKeyExpiry] = useState<string>('');
+  const [newKeyScopes, setNewKeyScopes] = useState<string[]>(['properties:read', 'reports:read']);
+  const [newKeyProperties, setNewKeyProperties] = useState<string[]>([]);
   const [creatingKey, setCreatingKey] = useState(false);
+  const [generatedKey, setGeneratedKey] = useState<any>(null);
+  const [showKeyModal, setShowKeyModal] = useState(false);
 
-  // Copy URL indicator
+  // Copy indicator & Upgrade modal states
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  // Commercial Tier Upgrade state
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradingTier, setUpgradingTier] = useState(false);
+
+  // White-Label Branding states
+  const [companyName, setCompanyName] = useState('');
+  const [companyLogoUrl, setCompanyLogoUrl] = useState('');
+  const [customFooterText, setCustomFooterText] = useState('');
+  const [hideBranding, setHideBranding] = useState(false);
+  const [savingBranding, setSavingBranding] = useState(false);
 
   // Modals & Form states
   const [isPropertyModalOpen, setIsPropertyModalOpen] = useState(false);
@@ -244,6 +249,12 @@ export default function DashboardClient() {
         }
 
         setHost(authData.host);
+        if (authData.host) {
+          setCompanyName(authData.host.business_name || '');
+          setCompanyLogoUrl(authData.host.company_logo_url || '');
+          setCustomFooterText(authData.host.custom_footer || '');
+          setHideBranding(!!authData.host.hide_branding);
+        }
         setAuthChecking(false);
 
         // Load all data
@@ -1822,6 +1833,120 @@ export default function DashboardClient() {
                   </div>
                 ) : (
                   <>
+                {/* White-Label Branding Card */}
+                <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-850 pb-4">
+                    <div>
+                      <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                        <span>🎨 White-Label &amp; Custom Agency Branding</span>
+                        <span className="px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[9px] font-black uppercase">
+                          Growing Portfolio + Commercial
+                        </span>
+                      </h3>
+                      <p className="text-xs text-neutral-400 mt-0.5">
+                        Customize report certificates, digital turnover views, and PDF exports with your agency logo and custom footer.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
+                          Company / Agency Name
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Apex Cleaning & Management Co."
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-sm text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
+                          Company Logo Image URL
+                        </label>
+                        <input
+                          type="url"
+                          placeholder="https://yourcompany.com/logo.png"
+                          value={companyLogoUrl}
+                          onChange={(e) => setCompanyLogoUrl(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-sm text-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
+                          Custom PDF &amp; Email Footer Text
+                        </label>
+                        <textarea
+                          rows={3}
+                          placeholder="e.g. Certified by Apex Turnover Assurance • Quality Line: (555) 019-2831 • support@apexcleaning.com"
+                          value={customFooterText}
+                          onChange={(e) => setCustomFooterText(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-xs text-white"
+                        />
+                      </div>
+
+                      <div className="pt-1">
+                        <label className="flex items-center gap-3 p-3 rounded-2xl bg-neutral-950 border border-neutral-850 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={hideBranding}
+                            onChange={(e) => setHideBranding(e.target.checked)}
+                            className="rounded border-neutral-800 text-purple-500 focus:ring-purple-500 bg-neutral-900 h-4 w-4"
+                          />
+                          <div>
+                            <span className="text-xs font-extrabold text-white block">Hide "Powered by TurnProofs" Badge</span>
+                            <span className="text-[10px] text-neutral-500 block">Remove platform branding from all customer-facing reports &amp; PDFs</span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-2 border-t border-neutral-850">
+                    <button
+                      onClick={async () => {
+                        setSavingBranding(true);
+                        try {
+                          const res = await fetch('/api/auth', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              action: 'update_branding',
+                              company_name: companyName,
+                              company_logo_url: companyLogoUrl,
+                              custom_footer: customFooterText,
+                              hide_branding: hideBranding
+                            })
+                          });
+                          const data = await res.json();
+                          if (data.success) {
+                            if (data.host) setHost(data.host);
+                            alert("White-Label Branding Settings Saved Successfully!");
+                          } else {
+                            alert(data.error || "Failed to save branding settings");
+                          }
+                        } catch (e) {
+                          alert("Error saving branding settings");
+                        } finally {
+                          setSavingBranding(false);
+                        }
+                      }}
+                      disabled={savingBranding}
+                      className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10 flex items-center gap-1.5"
+                    >
+                      {savingBranding ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                      <span>Save White-Label Settings</span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* API Key Generator Card */}
                 <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-6">
                   <div>

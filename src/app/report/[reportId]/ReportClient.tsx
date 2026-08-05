@@ -541,12 +541,36 @@ export default function ReportClient({ reportId }: { reportId: string }) {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-8 border-b border-neutral-800/80">
             <div>
-              <Link href="/" className="flex items-center gap-2 mb-3 cursor-pointer hover:opacity-90 transition-opacity">
-                <div className="h-8 w-8 rounded-lg bg-rose-500 flex items-center justify-center">
-                  <ShieldCheck className="h-5 w-5 text-white" />
+              {(report as any)?.branding?.company_logo_url ? (
+                <div className="flex items-center gap-3 mb-3">
+                  <img 
+                    src={(report as any).branding.company_logo_url} 
+                    alt={(report as any).branding.business_name || 'Agency Logo'} 
+                    className="h-10 max-w-[200px] object-contain rounded-lg"
+                  />
+                  {(report as any).branding?.business_name && (
+                    <span className="font-extrabold text-base text-neutral-200 uppercase tracking-wider border-l border-neutral-800 pl-3">
+                      {(report as any).branding.business_name}
+                    </span>
+                  )}
                 </div>
-                <span className="font-extrabold text-lg text-rose-500 tracking-tight">TURNPROOFS VERIFICATION SYSTEM</span>
-              </Link>
+              ) : (report as any)?.branding?.business_name ? (
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-8 w-8 rounded-lg bg-purple-600 flex items-center justify-center font-black text-white text-sm">
+                    {(report as any).branding.business_name.charAt(0)}
+                  </div>
+                  <span className="font-extrabold text-lg text-purple-400 tracking-tight uppercase">
+                    {(report as any).branding.business_name}
+                  </span>
+                </div>
+              ) : (
+                <Link href="/" className="flex items-center gap-2 mb-3 cursor-pointer hover:opacity-90 transition-opacity">
+                  <div className="h-8 w-8 rounded-lg bg-rose-500 flex items-center justify-center">
+                    <ShieldCheck className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="font-extrabold text-lg text-rose-500 tracking-tight">TURNPROOFS VERIFICATION SYSTEM</span>
+                </Link>
+              )}
               <h1 className="print-text-dark text-3xl font-extrabold tracking-tight">{lang === 'en' ? 'Cleaning Verification Certificate' : 'Certificado de Verificación de Limpieza'}</h1>
               <p className="print-text-muted text-sm text-neutral-400 mt-1">{lang === 'en' ? 'Official checklist compliance record for short-term rental properties.' : 'Registro oficial de cumplimiento de lista de verificación.'}</p>
             </div>
@@ -1130,9 +1154,22 @@ export default function ReportClient({ reportId }: { reportId: string }) {
 
           {/* Verification Badge Footer */}
           <div className="pt-10 border-t border-neutral-800/80 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500 print-text-muted">
-            <div className="flex items-center gap-1">
-              <ShieldCheck className="h-4.5 w-4.5 text-emerald-500" />
-              <span>TurnProofs Certified Audit Log. Cryptographically signed.</span>
+            <div className="flex flex-col gap-1">
+              {(report as any)?.branding?.custom_footer ? (
+                <span className="font-semibold text-neutral-300 text-[11px]">
+                  {(report as any).branding.custom_footer}
+                </span>
+              ) : !(report as any)?.branding?.hide_branding ? (
+                <div className="flex items-center gap-1">
+                  <ShieldCheck className="h-4.5 w-4.5 text-emerald-500" />
+                  <span>TurnProofs Certified Audit Log. Cryptographically signed.</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <ShieldCheck className="h-4.5 w-4.5 text-emerald-500" />
+                  <span>Verified Turnover Audit Log.</span>
+                </div>
+              )}
             </div>
             <div>
               <span>Generated on: {new Date(report.created_at).toLocaleDateString()} {new Date(report.created_at).toLocaleTimeString()}</span>

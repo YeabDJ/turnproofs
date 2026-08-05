@@ -73,9 +73,32 @@ export async function GET(
       return NextResponse.json({ success: false, error: tasksError.message }, { status: 500 });
     }
 
+    // Fetch host branding info for white-labeling
+    let branding = null;
+    if (report.airbnb_properties?.host_id) {
+      const { data: hostData } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .select('business_name, company_logo_url, custom_footer, hide_branding, subscription_tier')
+        .eq('id', report.airbnb_properties.host_id)
+        .maybeSingle();
+
+      if (hostData) {
+        branding = {
+          business_name: hostData.business_name,
+          company_logo_url: hostData.company_logo_url,
+          custom_footer: hostData.custom_footer,
+          hide_branding: !!hostData.hide_branding,
+          subscription_tier: hostData.subscription_tier
+        };
+      }
+    }
+
     return NextResponse.json({
       success: true,
-      report,
+      report: {
+        ...report,
+        branding
+      },
       tasks
     });
   } catch (error: any) {

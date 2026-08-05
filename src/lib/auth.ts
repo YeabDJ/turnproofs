@@ -10,6 +10,9 @@ export interface Host {
   subscription_status?: string | null;
   stripe_customer_id?: string | null;
   stripe_subscription_id?: string | null;
+  company_logo_url?: string | null;
+  custom_footer?: string | null;
+  hide_branding?: boolean;
   created_at: string;
 }
 
