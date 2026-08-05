@@ -47,15 +47,26 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const queryPropertyId = searchParams.get('property_id');
-    const since = searchParams.get('since');
-    const cursor = searchParams.get('cursor'); // Cursor completes cursor-based pagination
+    const since = searchParams.get('since') || searchParams.get('date_from');
+    const dateTo = searchParams.get('date_to');
+    const statusParam = searchParams.get('status');
+    const cursor = searchParams.get('cursor');
     
     let limit = parseInt(searchParams.get('limit') || '50');
+    let pageParam = searchParams.get('page');
     let offset = parseInt(searchParams.get('offset') || '0');
     
     if (isNaN(limit) || limit <= 0) limit = 50;
     if (limit > 100) limit = 100;
+
+    if (pageParam && !isNaN(parseInt(pageParam))) {
+      const pageNum = parseInt(pageParam);
+      if (pageNum > 0) {
+        offset = (pageNum - 1) * limit;
+      }
+    }
     if (isNaN(offset) || offset < 0) offset = 0;
+    const pageNumber = Math.floor(offset / limit) + 1;
 
     // 1. Fetch properties owned by this host
     const { data: properties, error: propError } = await supabaseAdmin
@@ -90,7 +101,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         data: [],
-        pagination: { total: 0, limit, offset, has_more: false, next_cursor: null }
+        pagination: { page: 1, limit, total: 0, pages: 0, offset: 0, has_more: false, next_cursor: null }
       }, { headers: responseHeaders });
     }
 
@@ -113,12 +124,12 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: [],
-          pagination: { total: 0, limit, offset, has_more: false, next_cursor: null }
+          pagination: { page: 1, limit, total: 0, pages: 0, offset: 0, has_more: false, next_cursor: null }
         }, { headers: responseHeaders });
       }
     }
 
-    // 2. Count Total Matching Reports (Total reports without pagination limits)
+    // 2. Count Total Matching Reports
     let countQuery = supabaseAdmin
       .from('airbnb_reports')
       .select('id')
@@ -127,6 +138,9 @@ export async function GET(request: NextRequest) {
     if (since) {
       countQuery = countQuery.gte('completed_at', since);
     }
+    if (dateTo) {
+      countQuery = countQuery.lte('completed_at', dateTo);
+    }
 
     const { data: totalReports, error: countError } = await countQuery;
     if (countError) {
@@ -134,6 +148,7 @@ export async function GET(request: NextRequest) {
     }
 
     const total = totalReports ? totalReports.length : 0;
+    const totalPages = Math.ceil(total / limit);
 
     if (total === 0) {
       await logApiRequest({
@@ -149,7 +164,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         data: [],
-        pagination: { total: 0, limit, offset, has_more: false, next_cursor: null }
+        pagination: { page: pageNumber, limit, total: 0, pages: 0, offset, has_more: false, next_cursor: null }
       }, { headers: responseHeaders });
     }
 
@@ -162,8 +177,11 @@ export async function GET(request: NextRequest) {
     if (since) {
       pageQuery = pageQuery.gte('completed_at', since);
     }
+    if (dateTo) {
+      pageQuery = pageQuery.lte('completed_at', dateTo);
+    }
 
-    // Apply cursor filter if present (cursor-based pagination is prioritized over offset)
+    // Apply cursor filter if present
     if (cursor) {
       pageQuery = pageQuery.lt('completed_at', cursor);
     }
@@ -230,8 +248,10 @@ export async function GET(request: NextRequest) {
       success: true,
       data: formattedData,
       pagination: {
-        total,
+        page: pageNumber,
         limit,
+        total,
+        pages: totalPages,
         offset: cursor ? null : offset,
         has_more,
         next_cursor
