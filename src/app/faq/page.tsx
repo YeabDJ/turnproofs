@@ -48,7 +48,7 @@ export default function DedicatedFaqPage() {
       category: 'pricing',
       categoryName: lang === 'en' ? 'Pricing & Trial' : 'Precios y Prueba',
       q: lang === 'en' ? "How does the 14-day free trial work and when do I enter my card?" : "¿Cómo funciona la prueba gratuita de 14 días y cuándo me piden tarjeta?",
-      a: lang === 'en' ? "You get 14 days of full feature access with zero credit card required upfront ($0 charged today). On Day 15, simply select a plan (Pro $9/mo, Growth $18.99/mo) and enter your payment card to continue using TurnProofs." : "Obtienes 14 días de acceso completo sin tarjeta requerida. En el Día 15, simplemente eliges un plan (Pro $9/mes, Growth $18.99/mes) e ingresas tu tarjeta para continuar."
+      a: lang === 'en' ? "You get 14 days of full feature access with zero credit card required upfront ($0 charged today). On Day 15, simply select a plan (Solo $9/mo, Small Team $18.99/mo, Growing Portfolio $35.99/mo, or Commercial $89.99/mo) and enter your payment card to continue using TurnProofs." : "Obtienes 14 días de acceso completo sin tarjeta requerida. En el Día 15, simplemente eliges un plan (Solo $9/mes, Small Team $18.99/mes, Growing Portfolio $35.99/mes o Commercial $89.99/mes) e ingresas tu tarjeta para continuar."
     },
     {
       id: 'faq-3',
