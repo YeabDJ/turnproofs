@@ -64,7 +64,7 @@ export default function TermsOfService() {
               <li><strong>14-Day Free Trial:</strong> Full feature access with zero credit card required upfront ($0 charged today).</li>
               <li><strong>Pro Plan ($9.00/mo or $7.65/mo annual):</strong> Covers 1 managed property.</li>
               <li><strong>Growth Plan ($18.99/mo or $16.14/mo annual):</strong> Covers 2 to 3 managed properties.</li>
-              <li><strong>Elite Plan ($29.99/mo + $4.99/unit beyond 6):</strong> Covers 4 to 6+ managed properties.</li>
+              <li><strong>Elite / Growing Portfolio Plan ($35.99/mo or $30.59/mo annual + $4.99/unit beyond 6):</strong> Covers 4 to 6+ managed properties with full REST API access.</li>
               <li><strong>Commercial Plan ($89.99/mo):</strong> Dedicated commercial multi-tenant facility site tier.</li>
             </ul>
             <p>Subscriptions renew automatically unless canceled prior to the next billing cycle. All payments are non-refundable after the trial period.</p>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedHost } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
 import { generateRawApiKey } from '@/lib/api-auth';
+import { hasApiAccess, getRateLimit } from '@/config/pricing';
 
 // GET active/all keys for host
 export async function GET() {
@@ -39,6 +40,14 @@ export async function POST(request: NextRequest) {
     const { name, scopes, property_ids, expires_in_days, environment } = body;
     const targetEnv = environment === 'test' ? 'test' : 'live';
 
+    // Gate: only Growing Portfolio (elite) and Commercial tiers can generate API keys
+    if (!hasApiAccess(host.subscription_tier)) {
+      return NextResponse.json({
+        success: false,
+        error: 'API access requires the Growing Portfolio or Commercial plan. Upgrade in Billing & Subscription.'
+      }, { status: 403 });
+    }
+
     if (!name || typeof name !== 'string' || !name.trim()) {
       return NextResponse.json({ success: false, error: 'API key name is required.' }, { status: 400 });
     }
@@ -70,8 +79,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Set rate limit based on host tier: Commercial = 5000, standard = 500
-    const limitMax = host.subscription_tier === 'commercial' ? 5000.0 : 500.0;
+    // Set rate limit based on tier (requests/minute)
+    const limitMax = getRateLimit(host.subscription_tier);
 
     // Use production-grade key generator: returns raw, prefix, hash, salt
     const { rawKey, prefix, hash, salt } = generateRawApiKey(targetEnv);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthenticatedHost } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase';
+import { PRICING_TIERS } from '@/config/pricing';
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,19 +54,19 @@ export async function POST(request: NextRequest) {
     const count = parseInt(propertiesCount || '1', 10);
 
     if (plan === 'growth' || (count >= 2 && count <= 3)) {
-      baseMonthlyAmount = 18.99;
-      planName = 'Growth Plan (2-3 Properties)';
+      baseMonthlyAmount = PRICING_TIERS.growth.monthlyPrice;
+      planName = 'Small Team Plan (2-3 Properties)';
     } else if (plan === 'elite' || count >= 4) {
       if (count <= 6) {
-        baseMonthlyAmount = 29.99;
-        planName = 'Elite Plan (4-6 Properties)';
+        baseMonthlyAmount = PRICING_TIERS.elite.monthlyPrice;
+        planName = 'Growing Portfolio Plan (4-6 Properties)';
       } else {
         const extra = count - 6;
-        baseMonthlyAmount = parseFloat((29.99 + extra * 4.99).toFixed(2));
-        planName = `Elite Scaling Plan (${count} Properties)`;
+        baseMonthlyAmount = parseFloat((PRICING_TIERS.elite.monthlyPrice + extra * (PRICING_TIERS.elite.additionalPropertyPrice ?? 4.99)).toFixed(2));
+        planName = `Growing Portfolio Scaling Plan (${count} Properties)`;
       }
     } else if (plan === 'commercial') {
-      baseMonthlyAmount = 89.99;
+      baseMonthlyAmount = PRICING_TIERS.commercial.monthlyPrice;
       planName = 'Commercial Site Plan';
     }
 

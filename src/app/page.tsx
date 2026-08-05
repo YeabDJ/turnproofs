@@ -17,8 +17,8 @@ export default function LandingPage() {
     : calcUnits <= 3 
     ? (isAnnual ? '$16.14' : '$18.99') 
     : calcUnits <= 6 
-    ? (isAnnual ? '$25.49' : '$29.99') 
-    : (isAnnual ? `$${((29.99 + (calcUnits - 6) * 4.99) * 0.85).toFixed(2)}` : `$${(29.99 + (calcUnits - 6) * 4.99).toFixed(2)}`);
+    ? (isAnnual ? '$30.59' : '$35.99') 
+    : (isAnnual ? `$${((35.99 + (calcUnits - 6) * 4.99) * 0.85).toFixed(2)}` : `$${(35.99 + (calcUnits - 6) * 4.99).toFixed(2)}`);
 
   const [leadEmail, setLeadEmail] = useState('');
   const [submittedLead, setSubmittedLead] = useState(false);
@@ -788,7 +788,7 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Growing Portfolio Plan ($29.99/mo for 4-6 Properties) */}
+          {/* Growing Portfolio Plan ($35.99/mo for 4-6 Properties) */}
           <div className="p-5 rounded-2xl bg-neutral-900/60 border border-purple-500/50 flex flex-col justify-between relative group hover:border-purple-500 transition-all shadow-lg shadow-purple-500/5">
             <div className="absolute -top-3 right-4 px-2 py-0.5 rounded-full bg-purple-500 text-[8px] font-extrabold text-white uppercase tracking-wider">
               Scaling
@@ -799,15 +799,19 @@ export default function LandingPage() {
                 <span className="px-2 py-0.5 rounded-full bg-purple-500/10 text-[9px] font-bold text-purple-400 uppercase tracking-wider">4-6 Props</span>
               </div>
               <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-2xl font-extrabold text-white">{isAnnual ? '$25.49' : '$29.99'}</span>
+                <span className="text-2xl font-extrabold text-white">{isAnnual ? '$30.59' : '$35.99'}</span>
                 <span className="text-neutral-500 text-xs">/ month</span>
               </div>
               <p className="text-[10px] text-purple-400 font-semibold mb-1">+$4.99/mo per unit beyond 6</p>
-              <p className="text-[10px] text-neutral-400 italic mb-4">For growing portfolios with 4+ properties. SMS alerts, CRM integration, QR sign generator.</p>
+              <p className="text-[10px] text-neutral-400 italic mb-4">For growing portfolios with 4+ properties. Includes API access, SMS alerts, &amp; QR generator.</p>
               <ul className="space-y-2.5 text-[11px] text-neutral-400 mb-6">
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-purple-400 shrink-0" />
                   <span className="text-neutral-200 font-semibold">4 to 6 Managed Properties</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <Check className="h-3.5 w-3.5 text-purple-400 shrink-0" />
+                  <span className="text-purple-300 font-extrabold">🔗 Full REST API Access &amp; Keys</span>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Check className="h-3.5 w-3.5 text-purple-400 shrink-0" />

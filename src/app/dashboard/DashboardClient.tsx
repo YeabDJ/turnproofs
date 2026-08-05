@@ -313,7 +313,7 @@ export default function DashboardClient() {
 
     // Anti-gaming free trial guard (1 property limit)
     if (properties.length >= 1 && !host?.stripe_subscription_id && host?.subscription_status !== 'active') {
-      alert('14-Day Free Trial Capacity Reached: Your trial includes 1 managed property ($0 today). To add additional properties to your portfolio, please select a plan: Growth Tier (2-3 properties @ $18.99/mo) or Elite Tier (4-6 properties @ $29.99/mo).');
+      alert('14-Day Free Trial Capacity Reached: Your trial includes 1 managed property ($0 today). To add additional properties to your portfolio, please select a plan: Growth Tier (2-3 properties @ $18.99/mo) or Elite Tier (4-6 properties @ $35.99/mo).');
       setCheckoutPlan({
         name: 'Growth Plan',
         planKey: 'growth',
@@ -756,6 +756,11 @@ export default function DashboardClient() {
           >
             <Terminal className="h-4.5 w-4.5" />
             <span>Integrations (API)</span>
+            {!['elite', 'commercial'].includes(host?.subscription_tier || '') && (
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-400 uppercase tracking-wider">
+                🔒 Upgrade
+              </span>
+            )}
           </button>
         </div>
 
@@ -1186,7 +1191,7 @@ export default function DashboardClient() {
                       <p className="text-sm text-neutral-400">
                         {isPaidActive ? 'Current portfolio rate: ' : 'Plan rate when trial ends: '}
                         <strong className="text-white font-mono">
-                          {`$${properties.length <= 1 ? '9.00' : properties.length <= 3 ? '18.99' : (29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)} /mo`}
+                          {`$${properties.length <= 1 ? '9.00' : properties.length <= 3 ? '18.99' : (35.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)} /mo`}
                         </strong> {isPaidActive ? `(${properties.length} active unit${properties.length === 1 ? '' : 's'})` : `($0.00 charged during 14-day trial)`}
                       </p>
                     </div>
@@ -1199,8 +1204,8 @@ export default function DashboardClient() {
                             name: properties.length <= 1 ? 'Pro Plan' : properties.length <= 3 ? 'Growth Plan' : 'Elite Plan',
                             planKey: targetPlan,
                             units: properties.length,
-                            monthlyRate: properties.length <= 1 ? 9.00 : properties.length <= 3 ? 18.99 : parseFloat((29.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)),
-                            annualRate: properties.length <= 1 ? 7.65 : properties.length <= 3 ? 16.14 : parseFloat(((29.99 + Math.max(0, properties.length - 6) * 4.99) * 0.85).toFixed(2))
+                            monthlyRate: properties.length <= 1 ? 9.00 : properties.length <= 3 ? 18.99 : parseFloat((35.99 + Math.max(0, properties.length - 6) * 4.99).toFixed(2)),
+                            annualRate: properties.length <= 1 ? 7.65 : properties.length <= 3 ? 16.14 : parseFloat(((35.99 + Math.max(0, properties.length - 6) * 4.99) * 0.85).toFixed(2))
                           });
                           setShowCheckoutModal(true);
                         }}
@@ -1451,17 +1456,18 @@ export default function DashboardClient() {
                             <div>
                               <h4 className="text-lg font-black text-white">Elite Plan</h4>
                               <div className="flex items-baseline gap-1 mt-2">
-                                <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$25.49' : '$29.99'}</span>
+                                <span className="text-3xl font-black text-white">{billingCycle === 'annual' ? '$30.59' : '$35.99'}</span>
                                 <span className="text-xs text-neutral-400 font-semibold">/ month</span>
                               </div>
                               {billingCycle === 'annual' ? (
-                                <span className="text-[10px] text-purple-400 font-bold block mt-1">💰 Save $54.00 / yr (15% OFF)</span>
+                                <span className="text-[10px] text-purple-400 font-bold block mt-1">💰 Save $64.80 / yr (15% OFF)</span>
                               ) : (
                                 <span className="text-[10px] text-purple-400 font-bold block mt-1">+$4.99/mo per unit beyond 6</span>
                               )}
                             </div>
                             <ul className="space-y-2 text-xs text-neutral-300">
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> 4 to 6+ Managed Properties</li>
+                              <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> <span className="text-purple-300 font-bold">Full REST API Access &amp; Keys</span></li>
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Twilio SMS Autopilot Alerts</li>
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> HubSpot CRM Integration</li>
                               <li className="flex items-center gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-purple-400 shrink-0" /> Door QR Code Generator</li>
@@ -1476,7 +1482,7 @@ export default function DashboardClient() {
                             <button
                               onClick={() => {
                                 const units = Math.max(4, properties.length);
-                                const mRate = units <= 6 ? 29.99 : parseFloat((29.99 + (units - 6) * 4.99).toFixed(2));
+                                const mRate = units <= 6 ? 35.99 : parseFloat((35.99 + (units - 6) * 4.99).toFixed(2));
                                 const aRate = parseFloat((mRate * 0.85).toFixed(2));
                                 setCheckoutPlan({
                                   name: `Elite Plan (${units} Units)`,
@@ -1489,7 +1495,7 @@ export default function DashboardClient() {
                               }}
                               className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10"
                             >
-                              Upgrade to Elite ($29.99+)
+                              Upgrade to Elite ($35.99+)
                             </button>
                           )}
                         </div>
@@ -1772,6 +1778,50 @@ export default function DashboardClient() {
                   </Link>
                 </div>
 
+                {/* Tier Gate: upsell wall for non-eligible users */}
+                {!['elite', 'commercial'].includes(host?.subscription_tier || '') ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center space-y-6">
+                    <div className="h-20 w-20 rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                      <span className="text-4xl">🔒</span>
+                    </div>
+                    <div className="space-y-2 max-w-md">
+                      <h3 className="text-xl font-extrabold text-white">API Access is a Growing Portfolio Feature</h3>
+                      <p className="text-sm text-neutral-400 leading-relaxed">
+                        Generate API keys to connect TurnProofs with Guesty, Breezeway, Zapier, or your own custom dashboard. Available on the <span className="text-amber-400 font-bold">Growing Portfolio</span> plan ($35.99/mo) and above.
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('billing')}
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white text-sm font-extrabold transition-all shadow-lg shadow-rose-500/20 cursor-pointer"
+                      >
+                        ⚡ Upgrade to Growing Portfolio
+                      </button>
+                      <Link
+                        href="/docs"
+                        target="_blank"
+                        className="px-6 py-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-neutral-300 text-sm font-bold transition-all"
+                      >
+                        Preview API Docs
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl w-full pt-4">
+                      {[
+                        { icon: '🔗', title: 'Zapier / Make', body: 'Trigger automations when a turnover report is completed.' },
+                        { icon: '📊', title: 'Custom Dashboards', body: 'Pull your property and report data into any BI tool.' },
+                        { icon: '🏠', title: 'Guesty / Breezeway', body: 'Sync turnover status directly to your PMS.' },
+                      ].map(({ icon, title, body }) => (
+                        <div key={title} className="p-4 rounded-2xl bg-neutral-900/40 border border-neutral-800 text-left space-y-1">
+                          <div className="text-2xl">{icon}</div>
+                          <p className="text-xs font-extrabold text-white">{title}</p>
+                          <p className="text-[11px] text-neutral-500 leading-relaxed">{body}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <>
                 {/* API Key Generator Card */}
                 <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-6">
                   <div>
@@ -2069,6 +2119,8 @@ export default function DashboardClient() {
                     </div>
                   )}
                 </div>
+                  </>
+                )}
               </div>
             )}
           </div>
