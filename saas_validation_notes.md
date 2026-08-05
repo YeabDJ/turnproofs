@@ -39,7 +39,7 @@ We posted a validation question asking hosts: *"How do you protect yourselves fr
 
 ---
 
-## 3. Product Positioning for CleanProof
+## 3. Product Positioning for TurnProofs
 
 * **Core Mission**: We are NOT just building a "cleaning schedule manager." We are building **Airbnb Refund Protection**. 
 * **The Pitch**: Prevent fraudulent guest refunds by generating certified, GPS-validated checkout records in under 3 minutes, with **zero app downloads** for your cleaners.

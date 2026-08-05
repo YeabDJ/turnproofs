@@ -1,4 +1,4 @@
-# Airbnb Cleaning Checklist Platform (CleanProof)
+# TurnProofs Platform Plan (turnproofs.com)
 
 This plan outlines the architecture, database schema, API endpoints, and user interface for the **Airbnb Cleaning Checklist** system. This feature will enable short-term rental hosts to manage their properties, assign checklists, track cleaner completions, verify geo-location coordinates, and export proof-of-cleaning reports for Airbnb support.
 
