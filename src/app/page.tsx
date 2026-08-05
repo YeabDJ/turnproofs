@@ -260,6 +260,28 @@ export default function LandingPage() {
                   <ChevronRight className="h-3 w-3 text-neutral-600 group-hover:text-rose-400 transition-colors" />
                 </Link>
               </div>
+
+              {/* Mobile-only QR preview strip — hidden on lg since full floating cards are visible */}
+              <div className="flex lg:hidden items-center justify-center gap-3 pt-3">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#131720]/80 border border-orange-500/20">
+                  <div className="h-10 w-10 rounded-lg bg-white p-1 shrink-0">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=demo" alt="Demo QR" className="w-full h-full" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[9px] font-extrabold text-orange-400 uppercase tracking-wider">📍 3:45 PM</p>
+                    <p className="text-[10px] text-neutral-300 font-semibold">Cleaner Check-In</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#131720]/80 border border-orange-500/20">
+                  <div className="h-10 w-10 rounded-lg bg-white p-1 shrink-0">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=report" alt="Report QR" className="w-full h-full" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[9px] font-extrabold text-orange-400 uppercase tracking-wider">⏱ 12:00 AM</p>
+                    <p className="text-[10px] text-neutral-300 font-semibold">PDF Generated</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Right Flank: Floating QR Card with documents */}
@@ -296,7 +318,6 @@ export default function LandingPage() {
             
             {/* Card 1 */}
             <div className="bg-[#131720]/80 border border-neutral-850 rounded-2xl p-4.5 p-4 relative flex items-start gap-4 transition-all hover:scale-[1.01] hover:border-orange-500/10">
-              <div className="absolute top-4 right-4 h-2.5 w-2.5 rounded-full bg-[#0052FF]" />
               <div className="h-14 w-14 shrink-0 rounded-xl bg-linear-to-b from-neutral-850 to-neutral-900 border border-neutral-800 flex items-center justify-center shadow-inner relative overflow-hidden">
                 <svg viewBox="0 0 64 64" className="w-9 h-9 drop-shadow-[0_4px_10px_rgba(244,63,94,0.3)]">
                   <path d="M32 8 L54 20 L32 32 L10 20 Z" fill="#FDA4AF" />

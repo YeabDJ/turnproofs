@@ -246,15 +246,15 @@ export default function DedicatedFaqPage() {
                 <button
                   type="button"
                   onClick={() => setOpenFaqId(isOpen ? null : faq.id)}
-                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-extrabold text-sm text-white cursor-pointer"
+                  className="w-full p-4 sm:p-5 text-left flex items-start justify-between gap-3 cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold uppercase tracking-wider shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                    <span className="px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[10px] font-bold uppercase tracking-wider shrink-0 self-start sm:self-auto">
                       {faq.categoryName}
                     </span>
-                    <span>{faq.q}</span>
+                    <span className="font-extrabold text-sm text-white leading-snug">{faq.q}</span>
                   </div>
-                  <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-4 w-4 text-rose-400 shrink-0 mt-0.5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isOpen && (
