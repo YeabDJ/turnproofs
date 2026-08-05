@@ -10,6 +10,12 @@ export async function GET(request: NextRequest) {
   const responseHeaders: Record<string, string> = {
     'x-request-id': auth.requestId
   };
+
+  if (auth.rateLimitMax !== undefined) {
+    responseHeaders['X-RateLimit-Limit'] = auth.rateLimitMax.toString();
+    responseHeaders['X-RateLimit-Remaining'] = (auth.tokensRemaining ?? 0).toString();
+    responseHeaders['X-RateLimit-Reset'] = Math.ceil((60000 - (Date.now() % 60000)) / 1000).toString();
+  }
   
   if (auth.statusCode !== 200) {
     const errorBody = {

@@ -37,6 +37,8 @@ export interface ApiAuthResult {
   propertyIds?: string[] | null;
   scopes?: string[];
   requestId: string;
+  rateLimitMax?: number;
+  tokensRemaining?: number;
   error?: {
     code: string;
     message: string;
@@ -197,6 +199,8 @@ export async function validateApiKey(
         requestId,
         error: { code: 'rate_limit_exceeded', message: `You have exceeded ${keyRecord.rate_limit_max} requests per minute` },
         retryAfter,
+        rateLimitMax: keyRecord.rate_limit_max,
+        tokensRemaining: 0,
         statusCode: 429
       };
     }
@@ -220,6 +224,8 @@ export async function validateApiKey(
       propertyIds: keyRecord.property_ids,
       scopes,
       requestId,
+      rateLimitMax: keyRecord.rate_limit_max,
+      tokensRemaining: Math.max(0, Math.floor(tokensLeft)),
       statusCode: 200
     };
   } catch (err: any) {
