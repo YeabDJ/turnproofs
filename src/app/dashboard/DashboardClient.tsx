@@ -27,6 +27,7 @@ import {
   CreditCard,
   Lock,
   Shield,
+  FileCheck2,
   CheckCircle2,
   AlertTriangle,
   ChevronRight,
@@ -1002,91 +1003,156 @@ export default function DashboardClient() {
                   </div>
                 ) : (
                   <div className="border border-neutral-800 rounded-2xl bg-neutral-900/20 overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="border-b border-neutral-800 bg-neutral-950 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                            <th className="p-4">Property</th>
-                            <th className="p-4">Cleaner</th>
-                            <th className="p-4">Completed Date</th>
-                            <th className="p-4">Duration</th>
-                            <th className="p-4 text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-neutral-800/80 text-sm text-neutral-300">
+                    {reports.length === 0 ? (
+                      <div className="p-12 text-center text-neutral-500">
+                        <FileCheck2 className="h-10 w-10 mx-auto text-neutral-700 mb-3" />
+                        <p className="font-semibold text-neutral-300">No turnover verification logs completed yet.</p>
+                        <p className="text-xs text-neutral-500 mt-1">When cleaners submit checklist logs, their signed certificates appear here.</p>
+                      </div>
+                    ) : (
+                      <>
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="border-b border-neutral-800 bg-neutral-950/60 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                                <th className="p-4">Property</th>
+                                <th className="p-4">Cleaner</th>
+                                <th className="p-4">Completed Date</th>
+                                <th className="p-4">Duration</th>
+                                <th className="p-4 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-neutral-800/80 text-sm text-neutral-300">
+                              {reports.map((report) => {
+                                const start = new Date(report.started_at);
+                                const end = new Date(report.completed_at);
+                                const durationMs = end.getTime() - start.getTime();
+                                const durationMin = Math.max(1, Math.round(durationMs / 60000));
+
+                                let hasAlert = false;
+                                let isRedFlag = report.notes?.includes('[RED FLAG ALERT]');
+                                let isLostFound = report.notes?.includes('[LOST & FOUND ALERT]');
+
+                                if (report.notes && report.notes.trim().startsWith('{')) {
+                                  try {
+                                    const parsed = JSON.parse(report.notes);
+                                    hasAlert = !!parsed.maintenanceAlert;
+                                  } catch(e) {}
+                                }
+
+                                return (
+                                  <tr key={report.id} className="hover:bg-neutral-900/40 transition-colors">
+                                    <td className="p-4">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <p className="font-bold text-neutral-200">{report.airbnb_properties?.name || 'Unknown Unit'}</p>
+                                        {isRedFlag && (
+                                          <span className="px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
+                                            🚨 Red Flag Alert
+                                          </span>
+                                        )}
+                                        {isLostFound && (
+                                          <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
+                                            🎒 Lost & Found Item
+                                          </span>
+                                        )}
+                                        {hasAlert && !isRedFlag && (
+                                          <span className="px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-extrabold uppercase tracking-wide shrink-0">
+                                            ⚠️ Maintenance
+                                          </span>
+                                        )}
+                                      </div>
+                                      <p className="text-xs text-neutral-500 truncate max-w-[240px]">{report.airbnb_properties?.address}</p>
+                                      {(isRedFlag || isLostFound) && report.notes && (
+                                        <p className="text-xs text-neutral-300 mt-1 italic line-clamp-1 bg-neutral-950/60 p-1.5 rounded-lg border border-neutral-800">
+                                          "{report.notes.replace(/^(🚨 \[RED FLAG ALERT\]:|🎒 \[LOST & FOUND ALERT\]:)\s*/, '').split('|||')[0].trim()}"
+                                        </p>
+                                      )}
+                                    </td>
+                                    <td className="p-4 font-medium">{report.cleaner_name}</td>
+                                    <td className="p-4 text-xs">
+                                      {new Date(report.completed_at).toLocaleDateString(undefined, {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                      })}
+                                    </td>
+                                    <td className="p-4 text-xs font-mono">{durationMin} min</td>
+                                    <td className="p-4 text-right">
+                                      <a
+                                        href={`/report/${report.id}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 text-xs font-semibold transition-all"
+                                      >
+                                        <span>Certificate</span>
+                                        <ExternalLink className="h-3.5 w-3.5" />
+                                      </a>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Mobile Cards Stack View */}
+                        <div className="block md:hidden divide-y divide-neutral-800/80">
                           {reports.map((report) => {
                             const start = new Date(report.started_at);
                             const end = new Date(report.completed_at);
                             const durationMs = end.getTime() - start.getTime();
-                            const durationMin = Math.round(durationMs / 60000);
+                            const durationMin = Math.max(1, Math.round(durationMs / 60000));
 
-                            let hasAlert = false;
                             let isRedFlag = report.notes?.includes('[RED FLAG ALERT]');
                             let isLostFound = report.notes?.includes('[LOST & FOUND ALERT]');
 
-                            if (report.notes && report.notes.trim().startsWith('{')) {
-                              try {
-                                const parsed = JSON.parse(report.notes);
-                                hasAlert = !!parsed.maintenanceAlert;
-                              } catch(e) {}
-                            }
-
                             return (
-                              <tr key={report.id} className="hover:bg-neutral-900/40 transition-colors">
-                                <td className="p-4">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <p className="font-bold text-neutral-200">{report.airbnb_properties?.name || 'Unknown Unit'}</p>
-                                    {isRedFlag && (
-                                      <span className="px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
-                                        🚨 Red Flag Alert
-                                      </span>
-                                    )}
-                                    {isLostFound && (
-                                      <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold uppercase tracking-wide shrink-0">
-                                        🎒 Lost & Found Item
-                                      </span>
-                                    )}
-                                    {hasAlert && !isRedFlag && (
-                                      <span className="px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 text-[9px] font-extrabold uppercase tracking-wide shrink-0">
-                                        ⚠️ Maintenance
-                                      </span>
-                                    )}
+                              <div key={report.id} className="p-4 space-y-3 bg-neutral-950/40">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div>
+                                    <h4 className="font-extrabold text-sm text-white">{report.airbnb_properties?.name || 'Vacation Unit'}</h4>
+                                    <p className="text-xs text-neutral-400">{report.airbnb_properties?.address}</p>
                                   </div>
-                                  <p className="text-xs text-neutral-500 truncate max-w-[240px]">{report.airbnb_properties?.address}</p>
-                                  {(isRedFlag || isLostFound) && report.notes && (
-                                    <p className="text-xs text-neutral-300 mt-1 italic line-clamp-1 bg-neutral-950/60 p-1.5 rounded-lg border border-neutral-800">
-                                      "{report.notes.replace(/^(🚨 \[RED FLAG ALERT\]:|🎒 \[LOST & FOUND ALERT\]:)\s*/, '').split('|||')[0].trim()}"
-                                    </p>
-                                  )}
-                                </td>
-                                <td className="p-4 font-medium">{report.cleaner_name}</td>
-                                <td className="p-4 text-xs">
-                                  {new Date(report.completed_at).toLocaleDateString(undefined, {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </td>
-                                <td className="p-4 text-xs font-mono">{durationMin} min</td>
-                                <td className="p-4 text-right">
                                   <a
                                     href={`/report/${report.id}`}
                                     target="_blank"
                                     rel="noreferrer"
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 text-xs font-semibold transition-all"
+                                    className="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-extrabold flex items-center gap-1 shrink-0 shadow-sm"
                                   >
-                                    <span>Certificate</span>
+                                    <span>View</span>
                                     <ExternalLink className="h-3 w-3" />
                                   </a>
-                                </td>
-                              </tr>
+                                </div>
+
+                                <div className="flex flex-wrap items-center gap-2 pt-1">
+                                  {isRedFlag && (
+                                    <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300 text-[10px] font-black uppercase">
+                                      🚨 Red Flag
+                                    </span>
+                                  )}
+                                  {isLostFound && (
+                                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase">
+                                      🎒 Lost & Found
+                                    </span>
+                                  )}
+                                  <span className="text-[11px] text-neutral-400 font-medium">
+                                    Cleaner: <strong className="text-neutral-200">{report.cleaner_name}</strong>
+                                  </span>
+                                  <span className="text-[11px] text-neutral-500">• {durationMin} min clean</span>
+                                </div>
+
+                                <p className="text-[10px] text-neutral-500 font-mono">
+                                  Completed: {new Date(report.completed_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
                             );
                           })}
-                        </tbody>
-                      </table>
-                    </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
