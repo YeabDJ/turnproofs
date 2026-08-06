@@ -119,11 +119,11 @@ export default function LandingPage() {
 
         {/* Website Navigation Header */}
         <header className="border-b border-neutral-900 bg-neutral-950/40 backdrop-blur-md px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 cursor-pointer hover:opacity-90 transition-opacity">
-            <div className="h-7 w-7 rounded-lg bg-[#FF4F2B] flex items-center justify-center font-black text-white text-base select-none">
+          <Link href="/" className="flex items-center gap-2.5 cursor-pointer hover:opacity-90 transition-opacity">
+            <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-[#FF4F2B] to-rose-600 flex items-center justify-center font-black text-white text-lg shadow-md shadow-orange-500/20 select-none">
               T
             </div>
-            <span className="font-extrabold text-lg text-white tracking-tight">TurnProofs</span>
+            <span className="font-black text-xl text-white tracking-tight">TurnProofs</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-semibold text-neutral-400">
@@ -213,98 +213,77 @@ export default function LandingPage() {
 
             {/* Center Column: Hero details */}
             <div className="text-center space-y-6">
-              {/* Checkpill badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#1E222B] border border-neutral-800 text-[10px] font-extrabold uppercase tracking-wider text-neutral-300 shadow-sm mx-auto">
-                <span className="h-4 w-4 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                  <Check className="h-2.5 w-2.5 text-emerald-400" />
-                </span>
-                <span>Turnover verification for hosts, managers, cleaners &amp; subcontractors</span>
-              </div>
-
               {/* Headline */}
-              <h1 className="text-4xl sm:text-5xl md:text-[52px] font-extrabold tracking-tight max-w-3xl mx-auto leading-[1.1] text-white">
-                One Scan. Proof Forever.
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight max-w-4xl mx-auto leading-[1.08] text-white">
+                One Scan. <span className="bg-gradient-to-r from-[#FF512F] via-[#FF4F2B] to-[#DD2476] bg-clip-text text-transparent">Proof Forever.</span>
               </h1>
 
               {/* Subtitle */}
-              <p className="text-xs sm:text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-lg text-neutral-300 font-medium max-w-2xl mx-auto leading-relaxed">
                 Turnover verification without the app friction. GPS proof, photo evidence, and audit-ready PDFs—before the next check-in.
               </p>
 
+              {/* Social Proof Badge */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                <div className="px-4 py-1.5 rounded-full bg-neutral-900/80 border border-neutral-800 text-[11px] font-semibold text-neutral-300 flex flex-wrap items-center justify-center gap-1.5 shadow-sm">
+                  <span className="text-amber-400">⭐⭐⭐⭐⭐</span>
+                  <span>Trusted by 100+ Property Managers &amp; Hosts</span>
+                  <span className="text-neutral-600 hidden sm:inline">•</span>
+                  <span className="text-emerald-400 font-bold">10,000+ Turnovers Verified</span>
+                </div>
+              </div>
+
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <Link
                   href="/login"
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#FF512F] to-[#DD2476] hover:scale-105 font-bold text-xs text-white transition-all shadow-lg shadow-[#FF512F]/20 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#FF512F] to-[#DD2476] hover:scale-105 font-extrabold text-xs sm:text-sm text-white transition-all shadow-xl shadow-[#FF512F]/20 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Start Your Free Trial</span>
                 </Link>
                 <Link
-                  href="/clean/demo"
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-transparent hover:bg-neutral-900 border border-neutral-700 font-bold text-xs text-white transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Try Cleaner Demo</span>
-                </Link>
-              </div>
-
-              {/* Sample report — direct link, no email gate */}
-              <div className="pt-1">
-                <Link
                   href="/report/sample-report"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-neutral-400 hover:text-white transition-colors group"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-850 border border-neutral-750 font-bold text-xs sm:text-sm text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
-                  <FileText className="h-3.5 w-3.5 text-neutral-500 group-hover:text-rose-400 transition-colors" />
-                  <span>View a sample audit-ready report</span>
-                  <ChevronRight className="h-3 w-3 text-neutral-600 group-hover:text-rose-400 transition-colors" />
+                  <FileText className="h-4 w-4 text-rose-400" />
+                  <span>View Sample Report</span>
                 </Link>
-              </div>
-
-              {/* Mobile-only QR preview strip — hidden on lg since full floating cards are visible */}
-              <div className="flex lg:hidden items-center justify-center gap-3 pt-3">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#131720]/80 border border-orange-500/20">
-                  <div className="h-10 w-10 rounded-lg bg-white p-1 shrink-0">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=demo" alt="Demo QR" className="w-full h-full" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[9px] font-extrabold text-orange-400 uppercase tracking-wider">📍 3:45 PM</p>
-                    <p className="text-[10px] text-neutral-300 font-semibold">Cleaner Check-In</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#131720]/80 border border-orange-500/20">
-                  <div className="h-10 w-10 rounded-lg bg-white p-1 shrink-0">
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=report" alt="Report QR" className="w-full h-full" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-[9px] font-extrabold text-orange-400 uppercase tracking-wider">⏱ 12:00 AM</p>
-                    <p className="text-[10px] text-neutral-300 font-semibold">PDF Generated</p>
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* Right Flank: Floating QR Card with documents */}
+            {/* Right Flank: Product Audit Certificate Mockup */}
             <div className="hidden lg:flex flex-col items-center justify-center relative h-64 animate-float-right">
-              <div className="relative p-3.5 rounded-2xl bg-[#131720]/75 border border-[#FF4F2B]/35 shadow-2xl shadow-orange-500/10">
-                <div className="h-28 w-28 rounded-xl bg-white p-2 flex items-center justify-center border border-neutral-800">
-                  <img
-                    src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=demo"
-                    alt="QR Code"
-                    className="h-full w-full object-contain"
-                  />
+              <div className="relative p-4 rounded-2xl bg-[#131720]/90 border border-emerald-500/35 shadow-2xl shadow-emerald-500/10 w-64 space-y-2.5 text-left">
+                <div className="flex items-center justify-between border-b border-neutral-800 pb-2">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                    <span className="text-xs font-black text-white">Verified Audit</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-black uppercase">PASSED</span>
                 </div>
 
-                {/* Floating Documents */}
-                <div className="absolute -top-3 -right-3 px-2 py-1 rounded-lg bg-neutral-950 border border-neutral-800 text-[9px] font-extrabold text-neutral-200 shadow-md flex items-center gap-1 rotate-[-6deg] animate-bounce">
-                  📄 <span className="text-[8px] text-neutral-400 font-semibold">PDF</span>
+                <div className="space-y-1.5 pt-0.5">
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-neutral-300 font-bold">Sunset Villa • Unit 4B</span>
+                    <span className="text-emerald-400 font-mono font-semibold">📍 GPS Verified</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[10px]">
+                    <span className="text-neutral-400">Cleaner: Maria S.</span>
+                    <span className="text-neutral-300 font-mono">⏱ 45 min clean</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-neutral-950 border border-neutral-850 flex items-center justify-between text-[10px]">
+                    <span className="text-neutral-300 font-semibold">📷 14 Photos Timestamped</span>
+                    <span className="text-emerald-400 font-bold">100%</span>
+                  </div>
                 </div>
-                <div className="absolute top-1/2 -left-6 px-2 py-1 rounded-lg bg-neutral-950 border border-neutral-800 text-[9px] font-extrabold text-neutral-200 shadow-md flex items-center gap-1 rotate-[-6deg] animate-bounce">
-                  📄 <span className="text-[8px] text-neutral-400 font-semibold">Cert</span>
-                </div>
-                <div className="absolute -bottom-3 -left-3 px-2 py-1 rounded-lg bg-black/90 border border-orange-500/30 text-[9px] font-extrabold text-orange-400 uppercase tracking-wider flex items-center gap-1 shadow-md rotate-[-6deg] animate-pulse">
-                  <Clock className="h-2.5 w-2.5" />
-                  <span>12:00 AM</span>
+
+                <div className="pt-1 flex items-center justify-between border-t border-neutral-850">
+                  <span className="text-[9px] text-neutral-500 font-mono">ID: 7997F191</span>
+                  <span className="text-[9px] text-rose-400 font-bold flex items-center gap-0.5">
+                    <FileText className="h-3 w-3" /> Audit PDF Ready
+                  </span>
                 </div>
               </div>
             </div>

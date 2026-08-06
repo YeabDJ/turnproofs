@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://turnproofs.com'),
-  title: "TurnProofs — Turnovers Verified. Claims Defended.",
-  description: "Bilingual cleaning checklists, timestamped photo evidence, GPS proof & dispute-ready audit reports for short-term rental hosts & property managers.",
+  title: "TurnProofs — One Scan. Proof Forever.",
+  description: "Turnover verification without the app friction. GPS proof, photo evidence, and audit-ready PDFs—before the next check-in.",
   icons: {
     icon: [
       { url: '/icon.png?v=2', type: 'image/png' },
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png?v=2',
   },
   openGraph: {
-    title: "TurnProofs — Turnovers Verified. Claims Defended.",
-    description: "Bilingual cleaning checklists, timestamped photo evidence, GPS proof & dispute-ready audit reports for short-term rental hosts & property managers.",
+    title: "TurnProofs — One Scan. Proof Forever.",
+    description: "Turnover verification without the app friction. GPS proof, photo evidence, and audit-ready PDFs—before the next check-in.",
     url: "https://turnproofs.com",
     siteName: "TurnProofs",
     images: [
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "TurnProofs — Property Turnover Verification Software",
+        alt: "TurnProofs — One Scan. Proof Forever.",
       },
     ],
     locale: "en_US",
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "TurnProofs — Turnovers Verified. Claims Defended.",
-    description: "Bilingual cleaning checklists, timestamped photo evidence, GPS proof & dispute-ready audit reports for short-term rental hosts & property managers.",
+    title: "TurnProofs — One Scan. Proof Forever.",
+    description: "Turnover verification without the app friction. GPS proof, photo evidence, and audit-ready PDFs—before the next check-in.",
     images: ["/og-image.jpg"],
   },
 };
