@@ -18,7 +18,8 @@ import {
   FileCheck2,
   Calendar,
   AlertCircle,
-  Mail
+  Mail,
+  RefreshCw
 } from 'lucide-react';
 
 interface ReportTask {
@@ -246,8 +247,67 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     }, 150);
   };
 
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
   const handleDownloadPDF = async () => {
-    await handlePrint();
+    if (downloadingPdf) return;
+    setDownloadingPdf(true);
+
+    try {
+      const element = document.getElementById('report-certificate-card');
+      if (!element) {
+        throw new Error("Certificate element not found.");
+      }
+
+      // Temporarily switch language to English for clean PDF export
+      const originalLang = lang;
+      setLang('en');
+      await new Promise((r) => setTimeout(r, 200));
+
+      const html2canvas = (await import('html2canvas')).default;
+      const { jsPDF } = await import('jspdf');
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#0a0a0a',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const filename = `turnproofs-certificate-${report?.id ? report.id.substring(0, 8) : 'report'}.pdf`;
+      pdf.save(filename);
+
+      setLang(originalLang);
+    } catch (err: any) {
+      console.error("PDF Export Error:", err);
+      await handlePrint();
+    } finally {
+      setDownloadingPdf(false);
+    }
   };
 
   if (loading) {
@@ -522,10 +582,15 @@ export default function ReportClient({ reportId }: { reportId: string }) {
 
             <button
               onClick={handleDownloadPDF}
-              className="px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-bold text-xs text-white transition-all shadow-md shadow-emerald-500/10 flex items-center justify-center gap-1.5 cursor-pointer text-center"
+              disabled={downloadingPdf}
+              className="px-4 py-2.5 rounded-xl bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 font-bold text-xs text-white transition-all shadow-md shadow-emerald-500/10 flex items-center justify-center gap-1.5 cursor-pointer text-center"
             >
-              <Download className="h-4 w-4 shrink-0" />
-              <span>{lang === 'en' ? 'Download PDF' : 'Descargar PDF'}</span>
+              {downloadingPdf ? (
+                <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-white" />
+              ) : (
+                <Download className="h-4 w-4 shrink-0" />
+              )}
+              <span>{downloadingPdf ? (lang === 'en' ? 'Exporting PDF...' : 'Exportando PDF...') : (lang === 'en' ? 'Download PDF' : 'Descargar PDF')}</span>
             </button>
 
             <button
@@ -539,7 +604,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
         </div>
 
         {/* Certificate Card Container */}
-        <div className="print-card bg-neutral-900/30 border border-neutral-800 rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl relative">
+        <div id="report-certificate-card" className="print-card bg-neutral-900/30 border border-neutral-800 rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl relative">
           <div className="absolute -inset-0.5 bg-linear-to-tr from-rose-500/5 to-orange-500/5 rounded-3xl blur-md -z-10 no-print" />
 
           {/* Header */}
