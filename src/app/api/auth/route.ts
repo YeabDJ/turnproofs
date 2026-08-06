@@ -121,55 +121,55 @@ export async function GET() {
   }
 }
 
-// POST login/register/reset
+// POST login/register/reset/update
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { email, pin_code, business_name, action, verification_code, new_pin } = body;
 
-    if (!email) {
-      return NextResponse.json({ success: false, error: 'Email address is required.' }, { status: 400 });
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-
-    // Alias email mapping for primary host
-    const isPrimaryAlias = ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail);
-    const searchEmails = isPrimaryAlias ? ['support@turnproofs.com', 'yeabidj@gmail.com'] : [cleanEmail];
-
-    let host: any = null;
+    let host: any = await getAuthenticatedHost();
+    const cleanEmail = email ? email.trim().toLowerCase() : (host?.email || '');
     let fetchError: any = null;
 
-    if (isPrimaryAlias) {
-      const { data: primaryHost } = await supabaseAdmin
-        .from('airbnb_hosts')
-        .select('*')
-        .eq('email', 'support@turnproofs.com')
-        .maybeSingle();
-      
-      if (primaryHost) {
-        host = primaryHost;
-      } else {
-        const { data: altHost, error: altErr } = await supabaseAdmin
+    if (!host && cleanEmail) {
+      // Alias email mapping for primary host
+      const isPrimaryAlias = ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail);
+
+      if (isPrimaryAlias) {
+        const { data: primaryHost } = await supabaseAdmin
           .from('airbnb_hosts')
           .select('*')
-          .eq('email', 'yeabidj@gmail.com')
+          .eq('email', 'support@turnproofs.com')
           .maybeSingle();
-        host = altHost;
-        fetchError = altErr;
+        
+        if (primaryHost) {
+          host = primaryHost;
+        } else {
+          const { data: altHost, error: altErr } = await supabaseAdmin
+            .from('airbnb_hosts')
+            .select('*')
+            .eq('email', 'yeabidj@gmail.com')
+            .maybeSingle();
+          host = altHost;
+          fetchError = altErr;
+        }
+      } else {
+        const { data: singleHost, error: singleErr } = await supabaseAdmin
+          .from('airbnb_hosts')
+          .select('*')
+          .eq('email', cleanEmail)
+          .maybeSingle();
+        host = singleHost;
+        fetchError = singleErr;
       }
-    } else {
-      const { data: singleHost, error: singleErr } = await supabaseAdmin
-        .from('airbnb_hosts')
-        .select('*')
-        .eq('email', cleanEmail)
-        .maybeSingle();
-      host = singleHost;
-      fetchError = singleErr;
     }
 
     if (fetchError) {
       return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
+    }
+
+    if (!host && action !== 'login' && action !== 'signup' && action !== 'request_reset_code' && action !== 'verify_reset_code') {
+      return NextResponse.json({ success: false, error: 'Email address or active session is required.' }, { status: 400 });
     }
 
     // ACTION: Upgrade Host Subscription Tier to Commercial ($89.99/mo)

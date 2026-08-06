@@ -1985,6 +1985,7 @@ export default function DashboardClient() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                               action: 'update_branding',
+                              email: host?.email,
                               company_name: companyName,
                               company_logo_url: companyLogoUrl,
                               custom_footer: customFooterText,
@@ -2208,105 +2209,173 @@ export default function DashboardClient() {
                       <p className="text-xs text-neutral-400">No active API keys found. Generate a key above to start integrating.</p>
                     </div>
                   ) : (
-                    <div className="overflow-x-auto rounded-2xl border border-neutral-850 bg-neutral-950">
-                      <table className="w-full text-left border-collapse text-xs">
-                        <thead>
-                          <tr className="border-b border-neutral-850 text-[10px] font-bold text-neutral-500 uppercase tracking-wider bg-neutral-900/20">
-                            <th className="p-4">Name / ID</th>
-                            <th className="p-4">Prefix</th>
-                            <th className="p-4">Env</th>
-                            <th className="p-4">Scopes</th>
-                            <th className="p-4">Property Restriction</th>
-                            <th className="p-4">Created / Expiry</th>
-                            <th className="p-4 text-right">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-neutral-900 font-semibold text-neutral-300 font-sans">
-                          {apiKeys.map((key) => {
-                            const isRevoked = !!key.revoked_at;
-                            const isExpired = key.expires_at && new Date(key.expires_at) < new Date();
-                            return (
-                              <tr key={key.id} className={`hover:bg-neutral-900/10 ${isRevoked || isExpired ? 'opacity-50' : ''}`}>
-                                <td className="p-4">
-                                  <span className="font-extrabold text-white block">{key.name}</span>
-                                  {isRevoked ? (
-                                    <span className="text-[10px] text-red-400 block mt-0.5 max-w-xs truncate">
-                                      Revoked: {key.revocation_reason || 'No reason'} ({new Date(key.revoked_at).toLocaleDateString()})
+                    <div className="rounded-2xl border border-neutral-850 bg-neutral-950 overflow-hidden">
+                      {/* Desktop Table View */}
+                      <div className="hidden md:block overflow-x-auto">
+                        <table className="w-full text-left border-collapse text-xs">
+                          <thead>
+                            <tr className="border-b border-neutral-850 text-[10px] font-bold text-neutral-500 uppercase tracking-wider bg-neutral-900/20">
+                              <th className="p-4">Name / ID</th>
+                              <th className="p-4">Prefix</th>
+                              <th className="p-4">Env</th>
+                              <th className="p-4">Scopes</th>
+                              <th className="p-4">Property Restriction</th>
+                              <th className="p-4">Created / Expiry</th>
+                              <th className="p-4 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-neutral-900 font-semibold text-neutral-300 font-sans">
+                            {apiKeys.map((key) => {
+                              const isRevoked = !!key.revoked_at;
+                              const isExpired = key.expires_at && new Date(key.expires_at) < new Date();
+                              return (
+                                <tr key={key.id} className={`hover:bg-neutral-900/10 ${isRevoked || isExpired ? 'opacity-50' : ''}`}>
+                                  <td className="p-4">
+                                    <span className="font-extrabold text-white block">{key.name}</span>
+                                    {isRevoked ? (
+                                      <span className="text-[10px] text-red-400 block mt-0.5 max-w-xs truncate">
+                                        Revoked: {key.revocation_reason || 'No reason'} ({new Date(key.revoked_at).toLocaleDateString()})
+                                      </span>
+                                    ) : isExpired ? (
+                                      <span className="text-[10px] text-amber-500 block mt-0.5">Expired</span>
+                                    ) : (
+                                      <span className="text-[10px] text-neutral-500 font-mono select-all block mt-0.5">{key.id}</span>
+                                    )}
+                                  </td>
+                                  <td className="p-4 font-mono text-neutral-400 select-all">{key.api_key_prefix}...</td>
+                                  <td className="p-4 uppercase font-bold text-[10px]">
+                                    <span className={`px-2 py-0.5 rounded border ${
+                                      key.environment === 'test' 
+                                        ? 'bg-amber-500/10 text-amber-400 border-amber-550/20' 
+                                        : 'bg-emerald-500/10 text-emerald-400 border-emerald-550/20'
+                                    }`}>
+                                      {key.environment || 'live'}
                                     </span>
-                                  ) : isExpired ? (
-                                    <span className="text-[10px] text-amber-500 block mt-0.5">Expired</span>
-                                  ) : (
-                                    <span className="text-[10px] text-neutral-500 font-mono select-all block mt-0.5">{key.id}</span>
-                                  )}
-                                </td>
-                                <td className="p-4 font-mono text-neutral-400 select-all">{key.api_key_prefix}...</td>
-                                <td className="p-4 uppercase font-bold text-[10px]">
-                                  <span className={`px-2 py-0.5 rounded border ${
-                                    key.environment === 'test' 
-                                      ? 'bg-amber-500/10 text-amber-400 border-amber-550/20' 
-                                      : 'bg-emerald-500/10 text-emerald-400 border-emerald-550/20'
-                                  }`}>
-                                    {key.environment || 'live'}
-                                  </span>
-                                </td>
-                                <td className="p-4 space-x-1">
-                                  {(key.scopes || []).map((sc: string) => (
-                                    <span key={sc} className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[9px] text-neutral-400 font-bold">
-                                      {sc}
+                                  </td>
+                                  <td className="p-4 space-x-1">
+                                    {(key.scopes || []).map((sc: string) => (
+                                      <span key={sc} className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[9px] text-neutral-400 font-bold">
+                                        {sc}
+                                      </span>
+                                    ))}
+                                  </td>
+                                  <td className="p-4">
+                                    {key.property_ids && Array.isArray(key.property_ids) ? (
+                                      <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px]">
+                                        {key.property_ids.length} Units Restricted
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px]">
+                                        All Properties
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="p-4">
+                                    <span className="block text-[11px]">{new Date(key.created_at).toLocaleDateString()}</span>
+                                    <span className="block text-[10px] text-neutral-500">
+                                      {key.expires_at ? `Exp: ${new Date(key.expires_at).toLocaleDateString()}` : 'Never expires'}
                                     </span>
-                                  ))}
-                                </td>
-                                <td className="p-4">
-                                  {key.property_ids && Array.isArray(key.property_ids) ? (
-                                    <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px]">
-                                      {key.property_ids.length} Units Restricted
-                                    </span>
-                                  ) : (
-                                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px]">
-                                      All Properties
-                                    </span>
-                                  )}
-                                </td>
-                                <td className="p-4">
-                                  <span className="block text-[11px]">{new Date(key.created_at).toLocaleDateString()}</span>
-                                  <span className="block text-[10px] text-neutral-500">
-                                    {key.expires_at ? `Exp: ${new Date(key.expires_at).toLocaleDateString()}` : 'Never expires'}
-                                  </span>
-                                </td>
-                                <td className="p-4 text-right">
-                                  {!isRevoked && (
-                                    <button
-                                      onClick={async () => {
-                                        const reason = prompt("Enter a reason for revoking this key (optional):") || "Revoked by owner";
-                                        if (!confirm(`Are you sure you want to revoke API key "${key.name}"? Guesty/Breezeway connections using this key will fail immediately.`)) {
-                                          return;
-                                        }
-                                        try {
-                                          const res = await fetch(`/api/api-keys?id=${key.id}&reason=${encodeURIComponent(reason)}`, {
-                                            method: 'DELETE'
-                                          });
-                                          const data = await res.json();
-                                          if (data.success) {
-                                            fetchApiKeys();
-                                          } else {
-                                            alert(data.error || "Failed to revoke key");
+                                  </td>
+                                  <td className="p-4 text-right">
+                                    {!isRevoked && (
+                                      <button
+                                        onClick={async () => {
+                                          const reason = prompt("Enter a reason for revoking this key (optional):") || "Revoked by owner";
+                                          if (!confirm(`Are you sure you want to revoke API key "${key.name}"? Guesty/Breezeway connections using this key will fail immediately.`)) {
+                                            return;
                                           }
-                                        } catch (e) {
-                                          alert("Error revoking key");
-                                        }
-                                      }}
-                                      className="p-1.5 rounded-lg border border-red-900/30 bg-red-950/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
-                                      title="Revoke Key"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                  )}
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+                                          try {
+                                            const res = await fetch(`/api/api-keys?id=${key.id}&reason=${encodeURIComponent(reason)}`, {
+                                              method: 'DELETE'
+                                            });
+                                            const data = await res.json();
+                                            if (data.success) {
+                                              fetchApiKeys();
+                                            } else {
+                                              alert(data.error || "Failed to revoke key");
+                                            }
+                                          } catch (e) {
+                                            alert("Error revoking key");
+                                          }
+                                        }}
+                                        className="p-1.5 rounded-lg border border-red-900/30 bg-red-950/20 text-red-400 hover:bg-red-500/20 transition-all cursor-pointer"
+                                        title="Revoke Key"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* Mobile Cards Stack View */}
+                      <div className="block md:hidden divide-y divide-neutral-900">
+                        {apiKeys.map((key) => {
+                          const isRevoked = !!key.revoked_at;
+                          const isExpired = key.expires_at && new Date(key.expires_at) < new Date();
+                          return (
+                            <div key={key.id} className="p-4 space-y-2.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <h4 className="font-extrabold text-sm text-white">{key.name}</h4>
+                                  <span className="font-mono text-[10px] text-neutral-400 block">{key.api_key_prefix}...</span>
+                                </div>
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                                  key.environment === 'test' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                }`}>
+                                  {key.environment || 'live'}
+                                </span>
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {(key.scopes || []).map((sc: string) => (
+                                  <span key={sc} className="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[9px] text-neutral-400 font-bold">
+                                    {sc}
+                                  </span>
+                                ))}
+                                {key.property_ids && Array.isArray(key.property_ids) ? (
+                                  <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px]">
+                                    {key.property_ids.length} Restricted
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px]">
+                                    All Properties
+                                  </span>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between text-[10px] text-neutral-500 pt-1 border-t border-neutral-900">
+                                <span>Created: {new Date(key.created_at).toLocaleDateString()}</span>
+                                {!isRevoked && (
+                                  <button
+                                    onClick={async () => {
+                                      const reason = prompt("Enter a reason for revoking this key (optional):") || "Revoked by owner";
+                                      if (!confirm(`Are you sure you want to revoke API key "${key.name}"?`)) return;
+                                      try {
+                                        const res = await fetch(`/api/api-keys?id=${key.id}&reason=${encodeURIComponent(reason)}`, {
+                                          method: 'DELETE'
+                                        });
+                                        const data = await res.json();
+                                        if (data.success) fetchApiKeys();
+                                        else alert(data.error || "Failed to revoke key");
+                                      } catch (e) {
+                                        alert("Error revoking key");
+                                      }
+                                    }}
+                                    className="text-red-400 font-bold px-2 py-1 rounded bg-red-950/40 border border-red-900/30"
+                                  >
+                                    Revoke
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
