@@ -14,14 +14,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TurnProofs — One Scan. Proof Forever.",
-  description: "Coordinate cleaners and subcontractors with bilingual checklists, photo proof, location verification, and closed-loop touch-up requests—before the next check-in. Zero app installs required.",
+  metadataBase: new URL('https://turnproofs.com'),
+  title: "TurnProofs — Turnovers Verified. Claims Defended.",
+  description: "Bilingual cleaning checklists, timestamped photo evidence, GPS proof & dispute-ready audit reports for short-term rental hosts & property managers.",
   icons: {
     icon: [
       { url: '/icon.png?v=2', type: 'image/png' },
       { url: '/favicon.ico?v=2' }
     ],
     apple: '/apple-icon.png?v=2',
+  },
+  openGraph: {
+    title: "TurnProofs — Turnovers Verified. Claims Defended.",
+    description: "Bilingual cleaning checklists, timestamped photo evidence, GPS proof & dispute-ready audit reports for short-term rental hosts & property managers.",
+    url: "https://turnproofs.com",
+    siteName: "TurnProofs",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "TurnProofs — Property Turnover Verification Software",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TurnProofs — Turnovers Verified. Claims Defended.",
+    description: "Bilingual cleaning checklists, timestamped photo evidence, GPS proof & dispute-ready audit reports for short-term rental hosts & property managers.",
+    images: ["/og-image.jpg"],
   },
 };
 
