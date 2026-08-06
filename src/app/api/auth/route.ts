@@ -209,7 +209,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Host account not found.' }, { status: 404 });
       }
 
-      const { company_logo_url, custom_footer, hide_branding, company_name } = body;
+      const { company_logo_url, custom_footer, hide_branding, company_name, email: inputEmail } = body;
       const cleanName = company_name && typeof company_name === 'string' && company_name.trim() 
         ? company_name.trim() 
         : host.business_name;
@@ -219,6 +219,9 @@ export async function POST(request: NextRequest) {
       if (company_logo_url !== undefined) updateData.company_logo_url = company_logo_url || null;
       if (custom_footer !== undefined) updateData.custom_footer = custom_footer || null;
       if (hide_branding !== undefined) updateData.hide_branding = !!hide_branding;
+      if (inputEmail && typeof inputEmail === 'string' && inputEmail.trim()) {
+        updateData.email = inputEmail.trim().toLowerCase();
+      }
 
       const { data: updatedHost, error: updateErr } = await supabaseAdmin
         .from('airbnb_hosts')

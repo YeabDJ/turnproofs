@@ -137,6 +137,7 @@ export default function DashboardClient() {
   // White-Label Branding states
   const [companyName, setCompanyName] = useState('');
   const [companyLogoUrl, setCompanyLogoUrl] = useState('');
+  const [agencyEmail, setAgencyEmail] = useState('');
   const [customFooterText, setCustomFooterText] = useState('');
   const [hideBranding, setHideBranding] = useState(false);
   const [savingBranding, setSavingBranding] = useState(false);
@@ -253,6 +254,7 @@ export default function DashboardClient() {
         if (authData.host) {
           setCompanyName(authData.host.business_name || '');
           setCompanyLogoUrl(authData.host.company_logo_url || '');
+          setAgencyEmail(authData.host.email || '');
           setCustomFooterText(authData.host.custom_footer || '');
           setHideBranding(!!authData.host.hide_branding);
         }
@@ -1932,23 +1934,23 @@ export default function DashboardClient() {
                 ) : (
                   <>
                 {/* White-Label Branding Card */}
-                <div className="p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-6">
+                <div className="p-4 sm:p-6 rounded-3xl bg-neutral-900/40 border border-neutral-800 space-y-5 sm:space-y-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-850 pb-4">
                     <div>
-                      <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                      <h3 className="text-sm sm:text-base font-extrabold text-white flex flex-wrap items-center gap-2">
                         <span>🎨 White-Label &amp; Custom Agency Branding</span>
                         <span className="px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[9px] font-black uppercase">
                           Growing Portfolio + Commercial
                         </span>
                       </h3>
-                      <p className="text-xs text-neutral-400 mt-0.5">
+                      <p className="text-xs text-neutral-400 mt-0.5 leading-relaxed">
                         Customize report certificates, digital turnover views, and PDF exports with your agency logo and custom footer.
                       </p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
+                  <div className="flex flex-col md:grid md:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-4 w-full">
                       <div>
                         <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
                           Company / Agency Name
@@ -1958,7 +1960,20 @@ export default function DashboardClient() {
                           placeholder="e.g. Apex Cleaning & Management Co."
                           value={companyName}
                           onChange={(e) => setCompanyName(e.target.value)}
-                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-sm text-white"
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-xs sm:text-sm text-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
+                          Agency / Host Contact Email <span className="text-purple-400">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          placeholder="support@turnproofs.com"
+                          value={agencyEmail}
+                          onChange={(e) => setAgencyEmail(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-xs sm:text-sm text-white"
                         />
                       </div>
 
@@ -1971,12 +1986,12 @@ export default function DashboardClient() {
                           placeholder="https://yourcompany.com/logo.png"
                           value={companyLogoUrl}
                           onChange={(e) => setCompanyLogoUrl(e.target.value)}
-                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-sm text-white"
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-xs sm:text-sm text-white"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 w-full">
                       <div>
                         <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
                           Custom PDF &amp; Email Footer Text
@@ -1991,25 +2006,30 @@ export default function DashboardClient() {
                       </div>
 
                       <div className="pt-1">
-                        <label className="flex items-center gap-3 p-3 rounded-2xl bg-neutral-950 border border-neutral-850 cursor-pointer">
+                        <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-neutral-950 border border-neutral-850 cursor-pointer">
                           <input
                             type="checkbox"
                             checked={hideBranding}
                             onChange={(e) => setHideBranding(e.target.checked)}
-                            className="rounded border-neutral-800 text-purple-500 focus:ring-purple-500 bg-neutral-900 h-4 w-4"
+                            className="mt-0.5 rounded border-neutral-800 text-purple-500 focus:ring-purple-500 bg-neutral-900 h-4 w-4 shrink-0"
                           />
                           <div>
                             <span className="text-xs font-extrabold text-white block">Hide "Powered by TurnProofs" Badge</span>
-                            <span className="text-[10px] text-neutral-500 block">Remove platform branding from all customer-facing reports &amp; PDFs</span>
+                            <span className="text-[10px] text-neutral-500 block leading-tight mt-0.5">Remove platform branding from all customer-facing reports &amp; PDFs</span>
                           </div>
                         </label>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex justify-end pt-2 border-t border-neutral-850">
+                  <div className="flex justify-end pt-3 border-t border-neutral-850">
                     <button
                       onClick={async () => {
+                        const targetEmail = agencyEmail.trim() || host?.email;
+                        if (!targetEmail) {
+                          alert("Please enter an agency email address.");
+                          return;
+                        }
                         setSavingBranding(true);
                         try {
                           const res = await fetch('/api/auth', {
@@ -2017,7 +2037,7 @@ export default function DashboardClient() {
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                               action: 'update_branding',
-                              email: host?.email,
+                              email: targetEmail,
                               company_name: companyName,
                               company_logo_url: companyLogoUrl,
                               custom_footer: customFooterText,
@@ -2038,7 +2058,7 @@ export default function DashboardClient() {
                         }
                       }}
                       disabled={savingBranding}
-                      className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10 flex items-center gap-1.5"
+                      className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white text-xs font-black transition-all cursor-pointer shadow-md shadow-purple-500/10 flex items-center justify-center gap-1.5"
                     >
                       {savingBranding ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                       <span>Save White-Label Settings</span>
