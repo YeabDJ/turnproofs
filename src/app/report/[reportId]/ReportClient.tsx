@@ -247,10 +247,6 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   };
 
   const handleDownloadPDF = async () => {
-    alert(lang === 'en' 
-      ? "To download as PDF, select 'Save as PDF' as the Destination in your browser's print options window."
-      : "Para descargar como PDF, seleccione 'Guardar como PDF' como Destino en el cuadro de impresión de su navegador."
-    );
     await handlePrint();
   };
 
