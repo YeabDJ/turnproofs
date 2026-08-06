@@ -527,6 +527,31 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Action: Resend Report PDF Email
+    if (action === 'resend_email') {
+      const { reportId, target_email } = body;
+      if (!reportId) {
+        return NextResponse.json({ success: false, error: 'Report ID is required.' }, { status: 400 });
+      }
+
+      const { data: reportObj } = await supabaseAdmin
+        .from('airbnb_reports')
+        .select('property_id')
+        .eq('id', reportId)
+        .maybeSingle();
+
+      if (!reportObj) {
+        return NextResponse.json({ success: false, error: 'Report not found.' }, { status: 404 });
+      }
+
+      await sendCheckoutReportEmail(reportObj.property_id, reportId, target_email);
+
+      return NextResponse.json({
+        success: true,
+        message: `Certified PDF report email dispatched successfully!`
+      });
+    }
+
     // Follow-up Quality Control Addendum (Host request / Cleaner retouch update)
     if (action === 'add_retouch_update') {
       const { reportId, author, text, photoUrl } = body;

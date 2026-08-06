@@ -1116,6 +1116,37 @@ export default function DashboardClient() {
                                     <h4 className="font-extrabold text-sm text-white">{report.airbnb_properties?.name || 'Vacation Unit'}</h4>
                                     <p className="text-xs text-neutral-400">{report.airbnb_properties?.address}</p>
                                   </div>
+                                   <div className="flex items-center gap-1.5 shrink-0">
+                                     <button
+                                       onClick={async () => {
+                                         const targetEmail = prompt("Enter recipient email address to receive certified PDF report (or leave blank to send to host email):", host?.email || '');
+                                         if (targetEmail === null) return;
+                                         try {
+                                           const res = await fetch('/api/reports', {
+                                             method: 'POST',
+                                             headers: { 'Content-Type': 'application/json' },
+                                             body: JSON.stringify({
+                                               action: 'resend_email',
+                                               reportId: report.id,
+                                               target_email: targetEmail.trim() || undefined
+                                             })
+                                           });
+                                           const data = await res.json();
+                                           if (data.success) {
+                                             alert(data.message || "Certified PDF report email dispatched successfully!");
+                                           } else {
+                                             alert(data.error || "Failed to resend email.");
+                                           }
+                                         } catch (e) {
+                                           alert("Error resending email.");
+                                         }
+                                       }}
+                                       className="px-2.5 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-200 text-xs font-bold"
+                                       title="Resend PDF Report to Email"
+                                     >
+                                       📧 Email
+                                     </button>
+
                                   <a
                                     href={`/report/${report.id}`}
                                     target="_blank"
@@ -1125,6 +1156,7 @@ export default function DashboardClient() {
                                     <span>View</span>
                                     <ExternalLink className="h-3 w-3" />
                                   </a>
+                                  </div>
                                 </div>
 
                                 <div className="flex flex-wrap items-center gap-2 pt-1">

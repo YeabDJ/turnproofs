@@ -395,11 +395,11 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   }
 
   // Parse pipe-delimited alert photos attached to instant notes
+  let alertPhotos: string[] = [];
   if (notesText && notesText.includes('|||')) {
     const parts = notesText.split('|||');
     notesText = parts[0].trim();
-    const alertPhotoUrls = parts[1].split(',').map(s => s.trim()).filter(Boolean);
-    additionalPhotos = Array.from(new Set([...additionalPhotos, ...alertPhotoUrls]));
+    alertPhotos = parts[1].split(',').map(s => s.trim()).filter(Boolean);
   }
 
   // Detect Red Flag Alerts & Lost & Found Alerts
@@ -626,9 +626,9 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 <p className="text-sm text-amber-100 print:text-gray-800 leading-relaxed font-semibold">
                   "{cleanAlertDescription || 'Guest item found during pre-cleaning inspection.'}"
                 </p>
-                {additionalPhotos.length > 0 && (
+                {alertPhotos.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {additionalPhotos.map((pUrl, pIdx) => (
+                    {alertPhotos.map((pUrl, pIdx) => (
                       <button
                         key={pIdx}
                         type="button"
@@ -663,9 +663,9 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                 <p className="text-sm text-red-300 print:text-gray-700 leading-relaxed font-semibold">
                   "{cleanAlertDescription || maintenanceDesc || 'An issue was reported during initial property audit.'}"
                 </p>
-                {additionalPhotos.length > 0 && (
+                {alertPhotos.length > 0 && (
                   <div className="flex flex-wrap gap-2 pt-2">
-                    {additionalPhotos.map((pUrl, pIdx) => (
+                    {alertPhotos.map((pUrl, pIdx) => (
                       <button
                         key={pIdx}
                         type="button"
