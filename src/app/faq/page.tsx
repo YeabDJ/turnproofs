@@ -129,13 +129,34 @@ export default function DedicatedFaqPage() {
     },
     {
       id: 'faq-14',
+      category: 'integrations',
+      categoryName: lang === 'en' ? 'API, CRM & White-Label' : 'API, CRM y Marca Blanca',
+      q: lang === 'en' ? "Does TurnProofs provide a REST API for developers and custom software integrations?" : "¿Ofrece TurnProofs una API REST para desarrolladores e integraciones de software personalizado?",
+      a: lang === 'en' ? "Yes! On our Growing Portfolio ($35.99/mo) and Commercial ($89.99/mo) plans, you get full access to the TurnProofs REST API. Generate API keys in 1 click to read properties, checklists, and turnover reports programmatically, or trigger webhooks for completed audits." : "¡Sí! En nuestros planes Growing Portfolio ($35.99/mes) y Commercial ($89.99/mes), obtienes acceso completo a la API REST de TurnProofs para leer propiedades, listas de verificación e informes de rotación mediante programación."
+    },
+    {
+      id: 'faq-15',
+      category: 'integrations',
+      categoryName: lang === 'en' ? 'API, CRM & White-Label' : 'API, CRM y Marca Blanca',
+      q: lang === 'en' ? "Can I connect TurnProofs to my CRM (HubSpot, Salesforce, Pipedrive) or PMS via Zapier?" : "¿Puedo conectar TurnProofs a mi CRM (HubSpot, Salesforce) o PMS a través de Zapier?",
+      a: lang === 'en' ? "Yes! You can connect TurnProofs to 5,000+ apps via Zapier or Make. Automatically send completed turnover PDFs to your CRM, trigger instant Slack/Gmail alerts when damage is reported, or sync turnover completion status back into your Property Management System (Guesty, Breezeway, Hospitable)." : "¡Sí! Puedes conectar TurnProofs a más de 5,000 aplicaciones a través de Zapier o Make. Envía automáticamente archivos PDF de rotación completados a tu CRM o activa alertas instantáneas en Slack o Gmail."
+    },
+    {
+      id: 'faq-16',
+      category: 'integrations',
+      categoryName: lang === 'en' ? 'API, CRM & White-Label' : 'API, CRM y Marca Blanca',
+      q: lang === 'en' ? "How does White-Label Agency Branding work for property management companies?" : "¿Cómo funciona la Marca Blanca para empresas de gestión de propiedades?",
+      a: lang === 'en' ? "With White-Label Branding (included in Growing Portfolio & Commercial plans), you can upload your custom agency logo, display your company name, add custom phone/support footers to all PDF certificates, and completely hide the 'Powered by TurnProofs' platform badges from your clients and homeowners." : "Con la marca blanca, puedes subir el logotipo personalizado de tu agencia, mostrar el nombre de tu empresa, agregar pie de página personalizado a todos los certificados PDF y ocultar por completo las insignias de TurnProofs."
+    },
+    {
+      id: 'faq-17',
       category: 'pause',
       categoryName: lang === 'en' ? 'Subscription Pause & Management' : 'Pausa y Gestión de Suscripción',
       q: lang === 'en' ? "How does Billing Email Dispatch work?" : "¿Cómo funciona el envío de correos de facturación?",
       a: lang === 'en' ? "Invoices and PDF receipts are automatically dispatched to your primary billing email. You can update your primary billing address anytime in your Host Dashboard Billing tab." : "Las facturas y recibos PDF se envían automáticamente a su correo electrónico de facturación principal."
     },
     {
-      id: 'faq-15',
+      id: 'faq-18',
       category: 'disputes',
       categoryName: lang === 'en' ? 'Dispute Protection & Claims' : 'Protección de Reclamos',
       q: lang === 'en' ? "Can I click photo links directly inside the exported PDF?" : "¿Puedo hacer clic en los enlaces de fotos dentro del PDF exportado?",
