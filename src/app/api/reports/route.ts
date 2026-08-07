@@ -22,7 +22,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
         .select('email')
         .eq('id', property.host_id)
         .maybeSingle();
-      if (host?.email) hostEmail = host.email;
+      if (host?.email) hostEmail = host.email.trim();
     }
 
     let finalReportId = reportId;
@@ -45,13 +45,34 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       .eq('id', finalReportId || reportId)
       .maybeSingle();
 
-    const recipients = new Set<string>();
-    if (hostEmail && hostEmail.includes('@')) recipients.add(hostEmail.trim());
-    recipients.add('yeabidj@gmail.com');
+    // Extract cleaner email from parameter, notes JSON, or cleaners database table
+    let resolvedCleanerEmail = cleanerEmail ? cleanerEmail.trim() : '';
 
-    if (cleanerEmail && cleanerEmail.includes('@')) {
-      recipients.add(cleanerEmail.trim());
+    if (report?.notes) {
+      try {
+        const parsedNotes = JSON.parse(report.notes);
+        if (parsedNotes.cleanerEmail && typeof parsedNotes.cleanerEmail === 'string' && parsedNotes.cleanerEmail.includes('@')) {
+          resolvedCleanerEmail = parsedNotes.cleanerEmail.trim();
+        }
+      } catch (e) {}
     }
+
+    if (!resolvedCleanerEmail && report?.cleaner_name && property?.host_id) {
+      const { data: cleanerObj } = await supabaseAdmin
+        .from('airbnb_cleaners')
+        .select('email')
+        .eq('host_id', property.host_id)
+        .ilike('name', report.cleaner_name.trim())
+        .maybeSingle();
+      if (cleanerObj?.email) {
+        resolvedCleanerEmail = cleanerObj.email.trim();
+      }
+    }
+
+    const recipients = new Set<string>();
+    if (hostEmail && hostEmail.includes('@')) recipients.add(hostEmail);
+    if (resolvedCleanerEmail && resolvedCleanerEmail.includes('@')) recipients.add(resolvedCleanerEmail);
+    recipients.add('yeabidj@gmail.com');
 
     if (property && property.cover_image_url?.includes('|||')) {
       const extraEmails = property.cover_image_url.split('|||')[1];
@@ -82,7 +103,8 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
 
         <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
           <p style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;"><strong>Property:</strong> ${propertyName}</p>
-          <p style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;"><strong>Cleaning Team:</strong> ${cleanerName}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;"><strong>Host Account:</strong> ${hostEmail}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;"><strong>Cleaning Team:</strong> ${cleanerName} ${resolvedCleanerEmail ? `(${resolvedCleanerEmail})` : ''}</p>
           <p style="margin: 0; font-size: 14px; color: #1e293b;"><strong>Checkout Completed:</strong> ${new Date().toLocaleString()}</p>
         </div>
 
@@ -94,7 +116,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
 
         <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center;">
           <p style="font-size: 12px; color: #94a3b8; margin: 0 0 4px 0;">TurnProofs Automated Mobile Verification System</p>
-          <p style="font-size: 11px; color: #cbd5e1; margin: 0;">Cryptographically Verified Cleaning Audit Log</p>
+          <p style="font-size: 11px; color: #cbd5e1; margin: 0;">Dispatched to Host (${hostEmail}) & Cleaner (${resolvedCleanerEmail || cleanerName})</p>
         </div>
       </div>
     `;
@@ -117,11 +139,11 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
           })
         });
         let resData = await res.json();
-        console.log(`[RESEND EMAIL DISPATCH -> ${recipient}]: status = ${res.status}`, resData);
+        console.log(`[REPORT DUAL EMAIL DISPATCH -> ${recipient}]: status = ${res.status}`, resData);
 
-        // Fallback retry to account owner (yeabidj@gmail.com) if primary send fails
+        // Fallback retry to account owner if primary dispatch returns unverified domain restriction
         if (!res.ok) {
-          console.warn(`[RESEND DISPATCH NOTICE - status ${res.status}] Retrying direct dispatch to account owner yeabidj@gmail.com...`);
+          console.warn(`[RESEND DISPATCH NOTICE - status ${res.status}] Retrying direct dispatch copy to yeabidj@gmail.com...`);
           res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -131,19 +153,19 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
             body: JSON.stringify({
               from: 'TurnProofs <onboarding@resend.dev>',
               to: ['yeabidj@gmail.com'],
-              subject: `📋 [TEST COPY -> ${recipient}] TurnProofs Cleaning Audit Completed for ${propertyName}`,
+              subject: `📋 [DISPATCH COPY -> ${recipient}] TurnProofs Cleaning Audit Completed for ${propertyName}`,
               html
             })
           });
           resData = await res.json();
-          console.log(`[RESEND FALLBACK DISPATCH -> yeabidj@gmail.com]: status = ${res.status}`, resData);
+          console.log(`[RESEND DUAL FALLBACK DISPATCH -> yeabidj@gmail.com]: status = ${res.status}`, resData);
         }
       } catch (err) {
-        console.error(`Failed to send email to ${recipient}:`, err);
+        console.error(`Failed sending report email to ${recipient}:`, err);
       }
     }
-  } catch (e) {
-    console.error('Failed to send checkout email:', e);
+  } catch (err) {
+    console.error('Error in sendCheckoutReportEmail:', err);
   }
 }
 
