@@ -253,29 +253,60 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     if (downloadingPdf) return;
     setDownloadingPdf(true);
 
+    const originalLang = lang;
     try {
       const element = document.getElementById('report-certificate-card');
       if (!element) {
         throw new Error("Certificate element not found.");
       }
 
-      // Temporarily switch language to English for clean PDF export
-      const originalLang = lang;
       setLang('en');
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 250));
 
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
+      // Convert all images inside the certificate card to base64 Data URIs to guarantee zero CORS canvas tainting
+      const images = Array.from(element.querySelectorAll('img'));
+      await Promise.all(images.map(async (img) => {
+        if (!img.src || img.src.startsWith('data:')) return;
+        try {
+          const res = await fetch(img.src, { mode: 'cors' });
+          if (res.ok) {
+            const blob = await res.blob();
+            const reader = new FileReader();
+            await new Promise((resolve) => {
+              reader.onloadend = () => {
+                if (reader.result) {
+                  img.setAttribute('data-original-src', img.src);
+                  img.src = reader.result as string;
+                }
+                resolve(null);
+              };
+              reader.readAsDataURL(blob);
+            });
+          }
+        } catch (e) {
+          img.crossOrigin = 'anonymous';
+        }
+      }));
+
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         backgroundColor: '#0a0a0a',
-        logging: false
+        logging: false,
+        ignoreElements: (el) => el.classList.contains('no-print')
       });
 
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      // Restore original image sources
+      images.forEach((img) => {
+        const orig = img.getAttribute('data-original-src');
+        if (orig) img.src = orig;
+      });
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -300,12 +331,27 @@ export default function ReportClient({ reportId }: { reportId: string }) {
 
       const filename = `turnproofs-certificate-${report?.id ? report.id.substring(0, 8) : 'report'}.pdf`;
       pdf.save(filename);
-
-      setLang(originalLang);
     } catch (err: any) {
       console.error("PDF Export Error:", err);
-      await handlePrint();
+      try {
+        const element = document.getElementById('report-certificate-card');
+        if (element) {
+          const htmlContent = `<!DOCTYPE html><html><head><title>TurnProofs Certificate ${report?.id || ''}</title><style>body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #ffffff; padding: 20px; } img { max-width: 100%; height: auto; }</style></head><body>${element.innerHTML}</body></html>`;
+          const blob = new Blob([htmlContent], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `turnproofs-certificate-${report?.id ? report.id.substring(0, 8) : 'report'}.html`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+      } catch (fallbackErr) {
+        alert("Failed to export PDF file. Please try again.");
+      }
     } finally {
+      setLang(originalLang);
       setDownloadingPdf(false);
     }
   };
