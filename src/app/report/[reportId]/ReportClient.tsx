@@ -336,7 +336,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       try {
         const element = document.getElementById('report-certificate-card');
         if (element) {
-          const htmlContent = `<!DOCTYPE html><html><head><title>TurnProofs Certificate ${report?.id || ''}</title><style>body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #ffffff; padding: 20px; } img { max-width: 100%; height: auto; }</style></head><body>${element.innerHTML}</body></html>`;
+          const htmlContent = `<!DOCTYPE html><html><head><title>TurnProofs Certificate ${report?.id || ''}</title><base href="https://turnproofs.com/" target="_blank"><style>body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #ffffff; padding: 20px; } img { max-width: 100%; height: auto; }</style></head><body>${element.innerHTML}</body></html>`;
           const blob = new Blob([htmlContent], { type: 'text/html' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -679,12 +679,12 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   </span>
                 </div>
               ) : (
-                <Link href="/" className="flex items-center gap-2 mb-3 cursor-pointer hover:opacity-90 transition-opacity">
+                <a href="https://turnproofs.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 mb-3 cursor-pointer hover:opacity-90 transition-opacity">
                   <div className="h-8 w-8 rounded-lg bg-rose-500 flex items-center justify-center">
                     <ShieldCheck className="h-5 w-5 text-white" />
                   </div>
                   <span className="font-extrabold text-lg text-rose-500 tracking-tight">TURNPROOFS VERIFICATION SYSTEM</span>
-                </Link>
+                </a>
               )}
               <h1 className="print-text-dark text-2xl sm:text-3xl font-extrabold tracking-tight">{lang === 'en' ? 'Cleaning Verification Certificate' : 'Certificado de Verificación de Limpieza'}</h1>
               <p className="print-text-muted text-xs sm:text-sm text-neutral-400 mt-1">{lang === 'en' ? 'Official checklist compliance record for short-term rental properties.' : 'Registro oficial de cumplimiento de lista de verificación.'}</p>
