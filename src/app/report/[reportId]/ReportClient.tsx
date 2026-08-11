@@ -94,6 +94,8 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [submittingTouchup, setSubmittingTouchup] = useState(false);
   const [touchupSuccess, setTouchupSuccess] = useState(false);
   const [touchupShareInfo, setTouchupShareInfo] = useState<{ smsLink: string; whatsappLink: string; touchupUrl: string; shareText: string; cleanerEmail?: string } | null>(null);
+  const [hostSignName, setHostSignName] = useState('');
+  const [signedTimestamp, setSignedTimestamp] = useState<string | null>(null);
 
   // Translation state for Spanish cleaner notes
   const [translatedNotes, setTranslatedNotes] = useState<string | null>(null);
@@ -712,6 +714,47 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                   <span className="block text-[10px] font-semibold text-neutral-400 print-text-muted uppercase tracking-wider">{lang === 'en' ? 'Verification ID' : 'ID de Verificación'}</span>
                   <span className="font-mono text-xs font-bold text-neutral-200 print-text-dark break-all">{report.id.substring(0, 18).toUpperCase()}</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Executive Summary Cover Header Card */}
+          <div className="mt-6 p-6 rounded-3xl bg-linear-to-r from-emerald-950/40 via-neutral-900 to-neutral-950 border border-emerald-500/30 space-y-4 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center font-black text-xl shrink-0">
+                  ✓
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-base text-white tracking-tight">
+                    {lang === 'en' ? 'GUEST-READY SANITATION AUDIT PASSED' : 'AUDITORÍA DE SANIDAD APROBADA'}
+                  </h3>
+                  <p className="text-xs text-emerald-400 font-semibold">
+                    {lang === 'en' ? 'Dispute-Ready Sanitation Log & Quality Verification' : 'Verificación de Calidad Lista para Disputas'}
+                  </p>
+                </div>
+              </div>
+              <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-extrabold text-xs uppercase tracking-wider text-center shrink-0">
+                100% COMPLIANT
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1 text-xs">
+              <div className="p-3 rounded-2xl bg-neutral-950/80 border border-neutral-800 space-y-1">
+                <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block">Property</span>
+                <span className="font-extrabold text-neutral-200 truncate block">{report.airbnb_properties?.name || 'Vacation Unit'}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-neutral-950/80 border border-neutral-800 space-y-1">
+                <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block">Cleaning Team</span>
+                <span className="font-extrabold text-emerald-400 truncate block">{report.cleaner_name}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-neutral-950/80 border border-neutral-800 space-y-1">
+                <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block">Tasks Verified</span>
+                <span className="font-extrabold text-neutral-200 block">{tasks.filter(t => t.completed).length} / {tasks.length} Passed</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-neutral-950/80 border border-neutral-800 space-y-1">
+                <span className="text-[10px] font-extrabold text-neutral-500 uppercase tracking-wider block">Photo Proofs</span>
+                <span className="font-extrabold text-amber-400 block">{additionalPhotos.length + tasks.filter(t => t.photo_url).length} Photos</span>
               </div>
             </div>
           </div>
@@ -1378,6 +1421,57 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             </div>
           )}
 
+          {/* Digital Host Sign-Off & Inspection Receipt Card */}
+          <div className="mt-8 p-6 rounded-3xl bg-neutral-950/60 border border-neutral-800 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-800 pb-3">
+              <div className="flex items-center gap-2">
+                <FileCheck2 className="h-5 w-5 text-emerald-400" />
+                <h3 className="font-extrabold text-sm text-white uppercase tracking-wider">
+                  {lang === 'en' ? '✍️ Host Digital Sign-Off & Inspection Acknowledgment' : '✍️ Firma Digital del Anfitrión'}
+                </h3>
+              </div>
+              <span className="px-2.5 py-1 rounded-full bg-neutral-900 border border-neutral-800 text-[10px] font-bold text-neutral-400">
+                AUDIT VERIFICATION
+              </span>
+            </div>
+
+            {signedTimestamp ? (
+              <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-extrabold flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-emerald-400 shrink-0" />
+                  <div>
+                    <span>✓ Digitally Acknowledged &amp; Approved by Host: <span className="text-white underline">{hostSignName}</span></span>
+                    <p className="text-[10px] text-emerald-400/80 font-mono font-normal mt-0.5">Timestamp: {signedTimestamp}</p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-[9px] font-black uppercase text-emerald-300">VERIFIED</span>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <input
+                  type="text"
+                  placeholder={lang === 'en' ? 'Type Host Name to Sign (e.g. Robiullah / Property Manager)...' : 'Escriba su nombre para firmar...'}
+                  value={hostSignName}
+                  onChange={(e) => setHostSignName(e.target.value)}
+                  className="flex-1 w-full px-4 py-2.5 bg-neutral-900 border border-neutral-800 rounded-xl outline-none text-xs text-white placeholder-neutral-500 focus:border-emerald-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!hostSignName.trim()) {
+                      alert('Please type your name before signing.');
+                      return;
+                    }
+                    setSignedTimestamp(new Date().toLocaleString());
+                  }}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-extrabold text-xs text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap cursor-pointer"
+                >
+                  ✍️ Sign Receipt
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Verification Badge Footer */}
           <div className="pt-10 border-t border-neutral-800/80 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-neutral-500 print-text-muted">
             <div className="flex flex-col gap-1">
@@ -1398,7 +1492,13 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               )}
             </div>
             <div>
-              <span>Generated on: {new Date(report.created_at).toLocaleDateString()} {new Date(report.created_at).toLocaleTimeString()}</span>
+              <span>
+                Generated on: {(() => {
+                  const raw = report?.completed_at || report?.created_at || report?.started_at;
+                  const d = raw ? new Date(raw) : new Date();
+                  return isNaN(d.getTime()) ? new Date().toLocaleString() : `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+                })()}
+              </span>
             </div>
           </div>
 

@@ -99,7 +99,64 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, address, cover_image_url, latitude, longitude } = await request.json();
+    const body = await request.json();
+    const { action, name, address, cover_image_url, latitude, longitude, sourcePropertyId, newName, newAddress } = body;
+
+    // Handle 1-click duplication of property + checklist
+    if (action === 'duplicate') {
+      if (!sourcePropertyId) {
+        return NextResponse.json({ success: false, error: 'sourcePropertyId is required.' }, { status: 400 });
+      }
+
+      // Fetch source property
+      const { data: sourceProp } = await supabaseAdmin
+        .from('airbnb_properties')
+        .select('*')
+        .eq('id', sourcePropertyId)
+        .eq('host_id', host.id)
+        .maybeSingle();
+
+      if (!sourceProp) {
+        return NextResponse.json({ success: false, error: 'Source property not found or unauthorized.' }, { status: 404 });
+      }
+
+      // Insert duplicated property
+      const { data: dupProperty, error: dupErr } = await supabaseAdmin
+        .from('airbnb_properties')
+        .insert({
+          host_id: host.id,
+          name: newName ? newName.trim() : `${sourceProp.name} (Copy)`,
+          address: newAddress ? newAddress.trim() : sourceProp.address,
+          cover_image_url: sourceProp.cover_image_url,
+          latitude: sourceProp.latitude,
+          longitude: sourceProp.longitude
+        })
+        .select('*')
+        .single();
+
+      if (dupErr) {
+        return NextResponse.json({ success: false, error: dupErr.message }, { status: 500 });
+      }
+
+      // Fetch and duplicate source property checklist tasks
+      const { data: sourceChecklists } = await supabaseAdmin
+        .from('airbnb_checklists')
+        .select('*')
+        .eq('property_id', sourcePropertyId)
+        .order('sort_order', { ascending: true });
+
+      if (sourceChecklists && sourceChecklists.length > 0) {
+        const dupTasks = sourceChecklists.map((t: any) => ({
+          property_id: dupProperty.id,
+          task_name: t.task_name,
+          requires_photo: !!t.requires_photo,
+          sort_order: t.sort_order
+        }));
+        await supabaseAdmin.from('airbnb_checklists').insert(dupTasks);
+      }
+
+      return NextResponse.json({ success: true, property: dupProperty });
+    }
 
     if (!name || !address) {
       return NextResponse.json({ success: false, error: 'Property name and address are required.' }, { status: 400 });

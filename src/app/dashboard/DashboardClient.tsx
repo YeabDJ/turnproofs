@@ -590,6 +590,32 @@ export default function DashboardClient() {
     }
   };
 
+  // Duplicate Property & Checklist in 1-Click
+  const handleDuplicateProperty = async (prop: Property) => {
+    if (!confirm(`Duplicate "${prop.name}" and copy its entire checklist in 1 action?`)) return;
+    try {
+      const res = await fetch('/api/properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'duplicate',
+          sourcePropertyId: prop.id,
+          newName: `${prop.name} (Copy)`,
+          newAddress: prop.address
+        })
+      });
+      const data = await res.json();
+      if (res.ok && data.success && data.property) {
+        setProperties(prev => [data.property, ...prev]);
+        openEditPropertyModal(data.property);
+      } else {
+        alert('Failed to duplicate property: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Network error duplicating property.');
+    }
+  };
+
   // Logout
   const handleLogout = async () => {
     try {
@@ -884,6 +910,13 @@ export default function DashboardClient() {
                               >
                                 <ListTodo className="h-4 w-4 text-neutral-400" />
                                 <span>Edit Checklist</span>
+                              </button>
+                              <button
+                                onClick={() => handleDuplicateProperty(prop)}
+                                className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-purple-500/30 hover:bg-purple-500/10 hover:text-purple-400 transition-all cursor-pointer"
+                                title="Duplicate Property & Checklist in 1-Click"
+                              >
+                                <Copy className="h-4.5 w-4.5" />
                               </button>
                               <button
                                 onClick={() => openEditPropertyModal(prop)}
