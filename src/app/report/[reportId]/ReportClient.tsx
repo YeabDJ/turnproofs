@@ -109,10 +109,14 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     }
     setIsTranslatingNotes(true);
     try {
-      const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=es|en`);
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, from: 'es', to: 'en' })
+      });
       const data = await res.json();
-      if (data && data.responseData && data.responseData.translatedText) {
-        setTranslatedNotes(data.responseData.translatedText);
+      if (data.success && data.translatedText) {
+        setTranslatedNotes(data.translatedText);
         setShowEnglishNotes(true);
       } else {
         setTranslatedNotes(text);
@@ -1067,6 +1071,45 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                       if (match) {
                         roomName = match[1];
                         cleanTaskName = match[2];
+                      }
+
+                      if (lang === 'es') {
+                        const roomMap: Record<string, string> = {
+                          'Entry Security & Access': 'Seguridad y Acceso Principal',
+                          'Utility & Supply Closet': 'Armario de Suministros y Servicios',
+                          'Foyer & Entrance': 'Entrada y Recibidor',
+                          'Master Bedroom': 'Dormitorio Principal',
+                          'Master En-Suite': 'Baño Principal En-Suite',
+                          'Guest Suite #2': 'Suite de Invitados #2',
+                          'Guest Bath #2': 'Baño de Invitados #2',
+                          'Guest Suite #3': 'Suite de Invitados #3',
+                          'Guest Suite #4': 'Suite de Invitados #4',
+                          'Guest Bath #3': 'Baño de Invitados #3',
+                          'Chef\'s Kitchen': 'Cocina de Chef',
+                          'Coffee & Pantry': 'Barra de Café y Despensa',
+                          'Dining Room': 'Comedor',
+                          'Grand Living Room': 'Gran Sala de Estar',
+                          'Second Floor Lounge': 'Sala del Segundo Piso',
+                          'Patio & Resort Pool': 'Patio y Piscina',
+                          'Outdoor Dining & BBQ': 'Comedor Exterior y Barbacoa',
+                          'Spa & Hot Tub': 'Jacuzzi y Spa',
+                          'EV Charging Station': 'Cargador de Vehículo Eléctrico (EV)',
+                          'Laundry Center': 'Centro de Lavandería',
+                          'Game Room & Arcade': 'Sala de Juegos',
+                          'Garage & Waste': 'Garaje y Gestión de Residuos',
+                          'Stairways & Corridors': 'Escaleras y Pasillos',
+                          'Climate Control & HVAC': 'Control de Clima (HVAC)',
+                          'Smoke & CO Detectors': 'Detectores de Humo y CO',
+                          'Welcome Setup': 'Preparación de Bienvenida',
+                          'Pre-Clean Audit': 'Auditoría Previa a la Limpieza',
+                          'Lost & Found Audit': 'Auditoría de Objetos Olvidados',
+                          'Sanitation Protocol': 'Protocolo de Sanidad',
+                          'Security Shutters': 'Persianas de Seguridad',
+                          'Final Departure Protocol': 'Protocolo Final de Salida'
+                        };
+                        if (roomMap[roomName]) {
+                          roomName = roomMap[roomName];
+                        }
                       }
 
                       return (
