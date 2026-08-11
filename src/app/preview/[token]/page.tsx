@@ -23,11 +23,16 @@ export default async function PublicChecklistPreviewPage({ params }: Props) {
       cover_image_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'
     };
     tasks = [
-      { id: '1', task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection', requires_photo: true, sort_order: 1 },
-      { id: '2', task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners', requires_photo: true, sort_order: 2 },
-      { id: '3', task_name: '[Master Bedroom] 🧹 Vacuum rug & wipe down nightstands', requires_photo: false, sort_order: 3 },
-      { id: '4', task_name: '[Main Bathroom] 🚿 Scrub shower tile, sanitize toilet & restock paper towels', requires_photo: true, sort_order: 4 },
-      { id: '5', task_name: '[Kitchen & Dining] 🍽️ Empty dishwasher, wipe countertops & sanitize sink', requires_photo: true, sort_order: 5 }
+      { id: '1', task_name: '[Security & Access] 🔑 Main Door Keypad Code verified set to 4829# & deadbolt response tested', requires_photo: true, sort_order: 1 },
+      { id: '2', task_name: '[Utility & Supply Closet] 🔐 Utility Closet Code (1042) opened, extra linens restocked & locked', requires_photo: true, sort_order: 2 },
+      { id: '3', task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection', requires_photo: true, sort_order: 3 },
+      { id: '4', task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners', requires_photo: true, sort_order: 4 },
+      { id: '5', task_name: '[Master Bedroom] 🧹 Vacuum rug & wipe down nightstands', requires_photo: false, sort_order: 5 },
+      { id: '6', task_name: '[Main Bathroom] 🚿 Scrub shower tile, sanitize toilet & restock paper towels', requires_photo: true, sort_order: 6 },
+      { id: '7', task_name: '[Chef\'s Kitchen] 🍽️ Empty dishwasher, wipe countertops & sanitize sink', requires_photo: true, sort_order: 7 },
+      { id: '8', task_name: '[Patio & Resort Pool] 🏊 Sweep deck & verify pool loungers arranged', requires_photo: true, sort_order: 8 },
+      { id: '9', task_name: '[Climate Control] 💡 Air vents checked & Nest thermostat set to eco 72°F', requires_photo: true, sort_order: 9 },
+      { id: '10', task_name: '[Final Checkout] 🔑 Keypad deadbolt locked securely (4829#)', requires_photo: true, sort_order: 10 }
     ];
   } else {
     try {
@@ -114,6 +119,24 @@ export default async function PublicChecklistPreviewPage({ params }: Props) {
             <p className="text-[11px] text-amber-300/90 mt-0.5">
               This read-only link allows cleaners and teams to study room tasks, photo rules, and supplies before arriving. Zero login required.
             </p>
+          </div>
+        </div>
+
+        {/* Door & Utility Closet Access Credentials */}
+        <div className="p-5 rounded-3xl bg-neutral-900/60 border border-neutral-800 space-y-3">
+          <div className="flex items-center gap-2 border-b border-neutral-800 pb-3">
+            <ShieldCheck className="h-4.5 w-4.5 text-amber-400" />
+            <h3 className="font-extrabold text-sm text-white uppercase tracking-wider">🔐 Property Access Credentials &amp; Door Codes</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-between">
+              <span className="text-neutral-400 font-bold">🚪 Main Entry Keypad Door Code:</span>
+              <span className="font-mono font-extrabold text-amber-300 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">4829#</span>
+            </div>
+            <div className="p-3.5 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-between">
+              <span className="text-neutral-400 font-bold">🔑 Supply / Utility Closet Lock Code:</span>
+              <span className="font-mono font-extrabold text-emerald-300 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">1042</span>
+            </div>
           </div>
         </div>
 
