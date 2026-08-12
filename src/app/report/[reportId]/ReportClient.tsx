@@ -102,6 +102,21 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [isTranslatingNotes, setIsTranslatingNotes] = useState(false);
   const [showEnglishNotes, setShowEnglishNotes] = useState(false);
 
+  useEffect(() => {
+    if (reportId) {
+      try {
+        const savedSign = localStorage.getItem(`turnproofs_sign_${reportId}`);
+        if (savedSign) {
+          const parsed = JSON.parse(savedSign);
+          if (parsed.name && parsed.timestamp) {
+            setHostSignName(parsed.name);
+            setSignedTimestamp(parsed.timestamp);
+          }
+        }
+      } catch (e) {}
+    }
+  }, [reportId]);
+
   async function handleTranslateNotes(text: string) {
     if (translatedNotes) {
       setShowEnglishNotes(!showEnglishNotes);
@@ -1505,7 +1520,11 @@ export default function ReportClient({ reportId }: { reportId: string }) {
                       alert('Please type your name before signing.');
                       return;
                     }
-                    setSignedTimestamp(new Date().toLocaleString());
+                    const ts = new Date().toLocaleString();
+                    setSignedTimestamp(ts);
+                    try {
+                      localStorage.setItem(`turnproofs_sign_${reportId}`, JSON.stringify({ name: hostSignName.trim(), timestamp: ts }));
+                    } catch (e) {}
                   }}
                   className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 font-extrabold text-xs text-white transition-all shadow-md shadow-emerald-500/20 whitespace-nowrap cursor-pointer"
                 >
