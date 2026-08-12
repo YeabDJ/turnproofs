@@ -5,6 +5,7 @@ import { getAuthenticatedHost } from '@/lib/auth';
 const DEFAULT_RESEND_KEY = ['re', 'W52bn4EG', '3s1LvCcrmw7CtwE9FLQWEPMX'].join('_');
 
 async function sendCheckoutReportEmail(propertyId: string, reportId: string, cleanerEmail?: string) {
+  if (!propertyId || propertyId === 'demo' || propertyId === 'sample-property' || reportId === 'demo-report-123') return;
   try {
     const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
 
@@ -1038,6 +1039,15 @@ export async function POST(request: NextRequest) {
     // --- LEGACY SINGLE STEP SUBMISSION ---
     if (!property_id || !cleaner_name) {
       return NextResponse.json({ success: false, error: 'Property ID and cleaner name are required.' }, { status: 400 });
+    }
+
+    if (property_id === 'demo' || property_id === 'sample-property' || (reportId && String(reportId).includes('demo'))) {
+      return NextResponse.json({
+        success: true,
+        demo: true,
+        reportId: 'demo-report-123',
+        message: 'Public demo cleaning session checkout completed successfully!'
+      });
     }
 
     // Insert the report
