@@ -225,6 +225,7 @@ export default function DashboardClient() {
 
   const [newCleanerName, setNewCleanerName] = useState('');
   const [newCleanerPhone, setNewCleanerPhone] = useState('');
+  const [newCleanerPropId, setNewCleanerPropId] = useState('');
 
   // QR Code generator state
   const [activeQrProperty, setActiveQrProperty] = useState<Property | null>(null);
@@ -425,7 +426,8 @@ export default function DashboardClient() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: newCleanerName,
-          phone: newCleanerPhone
+          phone: newCleanerPhone,
+          property_id: newCleanerPropId || undefined
         })
       });
 
@@ -433,6 +435,7 @@ export default function DashboardClient() {
       if (data.success) {
         setNewCleanerName('');
         setNewCleanerPhone('');
+        setNewCleanerPropId('');
         fetchCleaners();
       } else {
         alert('Error adding cleaner: ' + data.error);
@@ -1149,6 +1152,19 @@ export default function DashboardClient() {
                           className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 focus:ring-1 focus:ring-rose-500 outline-none text-sm transition-all"
                           required
                         />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Assign to Property Unit</label>
+                        <select
+                          value={newCleanerPropId}
+                          onChange={(e) => setNewCleanerPropId(e.target.value)}
+                          className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-rose-500 outline-none text-sm text-white transition-all cursor-pointer"
+                        >
+                          <option value="">All Portfolio Properties (Default)</option>
+                          {properties.map(p => (
+                            <option key={p.id} value={p.id}>{p.name}</option>
+                          ))}
+                        </select>
                       </div>
                       <button
                         type="submit"

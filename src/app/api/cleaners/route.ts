@@ -10,40 +10,63 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const propertyId = searchParams.get('propertyId');
 
-    let hostId = null;
-
     if (propertyId) {
-      // Find the host who owns this property
-      const { data: property, error: propError } = await supabaseAdmin
-        .from('airbnb_properties')
-        .select('host_id')
-        .eq('id', propertyId)
-        .maybeSingle();
+      // Find cleaners for this specific property
+      const { data: cleaners, error } = await supabaseAdmin
+        .from('airbnb_cleaners')
+        .select('*')
+        .eq('property_id', propertyId)
+        .order('name', { ascending: true });
 
-      if (propError || !property) {
-        return NextResponse.json({ success: false, error: 'Property not found or invalid.' }, { status: 404 });
+      if (error) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
       }
-      hostId = property.host_id;
+
+      return NextResponse.json({ success: true, cleaners: cleaners || [] });
     } else {
-      // Must be authenticated host
+      // Authenticated host request
       const host = await getAuthenticatedHost();
       if (!host) {
         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
       }
-      hostId = host.id;
+
+      // Fetch all property IDs for this host
+      const { data: properties, error: propErr } = await supabaseAdmin
+        .from('airbnb_properties')
+        .select('id')
+        .eq('host_id', host.id);
+
+      if (propErr) {
+        return NextResponse.json({ success: false, error: propErr.message }, { status: 500 });
+      }
+
+      const propertyIds = (properties || []).map((p: any) => p.id);
+      if (propertyIds.length === 0) {
+        return NextResponse.json({ success: true, cleaners: [] });
+      }
+
+      const { data: cleaners, error } = await supabaseAdmin
+        .from('airbnb_cleaners')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      const hostCleaners = (cleaners || []).filter((c: any) => propertyIds.includes(c.property_id));
+
+      // Deduplicate cleaners by name so each cleaner profile displays once in the host staff list
+      const uniqueMap = new Map();
+      for (const cleaner of hostCleaners) {
+        const key = cleaner.name.toLowerCase().trim();
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, cleaner);
+        }
+      }
+
+      return NextResponse.json({ success: true, cleaners: Array.from(uniqueMap.values()) });
     }
-
-    const { data: cleaners, error } = await supabaseAdmin
-      .from('airbnb_cleaners')
-      .select('*')
-      .eq('host_id', hostId)
-      .order('name', { ascending: true });
-
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, cleaners });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -57,16 +80,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, phone } = await request.json();
+    const { name, phone, property_id } = await request.json();
 
     if (!name || !phone) {
-      return NextResponse.json({ success: false, error: 'Cleaner name and phone number are required.' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Cleaner name and email/phone are required.' }, { status: 400 });
     }
+
+    // Get host's properties
+    const { data: properties } = await supabaseAdmin
+      .from('airbnb_properties')
+      .select('id')
+      .eq('host_id', host.id);
+
+    if (!properties || properties.length === 0) {
+      return NextResponse.json({ success: false, error: 'Please create a property unit first before adding staff cleaners.' }, { status: 400 });
+    }
+
+    const targetPropertyId = property_id && properties.some((p: any) => p.id === property_id) 
+      ? property_id 
+      : properties[0].id;
 
     const { data: newCleaner, error } = await supabaseAdmin
       .from('airbnb_cleaners')
       .insert({
-        host_id: host.id,
+        property_id: targetPropertyId,
         name: name.trim(),
         phone: phone.trim()
       })
@@ -96,18 +133,6 @@ export async function DELETE(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ success: false, error: 'Cleaner ID is required.' }, { status: 400 });
-    }
-
-    // Verify cleaner belongs to host
-    const { data: cleaner, error: fetchError } = await supabaseAdmin
-      .from('airbnb_cleaners')
-      .select('id')
-      .eq('id', id)
-      .eq('host_id', host.id)
-      .maybeSingle();
-
-    if (fetchError || !cleaner) {
-      return NextResponse.json({ success: false, error: 'Cleaner not found or access denied.' }, { status: 404 });
     }
 
     const { error: deleteError } = await supabaseAdmin
