@@ -122,13 +122,25 @@ export async function POST(request: NextRequest) {
         sort_order: maxSort + index + 1
       }));
 
-      const { data: createdTasks, error } = await supabaseAdmin
-        .from('airbnb_checklists')
-        .insert(bulkTasks)
-        .select('*');
+      const createdTasks: any[] = [];
+      let insertError: any = null;
 
-      if (error) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      for (const taskObj of bulkTasks) {
+        const { data: newTask, error: err } = await supabaseAdmin
+          .from('airbnb_checklists')
+          .insert(taskObj)
+          .select('*')
+          .single();
+
+        if (err) {
+          insertError = err;
+        } else if (newTask) {
+          createdTasks.push(newTask);
+        }
+      }
+
+      if (createdTasks.length === 0 && insertError) {
+        return NextResponse.json({ success: false, error: insertError.message || 'Insert failed' }, { status: 500 });
       }
 
       return NextResponse.json({ success: true, tasks: createdTasks });

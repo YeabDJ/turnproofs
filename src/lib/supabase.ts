@@ -174,6 +174,28 @@ class SupabaseRestHelper {
               } catch (err: any) {
                 return { data: null, error: { message: err.message || 'Insert failed' } };
               }
+            },
+            then: async (resolve: any) => {
+              try {
+                const res = await safeFetch(`${url}/rest/v1/${table}`, {
+                  method: 'POST',
+                  headers: {
+                    'apikey': key,
+                    'Authorization': `Bearer ${key}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                  },
+                  body: JSON.stringify(record)
+                });
+                if (!res.ok) {
+                  const errJson = await res.json().catch(() => ({ message: res.statusText }));
+                  return resolve({ data: null, error: { message: errJson.message || errJson.error || 'Insert failed' } });
+                }
+                const data = await res.json();
+                return resolve({ data, error: null });
+              } catch (err: any) {
+                return resolve({ data: null, error: { message: err.message || 'Insert failed' } });
+              }
             }
           }),
           then: async (resolve: any) => {
