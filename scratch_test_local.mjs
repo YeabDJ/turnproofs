@@ -1,27 +1,29 @@
-import https from 'https';
+import http from 'http';
 
-async function testLiveLogin() {
+function testLocalLogin() {
   const data = JSON.stringify({
     email: 'yeabidj@gmail.com',
     pin_code: '123456'
   });
 
-  const req = https.request('https://www.turnproofs.com/api/auth', {
+  const req = http.request({
+    hostname: 'localhost',
+    port: 3000,
+    path: '/api/auth',
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(data)
     }
   }, (res) => {
-    console.log("STATUS:", res.statusCode);
+    console.log("LOCAL STATUS:", res.statusCode);
     let body = '';
     res.on('data', c => body += c);
-    res.on('end', () => console.log("LIVE RESPONSE BODY:", body));
+    res.on('end', () => console.log("LOCAL BODY:", body));
   });
 
   req.write(data);
   req.end();
 }
 
-// Wait 12s for Vercel deployment to finish building
-setTimeout(testLiveLogin, 12000);
+testLocalLogin();

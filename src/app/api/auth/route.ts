@@ -132,40 +132,24 @@ export async function POST(request: NextRequest) {
     let fetchError: any = null;
 
     if (!host && cleanEmail) {
-      // Alias email mapping for primary host
-      const isPrimaryAlias = ['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail);
+      // 1. Try finding host record for cleanEmail directly
+      const { data: exactHost } = await supabaseAdmin
+        .from('airbnb_hosts')
+        .select('*')
+        .eq('email', cleanEmail)
+        .maybeSingle();
 
-      if (isPrimaryAlias) {
-        const { data: primaryHost } = await supabaseAdmin
+      if (exactHost) {
+        host = exactHost;
+      } else if (['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail)) {
+        // Fallback to primary support account if exact email not found
+        const { data: fallbackHost } = await supabaseAdmin
           .from('airbnb_hosts')
           .select('*')
           .eq('email', 'support@turnproofs.com')
           .maybeSingle();
-        
-        if (primaryHost) {
-          host = primaryHost;
-        } else {
-          const { data: altHost, error: altErr } = await supabaseAdmin
-            .from('airbnb_hosts')
-            .select('*')
-            .eq('email', 'yeabidj@gmail.com')
-            .maybeSingle();
-          host = altHost;
-          fetchError = altErr;
-        }
-      } else {
-        const { data: singleHost, error: singleErr } = await supabaseAdmin
-          .from('airbnb_hosts')
-          .select('*')
-          .eq('email', cleanEmail)
-          .maybeSingle();
-        host = singleHost;
-        fetchError = singleErr;
+        host = fallbackHost;
       }
-    }
-
-    if (fetchError) {
-      return NextResponse.json({ success: false, error: fetchError.message }, { status: 500 });
     }
 
     if (!host && action !== 'login' && action !== 'signup' && action !== 'request_reset_code' && action !== 'verify_reset_code') {
