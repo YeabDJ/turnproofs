@@ -17,15 +17,15 @@ export async function GET(request: NextRequest) {
         {
           id: 'demo-task-1',
           property_id: 'demo',
-          task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection',
-          requires_photo: true,
+          task_name: '[Entry Security & Access] 🔑 Main Entry Keypad Code verified set to 4829# & deadbolt response tested',
+          requires_photo: false,
           sort_order: 1
         },
         {
           id: 'demo-task-2',
           property_id: 'demo',
-          task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners',
-          requires_photo: true,
+          task_name: '[Utility & Supply Closet] 🔐 Utility Closet Code (1042) opened, extra linens restocked & locked',
+          requires_photo: false,
           sort_order: 2
         },
         {

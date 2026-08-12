@@ -23,8 +23,8 @@ export default async function PublicChecklistPreviewPage({ params }: Props) {
       cover_image_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80'
     };
     tasks = [
-      { id: '1', task_name: '[Security & Access] 🔑 Main Door Keypad Code verified set to 4829# & deadbolt response tested', requires_photo: true, sort_order: 1 },
-      { id: '2', task_name: '[Utility & Supply Closet] 🔐 Utility Closet Code (1042) opened, extra linens restocked & locked', requires_photo: true, sort_order: 2 },
+      { id: '1', task_name: '[Entry Security & Access] 🔑 Main Entry Keypad Code verified set to 4829# & deadbolt response tested', requires_photo: false, sort_order: 1 },
+      { id: '2', task_name: '[Utility & Supply Closet] 🔐 Utility Closet Code (1042) opened, extra linens restocked & locked', requires_photo: false, sort_order: 2 },
       { id: '3', task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection', requires_photo: true, sort_order: 3 },
       { id: '4', task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners', requires_photo: true, sort_order: 4 },
       { id: '5', task_name: '[Master Bedroom] 🧹 Vacuum rug & wipe down nightstands', requires_photo: false, sort_order: 5 },

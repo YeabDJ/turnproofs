@@ -43,8 +43,8 @@ export async function GET(
           }
         },
         tasks: [
-          { id: 'dt-1', task_name: '[Entry Security & Access] 🔑 Main Entry Keypad Code verified set to 4829# & deadbolt response tested', requires_photo: true, completed: true, photo_url: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80' },
-          { id: 'dt-2', task_name: '[Utility & Supply Closet] 🔐 Utility Closet Code (1042) opened, extra linens restocked & locked', requires_photo: true, completed: true, photo_url: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80' },
+          { id: 'dt-1', task_name: '[Entry Security & Access] 🔑 Main Entry Keypad Code verified set to 4829# & deadbolt response tested', requires_photo: false, completed: false, photo_url: null },
+          { id: 'dt-2', task_name: '[Utility & Supply Closet] 🔐 Utility Closet Code (1042) opened, extra linens restocked & locked', requires_photo: false, completed: false, photo_url: null },
           { id: 'dt-3', task_name: '[Foyer & Entrance] 🧹 Entryway mirror wiped, umbrella stand checked & floor polished', requires_photo: true, completed: true, photo_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80' },
           { id: 'dt-4', task_name: '[Master Bedroom] 🛏️ King bed remade with fresh 800-thread sheets & hospital corners', requires_photo: true, completed: true, photo_url: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=600&q=80' },
           { id: 'dt-5', task_name: '[Master Bedroom] 🧹 Nightstands dusted, lamps polished & USB ports tested', requires_photo: true, completed: true, photo_url: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=600&q=80' },

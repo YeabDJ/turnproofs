@@ -315,7 +315,11 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
             })));
             const initialStates: Record<string, { completed: boolean; photoUrl: string | null }> = {};
             taskData.tasks.forEach((t: any) => {
-              initialStates[t.id] = { completed: !!t.completed, photoUrl: t.photo_url || null };
+              if (t.id === 'dt-1' || t.id === 'dt-2' || t.id === 'demo-task-1' || t.id === 'demo-task-2') {
+                initialStates[t.id] = { completed: false, photoUrl: null };
+              } else {
+                initialStates[t.id] = { completed: !!t.completed, photoUrl: t.photo_url || null };
+              }
             });
             setTaskStates(initialStates);
             setCleanersList(taskData.report?.cleaner_name || '');
