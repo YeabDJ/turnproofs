@@ -357,7 +357,7 @@ export default function DashboardClient() {
       });
 
       const data = await res.json();
-      if (data.success) {
+      if (data.success && data.property) {
         setNewPropName('');
         setNewPropAddress('');
         setNewPropImage('');
@@ -366,6 +366,8 @@ export default function DashboardClient() {
         setNewPropEmails('');
         setIsPropertyModalOpen(false);
         fetchProperties();
+        // Instantly reveal the new unit's unique QR Code & Magic Link!
+        setActiveQrProperty(data.property);
       } else {
         alert('Error adding property: ' + data.error);
       }
@@ -627,7 +629,8 @@ export default function DashboardClient() {
         setProperties(prev => [data.property, ...prev]);
         setIsDuplicateModalOpen(false);
         setSourcePropForDup(null);
-        alert(`🎉 "${data.property.name}" and its complete checklist were duplicated successfully!`);
+        // Instantly reveal the new unit's unique QR Code & Magic Link!
+        setActiveQrProperty(data.property);
       } else {
         alert('Failed to duplicate property: ' + (data.error || 'Unknown error'));
       }
@@ -3269,7 +3272,7 @@ export default function DashboardClient() {
             <p className="text-xs text-neutral-400 mb-6">Print this card and place it inside the cleaning closet. Cleaners scan it to start tasks instantly.</p>
 
             {/* Printable Sign Box */}
-            <div id="qr-print-box" className="p-6 rounded-2xl bg-neutral-950 border border-neutral-850 text-center space-y-6">
+            <div id="qr-print-box" className="p-6 rounded-2xl bg-neutral-950 border border-neutral-850 text-center space-y-5">
               <div className="flex items-center justify-center gap-1.5 text-rose-500">
                 <ShieldCheck className="h-6 w-6 text-rose-500" />
                 <span className="font-extrabold text-base tracking-tight uppercase">TurnProofs Compliance</span>
@@ -3278,12 +3281,15 @@ export default function DashboardClient() {
               <div>
                 <h2 className="font-black text-xl text-neutral-100 print:text-black truncate">{activeQrProperty.name}</h2>
                 <p className="text-xs text-neutral-400 print:text-gray-600 truncate mt-1">{activeQrProperty.address}</p>
+                <span className="mt-2 inline-block px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-mono font-bold">
+                  UNIQUE UNIT ID: {activeQrProperty.id.substring(0, 13)}...
+                </span>
               </div>
 
               <div className="bg-white p-4 rounded-2xl inline-block shadow-lg mx-auto">
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                    window.location.origin + '/clean/' + activeQrProperty.id
+                    (typeof window !== 'undefined' ? window.location.origin : 'https://turnproofs.com') + '/clean/' + activeQrProperty.id
                   )}`}
                   alt="Cleaner Scan QR Code"
                   className="h-44 w-44 object-contain"
@@ -3292,7 +3298,7 @@ export default function DashboardClient() {
 
               <div className="space-y-1">
                 <span className="px-3 py-1 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-bold uppercase tracking-wider print:border print:border-rose-500">
-                  Scan To Audit
+                  Scan To Launch Mobile Terminal
                 </span>
                 <p className="text-[10px] text-neutral-500 print:text-gray-600 mt-2 font-medium">
                   Scan with your phone camera. Zero logins or app downloads required.
@@ -3300,19 +3306,54 @@ export default function DashboardClient() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-6">
+            {/* Quick Share Links */}
+            <div className="mt-4 space-y-2 text-xs">
+              <button
+                type="button"
+                onClick={() => {
+                  const url = `${window.location.origin}/clean/${activeQrProperty.id}`;
+                  navigator.clipboard.writeText(url);
+                  alert(`📋 Unique Cleaner Magic Link copied!\n\nURL: ${url}`);
+                }}
+                className="w-full py-2.5 px-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/50 font-bold text-neutral-200 hover:text-white transition-all flex items-center justify-between cursor-pointer"
+              >
+                <span className="text-neutral-400">📱 Unique Cleaner Terminal Link</span>
+                <span className="text-rose-400 flex items-center gap-1 font-semibold">
+                  <Copy className="h-3.5 w-3.5" />
+                  <span>Copy Cleaner Link</span>
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  const url = `${window.location.origin}/preview/${activeQrProperty.id}`;
+                  navigator.clipboard.writeText(url);
+                  alert(`👁️ Unique Read-Only Preview Link copied!\n\nURL: ${url}`);
+                }}
+                className="w-full py-2.5 px-3.5 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/50 font-bold text-neutral-200 hover:text-white transition-all flex items-center justify-between cursor-pointer"
+              >
+                <span className="text-neutral-400">👁️ Unique Read-Only Preview Link</span>
+                <span className="text-amber-400 flex items-center gap-1 font-semibold">
+                  <Copy className="h-3.5 w-3.5" />
+                  <span>Copy Preview Link</span>
+                </span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mt-5">
               <button
                 onClick={() => setActiveQrProperty(null)}
-                className="py-3 rounded-xl bg-neutral-800 hover:bg-neutral-750 font-bold text-sm transition-all"
+                className="py-3 rounded-xl bg-neutral-800 hover:bg-neutral-750 font-bold text-xs text-neutral-300 transition-all cursor-pointer"
               >
                 Close
               </button>
               <button
                 onClick={() => window.print()}
-                className="py-3 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-sm transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5"
+                className="py-3 rounded-xl bg-linear-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 font-bold text-xs text-white transition-all shadow-md shadow-rose-500/10 flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Printer className="h-4 w-4" />
-                <span>Print Sign Card</span>
+                <span>Print QR Sign Card</span>
               </button>
             </div>
 
