@@ -590,28 +590,49 @@ export default function DashboardClient() {
     }
   };
 
-  // Duplicate Property & Checklist in 1-Click
-  const handleDuplicateProperty = async (prop: Property) => {
-    if (!confirm(`Duplicate "${prop.name}" and copy its entire checklist in 1 action?`)) return;
+  // Duplicate Property Modal state
+  const [isDuplicateModalOpen, setIsDuplicateModalOpen] = useState(false);
+  const [sourcePropForDup, setSourcePropForDup] = useState<Property | null>(null);
+  const [dupPropName, setDupPropName] = useState('');
+  const [dupPropAddress, setDupPropAddress] = useState('');
+  const [duplicating, setDuplicating] = useState(false);
+
+  const openDuplicateModal = (prop: Property) => {
+    setSourcePropForDup(prop);
+    setDupPropName(`${prop.name} (Unit B)`);
+    setDupPropAddress(prop.address);
+    setIsDuplicateModalOpen(true);
+  };
+
+  const handleConfirmDuplicate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!sourcePropForDup || !dupPropName.trim() || !dupPropAddress.trim()) return;
+
+    setDuplicating(true);
     try {
       const res = await fetch('/api/properties', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'duplicate',
-          sourcePropertyId: prop.id,
-          newName: `${prop.name} (Copy)`,
-          newAddress: prop.address
+          sourcePropertyId: sourcePropForDup.id,
+          newName: dupPropName.trim(),
+          newAddress: dupPropAddress.trim()
         })
       });
       const data = await res.json();
+      setDuplicating(false);
+
       if (res.ok && data.success && data.property) {
         setProperties(prev => [data.property, ...prev]);
-        openEditPropertyModal(data.property);
+        setIsDuplicateModalOpen(false);
+        setSourcePropForDup(null);
+        alert(`🎉 "${data.property.name}" and its complete checklist were duplicated successfully!`);
       } else {
         alert('Failed to duplicate property: ' + (data.error || 'Unknown error'));
       }
     } catch (err) {
+      setDuplicating(false);
       alert('Network error duplicating property.');
     }
   };
@@ -912,9 +933,9 @@ export default function DashboardClient() {
                                 <span>Edit Checklist</span>
                               </button>
                               <button
-                                onClick={() => handleDuplicateProperty(prop)}
+                                onClick={() => openDuplicateModal(prop)}
                                 className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-purple-500/30 hover:bg-purple-500/10 hover:text-purple-400 transition-all cursor-pointer"
-                                title="Duplicate Property & Checklist in 1-Click"
+                                title="Duplicate Property & Checklist in 1 Action"
                               >
                                 <Copy className="h-4.5 w-4.5" />
                               </button>
@@ -2619,6 +2640,91 @@ export default function DashboardClient() {
               >
                 Create Listing
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: DUPLICATE PROPERTY & CHECKLIST */}
+      {isDuplicateModalOpen && sourcePropForDup && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-6 z-50 animate-fade-in">
+          <div className="w-full max-w-lg bg-neutral-900 border border-neutral-800 rounded-3xl p-7 shadow-2xl relative space-y-6">
+            <button
+              onClick={() => setIsDuplicateModalOpen(false)}
+              className="absolute top-6 right-6 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="flex items-center gap-3 border-b border-neutral-850 pb-4">
+              <div className="h-10 w-10 rounded-2xl bg-purple-500/20 border border-purple-500/40 text-purple-400 flex items-center justify-center font-extrabold shrink-0">
+                <Copy className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-xl text-white">Duplicate Property &amp; Checklist</h3>
+                <p className="text-xs text-neutral-400">
+                  Cloning template from: <span className="font-bold text-white">{sourcePropForDup.name}</span>
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleConfirmDuplicate} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
+                  New Property Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Sunset Villa Unit B"
+                  value={dupPropName}
+                  onChange={(e) => setDupPropName(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-sm text-white font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">
+                  New Property Address
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 123 Sunset Blvd, Suite 2B, Miami, FL"
+                  value={dupPropAddress}
+                  onChange={(e) => setDupPropAddress(e.target.value)}
+                  className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-sm text-white"
+                />
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200 leading-relaxed flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-purple-400 shrink-0" />
+                <span>All room checklist items &amp; photo protocols will be copied to your new property instantly.</span>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsDuplicateModalOpen(false)}
+                  className="flex-1 py-3 rounded-xl bg-neutral-950 border border-neutral-800 text-xs font-bold text-neutral-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={duplicating || !dupPropName.trim() || !dupPropAddress.trim()}
+                  className="flex-1 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-extrabold text-xs text-white transition-all shadow-md shadow-purple-600/20 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  {duplicating ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin text-white" />
+                      <span>Cloning Property...</span>
+                    </>
+                  ) : (
+                    <span>📋 Create &amp; Clone Checklist</span>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>
