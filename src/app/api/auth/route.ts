@@ -355,7 +355,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, host: activeHost, isNew });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    console.error('[AUTH POST ERROR]:', error);
+    return NextResponse.json({ 
+      success: false, 
+      error: error?.message || String(error), 
+      stack: error?.stack 
+    }, { status: 500 });
   }
 }
 
