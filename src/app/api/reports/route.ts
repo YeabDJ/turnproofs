@@ -122,7 +122,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <support@turnproofs.com>';
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <reports@turnproofs.com>';
 
     for (const recipient of Array.from(recipients)) {
       try {
@@ -290,6 +290,8 @@ async function sendResendAlertEmail({
   const targetRecipients = toEmails.filter(e => e && e.includes('@'));
   if (!targetRecipients.includes('yeabidj@gmail.com')) targetRecipients.push('yeabidj@gmail.com');
 
+  const alertFromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <reports@turnproofs.com>';
+
   for (const recipient of targetRecipients) {
     try {
       let res = await fetch('https://api.resend.com/emails', {
@@ -299,7 +301,7 @@ async function sendResendAlertEmail({
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: 'TurnProofs <onboarding@resend.dev>',
+          from: alertFromAddress,
           to: [recipient],
           subject,
           html
@@ -318,7 +320,7 @@ async function sendResendAlertEmail({
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: 'TurnProofs <onboarding@resend.dev>',
+            from: alertFromAddress,
             to: ['yeabidj@gmail.com'],
             subject: `[TEST COPY -> ${recipient}] ${subject}`,
             html
