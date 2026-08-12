@@ -138,6 +138,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: dupErr.message }, { status: 500 });
       }
 
+      const createdProp = Array.isArray(dupProperty) ? dupProperty[0] : dupProperty;
+
+      if (!createdProp || !createdProp.id) {
+        return NextResponse.json({ success: false, error: 'Failed to create duplicated property record.' }, { status: 500 });
+      }
+
       // Fetch and duplicate source property checklist tasks
       const { data: sourceChecklists } = await supabaseAdmin
         .from('airbnb_checklists')
@@ -147,7 +153,7 @@ export async function POST(request: NextRequest) {
 
       if (sourceChecklists && sourceChecklists.length > 0) {
         const dupTasks = sourceChecklists.map((t: any) => ({
-          property_id: dupProperty.id,
+          property_id: createdProp.id,
           task_name: t.task_name,
           requires_photo: !!t.requires_photo,
           sort_order: t.sort_order
@@ -156,16 +162,16 @@ export async function POST(request: NextRequest) {
       } else {
         // Automatically attach default checklist if source checklist was empty
         const defaultTasks = [
-          { property_id: dupProperty.id, task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection', requires_photo: true, sort_order: 1 },
-          { property_id: dupProperty.id, task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners', requires_photo: true, sort_order: 2 },
-          { property_id: dupProperty.id, task_name: '[Master Bedroom] 🧹 Vacuum rug & wipe down nightstands', requires_photo: false, sort_order: 3 },
-          { property_id: dupProperty.id, task_name: '[Main Bathroom] 🚿 Scrub shower tile, sanitize toilet & restock paper towels', requires_photo: true, sort_order: 4 },
-          { property_id: dupProperty.id, task_name: '[Kitchen & Dining] 🍽️ Empty dishwasher, wipe countertops & sanitize sink', requires_photo: true, sort_order: 5 }
+          { property_id: createdProp.id, task_name: '[Walkthrough Audit] 📸 Initial damage & guest lost/found inspection', requires_photo: true, sort_order: 1 },
+          { property_id: createdProp.id, task_name: '[Master Bedroom] 🛏️ Strip sheets, wash linens & remake bed with hospital corners', requires_photo: true, sort_order: 2 },
+          { property_id: createdProp.id, task_name: '[Master Bedroom] 🧹 Vacuum rug & wipe down nightstands', requires_photo: false, sort_order: 3 },
+          { property_id: createdProp.id, task_name: '[Main Bathroom] 🚿 Scrub shower tile, sanitize toilet & restock paper towels', requires_photo: true, sort_order: 4 },
+          { property_id: createdProp.id, task_name: '[Kitchen & Dining] 🍽️ Empty dishwasher, wipe countertops & sanitize sink', requires_photo: true, sort_order: 5 }
         ];
         await supabaseAdmin.from('airbnb_checklists').insert(defaultTasks);
       }
 
-      return NextResponse.json({ success: true, property: dupProperty });
+      return NextResponse.json({ success: true, property: createdProp });
     }
 
     if (!name || !address) {
@@ -183,25 +189,26 @@ export async function POST(request: NextRequest) {
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null
       })
-      .select('*')
-      .single();
+      .select('*');
 
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
+    const createdNewProp = Array.isArray(newProperty) ? newProperty[0] : newProperty;
+
     // Automatically create a default checklist for the property to save the host time
     const defaultTasks = [
-      { property_id: newProperty.id, task_name: 'Sweep and mop all floors', requires_photo: false, sort_order: 1 },
-      { property_id: newProperty.id, task_name: 'Make beds with fresh linens', requires_photo: true, sort_order: 2 },
-      { property_id: newProperty.id, task_name: 'Clean kitchen countertops and empty trash', requires_photo: false, sort_order: 3 },
-      { property_id: newProperty.id, task_name: 'Sanitize toilet, shower, and sink', requires_photo: true, sort_order: 4 },
-      { property_id: newProperty.id, task_name: 'Replenish toilet paper, soap, and towels', requires_photo: false, sort_order: 5 }
+      { property_id: createdNewProp.id, task_name: 'Sweep and mop all floors', requires_photo: false, sort_order: 1 },
+      { property_id: createdNewProp.id, task_name: 'Make beds with fresh linens', requires_photo: true, sort_order: 2 },
+      { property_id: createdNewProp.id, task_name: 'Clean kitchen countertops and empty trash', requires_photo: false, sort_order: 3 },
+      { property_id: createdNewProp.id, task_name: 'Sanitize toilet, shower, and sink', requires_photo: true, sort_order: 4 },
+      { property_id: createdNewProp.id, task_name: 'Replenish toilet paper, soap, and towels', requires_photo: false, sort_order: 5 }
     ];
 
     await supabaseAdmin.from('airbnb_checklists').insert(defaultTasks);
 
-    return NextResponse.json({ success: true, property: newProperty });
+    return NextResponse.json({ success: true, property: createdNewProp });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
