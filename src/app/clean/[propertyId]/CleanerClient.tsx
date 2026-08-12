@@ -12,7 +12,8 @@ import {
   Camera, 
   Check, 
   Loader2, 
-  AlertCircle, 
+  AlertCircle,
+  CheckCircle2, 
   FileText,
   Clock,
   Users,
@@ -1957,29 +1958,59 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
               </div>
             </div>
 
-            {/* Final Walkthrough Verification Checkbox */}
-            <div className="p-5 rounded-2xl bg-neutral-900/40 border border-neutral-850 space-y-3 backdrop-blur-md">
-              <span className="block text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-                {lang === 'en' ? '🏁 Final Checkout Check' : '🏁 Control de Salida Final'}
-              </span>
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={finalWalkthroughDone}
-                  onChange={(e) => setFinalWalkthroughDone(e.target.checked)}
-                  className="rounded border-neutral-800 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-neutral-950 bg-neutral-950 h-5 w-5 mt-0.5 cursor-pointer"
-                />
-                <div className="space-y-0.5">
-                  <span className={`text-xs font-extrabold block ${finalWalkthroughDone ? 'text-emerald-300' : 'text-neutral-200'}`}>
-                    {lang === 'en' ? 'Do a final walkthrough' : 'Realizar inspección final'}
-                  </span>
-                  <span className="text-[10px] text-neutral-400 block leading-normal">
-                    {lang === 'en' 
-                      ? 'I verify that the unit is in pristine checkout condition, lights are off, and keys are secure.'
-                      : 'Verifico que la unidad esté en perfectas condiciones de salida, las luces estén apagadas y las llaves seguras.'}
-                  </span>
+            {/* Final Walkthrough Verification Checkbox (Red & Green High-Visibility Status Card) */}
+            <div 
+              onClick={() => setFinalWalkthroughDone(!finalWalkthroughDone)}
+              className={`p-5 rounded-2xl border transition-all duration-300 backdrop-blur-md cursor-pointer select-none space-y-3 ${
+                finalWalkthroughDone
+                  ? 'bg-emerald-500/10 border-emerald-500/50 shadow-lg shadow-emerald-500/10'
+                  : 'bg-red-500/10 border-red-500/40 shadow-lg shadow-red-500/5 hover:border-red-500/60'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-white uppercase tracking-wider">
+                  {lang === 'en' ? '🏁 FINAL CHECKOUT CHECK' : '🏁 CONTROL DE SALIDA FINAL'}
+                </span>
+
+                {/* RED / GREEN STATUS BADGE */}
+                <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 transition-all ${
+                  finalWalkthroughDone
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-red-500/20 text-red-300 border border-red-500/30 animate-pulse'
+                }`}>
+                  {finalWalkthroughDone ? (
+                    <>
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                      <span>{lang === 'en' ? '🟢 VERIFIED & READY' : '🟢 VERIFICADO Y LISTO'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="h-3.5 w-3.5 text-red-400" />
+                      <span>{lang === 'en' ? '🔴 ACTION REQUIRED' : '🔴 ACCIÓN REQUERIDA'}</span>
+                    </>
+                  )}
+                </span>
+              </div>
+
+              <div className="flex items-start gap-3 pt-1">
+                <div className="mt-0.5 shrink-0">
+                  {finalWalkthroughDone ? (
+                    <CheckSquare className="h-6 w-6 text-emerald-400" />
+                  ) : (
+                    <Square className="h-6 w-6 text-red-400" />
+                  )}
                 </div>
-              </label>
+                <div className="space-y-1">
+                  <h4 className={`text-sm font-extrabold ${finalWalkthroughDone ? 'text-emerald-300' : 'text-red-200'}`}>
+                    {lang === 'en' ? 'Do a final walkthrough' : 'Realizar inspección final'}
+                  </h4>
+                  <p className={`text-xs leading-relaxed font-medium ${finalWalkthroughDone ? 'text-emerald-300/80' : 'text-neutral-300'}`}>
+                    {lang === 'en' 
+                      ? 'I verify that the unit is in pristine checkout condition, lights are off, windows locked, and keys are secure.'
+                      : 'Verifico que la unidad esté en perfectas condiciones de salida, las luces apagadas, ventanas cerradas y llaves seguras.'}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Submit checkout */}
