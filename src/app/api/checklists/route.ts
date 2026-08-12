@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Property ID is required.' }, { status: 400 });
     }
 
-    if (propertyId === 'demo') {
+    if (propertyId === 'demo' || propertyId === 'sample-property') {
       const demoTasks = [
         {
           id: 'demo-task-1',

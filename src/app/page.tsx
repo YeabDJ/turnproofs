@@ -234,13 +234,24 @@ export default function LandingPage() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3 pt-2">
                 <Link
                   href="/login"
                   className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-[#FF512F] to-[#DD2476] hover:scale-105 font-extrabold text-xs sm:text-sm text-white transition-all shadow-xl shadow-[#FF512F]/20 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>Start Your Free Trial</span>
                 </Link>
+
+                <Link
+                  href="/clean/demo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900/90 border border-emerald-500/40 font-bold text-xs sm:text-sm text-emerald-300 hover:text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-500/10"
+                >
+                  <Sparkles className="h-4 w-4 text-emerald-400" />
+                  <span>Try Cleaner Demo (Live QR App)</span>
+                </Link>
+
                 <Link
                   href="/report/sample-report"
                   target="_blank"
@@ -248,7 +259,7 @@ export default function LandingPage() {
                   className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-neutral-900/90 hover:bg-neutral-850 border border-neutral-750 font-bold text-xs sm:text-sm text-white transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
                 >
                   <FileText className="h-4 w-4 text-rose-400" />
-                  <span>View Sample Report</span>
+                  <span>View Sample Audit PDF</span>
                 </Link>
               </div>
             </div>

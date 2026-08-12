@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get('id');
 
     if (id) {
-      if (id === 'demo') {
+      if (id === 'demo' || id === 'sample-property') {
         return NextResponse.json({
           success: true,
           property: {
