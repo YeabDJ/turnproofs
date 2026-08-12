@@ -36,7 +36,9 @@ import {
   Edit3,
   Key,
   Terminal,
-  Code
+  Code,
+  Eye,
+  Share2
 } from 'lucide-react';
 
 interface Property {
@@ -131,6 +133,7 @@ export default function DashboardClient() {
 
   // Copy indicator & Upgrade modal states
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedPreviewId, setCopiedPreviewId] = useState<string | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradingTier, setUpgradingTier] = useState(false);
 
@@ -324,6 +327,16 @@ export default function DashboardClient() {
     navigator.clipboard.writeText(url);
     setCopiedId(propertyId);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  // Copy cleaner preview link
+  const copyPreviewLink = (propertyId: string) => {
+    const origin = window.location.origin;
+    const url = `${origin}/preview/${propertyId}`;
+    navigator.clipboard.writeText(url);
+    setCopiedPreviewId(propertyId);
+    setTimeout(() => setCopiedPreviewId(null), 2500);
+    alert(`📋 Cleaner Preview Link copied to clipboard!\n\nSend this URL to your cleaner so they can review tasks and reference photos beforehand:\n${url}`);
   };
 
   // Create Property
@@ -1019,9 +1032,9 @@ export default function DashboardClient() {
                             {/* Copy Magic Link */}
                             <button
                               onClick={() => copyCleanerLink(prop.id)}
-                              className="w-full py-2.5 px-4 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/40 hover:bg-neutral-900/50 text-sm font-semibold transition-all flex items-center justify-between"
+                              className="w-full py-2.5 px-4 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-rose-500/40 hover:bg-neutral-900/50 text-sm font-semibold transition-all flex items-center justify-between cursor-pointer"
                             >
-                              <span className="text-neutral-400">Cleaner Portal Magic Link</span>
+                              <span className="text-neutral-400">📱 Cleaner App Link (Mobile Terminal)</span>
                               <div className="flex items-center gap-1.5 text-rose-400">
                                 {copiedId === prop.id ? (
                                   <>
@@ -1031,7 +1044,28 @@ export default function DashboardClient() {
                                 ) : (
                                   <>
                                     <Copy className="h-4 w-4" />
-                                    <span className="text-xs">Copy URL</span>
+                                    <span className="text-xs">Copy Link</span>
+                                  </>
+                                )}
+                              </div>
+                            </button>
+
+                            {/* Copy Preview Link */}
+                            <button
+                              onClick={() => copyPreviewLink(prop.id)}
+                              className="w-full py-2.5 px-4 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-amber-500/40 hover:bg-neutral-900/50 text-sm font-semibold transition-all flex items-center justify-between cursor-pointer"
+                            >
+                              <span className="text-neutral-400">👁️ Share Cleaner Preview Link (Read-Only)</span>
+                              <div className="flex items-center gap-1.5 text-amber-400">
+                                {copiedPreviewId === prop.id ? (
+                                  <>
+                                    <Check className="h-4 w-4" />
+                                    <span className="text-xs">Copied</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Share2 className="h-4 w-4" />
+                                    <span className="text-xs">Copy Preview Link</span>
                                   </>
                                 )}
                               </div>
@@ -2998,12 +3032,24 @@ export default function DashboardClient() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-extrabold text-xl truncate">{activeChecklistProperty.name}</h3>
-                <button
-                  onClick={() => setActiveChecklistProperty(null)}
-                  className="p-1.5 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <a
+                    href={`/preview/${activeChecklistProperty.id}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Open cleaner read-only preview page in a new tab"
+                  >
+                    <Eye className="h-4 w-4 text-amber-400" />
+                    <span>👁️ Preview Cleaner View</span>
+                  </a>
+                  <button
+                    onClick={() => setActiveChecklistProperty(null)}
+                    className="p-1.5 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
               <p className="text-xs text-neutral-400 pb-4 border-b border-neutral-800">
                 Customize checklist requirements. Reorder list or request photography logs for tasks.
