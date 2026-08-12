@@ -598,6 +598,42 @@ export default function DashboardClient() {
     }
   };
 
+  // Toggle Photo Requirement for a single task
+  const handleToggleTaskPhoto = async (taskId: string, currentVal: boolean) => {
+    const nextVal = !currentVal;
+    setChecklistTasks(prev => prev.map(t => t.id === taskId ? { ...t, requires_photo: nextVal } : t));
+
+    try {
+      await fetch('/api/checklists', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: taskId,
+          requires_photo: nextVal
+        })
+      });
+    } catch (err) {
+      console.error('Error toggling photo requirement:', err);
+    }
+  };
+
+  // Batch Toggle Photo Requirement for ALL tasks of active property
+  const handleBatchTogglePhotos = async (enablePhotos: boolean) => {
+    if (!activeChecklistProperty || checklistTasks.length === 0) return;
+    setChecklistTasks(prev => prev.map(t => ({ ...t, requires_photo: enablePhotos })));
+
+    try {
+      const updatePayload = checklistTasks.map(t => ({ id: t.id, requires_photo: enablePhotos }));
+      await fetch('/api/checklists', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatePayload)
+      });
+    } catch (err) {
+      console.error('Error batch toggling photo requirement:', err);
+    }
+  };
+
   // Bulk Copy-Paste Checklist Importer
   const handleBulkImportChecklist = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -625,8 +661,7 @@ export default function DashboardClient() {
       }
 
       const fullTaskName = `[${roomTag}] ${cleanLine}`;
-      const isPhotoKey = /photo|picture|inspect|check|scrub|strip|remake|sanitize|clean|wash|towel|sheet|fridge|oven|bath|bed/i.test(cleanLine);
-      const requiresPhoto = bulkRequirePhotos || isPhotoKey;
+      const requiresPhoto = bulkRequirePhotos;
 
       return {
         task_name: fullTaskName,
@@ -3221,11 +3256,29 @@ export default function DashboardClient() {
 
               {/* Task list container grouped by Collapsible Room Cards */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Property Room Accordions</h4>
-                  <span className="text-[10px] font-semibold text-rose-400">
-                    {checklistTasks.length} Total Task{checklistTasks.length === 1 ? '' : 's'} Across Rooms
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleBatchTogglePhotos(false)}
+                      className="px-2.5 py-1 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-400 border border-neutral-850 hover:border-neutral-700 text-[10px] font-extrabold transition-all cursor-pointer active:scale-95"
+                      title="Turn off photo requirements for all tasks"
+                    >
+                      🚫 Remove All Photos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleBatchTogglePhotos(true)}
+                      className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-extrabold transition-all cursor-pointer active:scale-95"
+                      title="Require photos for all tasks"
+                    >
+                      📷 Require All Photos
+                    </button>
+                    <span className="text-[10px] font-semibold text-rose-400 ml-1">
+                      {checklistTasks.length} Task{checklistTasks.length === 1 ? '' : 's'}
+                    </span>
+                  </div>
                 </div>
                 
                 {checklistTasks.length === 0 ? (
@@ -3327,12 +3380,19 @@ export default function DashboardClient() {
                                       <span className="text-xs font-mono text-neutral-500 mt-0.5">{i + 1}</span>
                                       <div className="truncate">
                                         <p className="text-xs font-semibold text-neutral-200 truncate">{cleanText}</p>
-                                        {task.requires_photo && (
-                                          <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-500 mt-1 bg-amber-500/10 px-1.5 py-0.5 rounded-md uppercase">
-                                            <Camera className="h-3 w-3" />
-                                            <span>Photo Required</span>
-                                          </span>
-                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => handleToggleTaskPhoto(task.id, task.requires_photo)}
+                                          className={`inline-flex items-center gap-1 text-[9px] font-bold mt-1 px-2 py-0.5 rounded-md uppercase transition-all cursor-pointer ${
+                                            task.requires_photo
+                                              ? 'text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30'
+                                              : 'text-neutral-500 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800'
+                                          }`}
+                                          title="Click to toggle photo requirement on/off"
+                                        >
+                                          <Camera className={`h-3 w-3 ${task.requires_photo ? 'text-amber-400' : 'text-neutral-500'}`} />
+                                          <span>{task.requires_photo ? '📷 Photo Required' : '🚫 No Photo'}</span>
+                                        </button>
                                       </div>
                                     </div>
 
