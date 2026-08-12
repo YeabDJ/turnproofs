@@ -647,11 +647,18 @@ export default function DashboardClient() {
       const data = await res.json();
       setImportingBulk(false);
 
-      if (res.ok && data.success && data.tasks) {
-        setChecklistTasks(prev => [...prev, ...data.tasks]);
+      if (res.ok && data.success) {
+        // Re-fetch clean checklist from database to ensure valid task objects
+        const refetchRes = await fetch(`/api/checklists?propertyId=${activeChecklistProperty.id}`);
+        const refetchData = await refetchRes.json();
+        if (refetchData.success && refetchData.tasks) {
+          setChecklistTasks(refetchData.tasks);
+        } else if (data.tasks) {
+          setChecklistTasks(prev => [...prev, ...data.tasks]);
+        }
         setBulkText('');
         setChecklistMode('single');
-        alert(`⚡ Successfully imported ${data.tasks.length} checklist tasks into "${activeChecklistProperty.name}"!`);
+        alert(`⚡ Successfully imported ${data.tasks?.length || 'all'} checklist tasks into "${activeChecklistProperty.name}"!`);
       } else {
         alert('Failed to import checklist: ' + (data.error || 'Unknown error'));
       }
@@ -3230,8 +3237,9 @@ export default function DashboardClient() {
                     // Group tasks by Room Name
                     const roomMap: Record<string, typeof checklistTasks> = {};
                     checklistTasks.forEach(task => {
+                      if (!task) return;
                       let room = 'General / Entire Unit';
-                      const match = task.task_name.match(/^\[(.*?)\]\s*(.*)$/);
+                      const match = (task.task_name || '').match(/^\[(.*?)\]\s*(.*)$/);
                       if (match) {
                         room = match[1];
                       }
@@ -3305,9 +3313,10 @@ export default function DashboardClient() {
 
                             {/* Room Checklist Items */}
                             <div className="p-3 space-y-2 bg-neutral-950/50">
-                              {tasksInRoom.map((task, i) => {
-                                const cleanText = task.task_name.replace(/^\[.*?\]\s*/, '');
-                                const taskIndexInFullList = checklistTasks.findIndex(t => t.id === task.id);
+                                {tasksInRoom.map((task, i) => {
+                                  if (!task) return null;
+                                  const cleanText = (task.task_name || '').replace(/^\[.*?\]\s*/, '');
+                                  const taskIndexInFullList = checklistTasks.findIndex(t => t && t.id === task.id);
 
                                 return (
                                   <div
