@@ -236,6 +236,12 @@ export default function DashboardClient() {
   const [newTaskRefPhoto, setNewTaskRefPhoto] = useState('');
   const [uploadingRefPhoto, setUploadingRefPhoto] = useState(false);
 
+  // Bulk Copy-Paste Checklist Importer State
+  const [checklistMode, setChecklistMode] = useState<'single' | 'bulk'>('single');
+  const [bulkText, setBulkText] = useState('');
+  const [bulkRequirePhotos, setBulkRequirePhotos] = useState(true);
+  const [importingBulk, setImportingBulk] = useState(false);
+
   const isPaidActive = !!(host?.subscription_status === 'active' || host?.stripe_subscription_id);
 
   // Check auth and load initial dashboard data
@@ -589,6 +595,69 @@ export default function DashboardClient() {
       });
     } catch (err) {
       console.error('Error saving room order', err);
+    }
+  };
+
+  // Bulk Copy-Paste Checklist Importer
+  const handleBulkImportChecklist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeChecklistProperty || !bulkText.trim()) return;
+
+    const rawLines = bulkText.split('\n').map(l => l.trim()).filter(Boolean);
+    if (rawLines.length === 0) return;
+
+    setImportingBulk(true);
+
+    const parsedTasks = rawLines.map(line => {
+      let cleanLine = line.replace(/^[\-\*\•\d+\.\)\s]+/, '').trim();
+      let roomTag = selectedRoom || 'General / Entire Unit';
+
+      const match = cleanLine.match(/^\[(.*?)\]\s*(.*)$/);
+      if (match) {
+        roomTag = match[1];
+        cleanLine = match[2];
+      } else {
+        const colonMatch = cleanLine.match(/^([A-Za-z0-9\s#\-\_\&\']+):\s*(.*)$/);
+        if (colonMatch && colonMatch[1].length < 30) {
+          roomTag = colonMatch[1].trim();
+          cleanLine = colonMatch[2].trim();
+        }
+      }
+
+      const fullTaskName = `[${roomTag}] ${cleanLine}`;
+      const isPhotoKey = /photo|picture|inspect|check|scrub|strip|remake|sanitize|clean|wash|towel|sheet|fridge|oven|bath|bed/i.test(cleanLine);
+      const requiresPhoto = bulkRequirePhotos || isPhotoKey;
+
+      return {
+        task_name: fullTaskName,
+        requires_photo: requiresPhoto
+      };
+    });
+
+    try {
+      const res = await fetch('/api/checklists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          property_id: activeChecklistProperty.id,
+          tasks: parsedTasks
+        })
+      });
+
+      const data = await res.json();
+      setImportingBulk(false);
+
+      if (res.ok && data.success && data.tasks) {
+        setChecklistTasks(prev => [...prev, ...data.tasks]);
+        setBulkText('');
+        setChecklistMode('single');
+        alert(`⚡ Successfully imported ${data.tasks.length} checklist tasks into "${activeChecklistProperty.name}"!`);
+      } else {
+        alert('Failed to import checklist: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      setImportingBulk(false);
+      alert('Network error importing checklist.');
     }
   };
 
@@ -2973,22 +3042,99 @@ export default function DashboardClient() {
                   </div>
                 </div>
 
-                {/* Step 2: Add Task to Active Room */}
-                <form onSubmit={handleAddTask} className="pt-2 border-t border-neutral-850 space-y-3">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[11px] font-bold text-neutral-300">
-                      2. Add Task to <span className="text-rose-400 font-extrabold">&quot;{selectedRoom}&quot;</span>:
-                    </label>
+                {/* Step 2 Mode Selector: Single vs Bulk */}
+                <div className="pt-2 border-t border-neutral-850 space-y-3">
+                  <div className="flex items-center gap-2 border-b border-neutral-850 pb-2">
+                    <button
+                      type="button"
+                      onClick={() => setChecklistMode('single')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        checklistMode === 'single'
+                          ? 'bg-rose-500 text-white shadow-sm shadow-rose-500/30'
+                          : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      + Single Task
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setChecklistMode('bulk')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        checklistMode === 'bulk'
+                          ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
+                          : 'bg-neutral-900 border border-purple-500/30 text-purple-400 hover:bg-purple-500/10'
+                      }`}
+                    >
+                      <span>⚡ Bulk Copy &amp; Paste (Turno / Word / Email)</span>
+                    </button>
                   </div>
-                  
-                  <input
-                    type="text"
-                    placeholder={`e.g. Make bed with fresh linens in ${selectedRoom}`}
-                    value={newTaskName}
-                    onChange={(e) => setNewTaskName(e.target.value)}
-                    className="w-full px-3 py-2 bg-neutral-900 border border-neutral-850 rounded-lg focus:border-rose-500 outline-none text-xs text-white"
-                    required
-                  />
+
+                  {checklistMode === 'bulk' ? (
+                    /* BULK COPY-PASTE FORM */
+                    <form onSubmit={handleBulkImportChecklist} className="space-y-3 animate-fade-in">
+                      <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-200 leading-relaxed">
+                        <p className="font-extrabold text-purple-300 flex items-center gap-1.5 mb-1">
+                          <span>📋 Copy &amp; Paste From Turno, Word, PDF, or Email:</span>
+                        </p>
+                        <p className="text-[11px] text-neutral-400">
+                          Paste your entire checklist lines below. TurnProofs will automatically parse room categories <span className="text-purple-300 font-mono">[Master Bedroom]</span> or colons <span className="text-purple-300 font-mono">Master Bedroom: task</span>. Uncategorized items will be assigned to <span className="text-purple-300 font-bold">&quot;{selectedRoom}&quot;</span>.
+                        </p>
+                      </div>
+
+                      <textarea
+                        rows={7}
+                        value={bulkText}
+                        onChange={(e) => setBulkText(e.target.value)}
+                        placeholder={`[Master Bedroom] Strip linens, wash sheets & remake bed with hospital corners\n[Master Bedroom] Vacuum rug and dust nightstands\n[En-Suite Bath] Scrub shower glass, sanitize toilet & restock paper towels\n[Chef's Kitchen] Clean Sub-Zero fridge interior & sanitize marble island\n[Patio & Pool] Sweep deck tiles & check hot tub water temp`}
+                        className="w-full p-3 bg-neutral-900 border border-neutral-800 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500 outline-none text-xs text-white font-mono leading-relaxed placeholder:text-neutral-600"
+                        required
+                      />
+
+                      <div className="flex items-center justify-between pt-1">
+                        <label className="flex items-center gap-2 text-xs text-neutral-300 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={bulkRequirePhotos}
+                            onChange={(e) => setBulkRequirePhotos(e.target.checked)}
+                            className="rounded border-neutral-700 bg-neutral-900 text-purple-500 focus:ring-purple-500 h-4 w-4"
+                          />
+                          <span>Require Photo Evidence for Imported Items</span>
+                        </label>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={importingBulk || !bulkText.trim()}
+                        className="w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-extrabold text-xs text-white transition-all shadow-md shadow-purple-600/20 disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {importingBulk ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 animate-spin text-white" />
+                            <span>Importing Checklist...</span>
+                          </>
+                        ) : (
+                          <span>⚡ Import All Tasks ({bulkText.split('\n').filter(l => l.trim()).length} Items)</span>
+                        )}
+                      </button>
+                    </form>
+                  ) : (
+                    /* SINGLE TASK FORM */
+                    <form onSubmit={handleAddTask} className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[11px] font-bold text-neutral-300">
+                          2. Add Task to <span className="text-rose-400 font-extrabold">&quot;{selectedRoom}&quot;</span>:
+                        </label>
+                      </div>
+                      
+                      <input
+                        type="text"
+                        placeholder={`e.g. Make bed with fresh linens in ${selectedRoom}`}
+                        value={newTaskName}
+                        onChange={(e) => setNewTaskName(e.target.value)}
+                        className="w-full px-3 py-2 bg-neutral-900 border border-neutral-850 rounded-lg focus:border-rose-500 outline-none text-xs text-white"
+                        required
+                      />
 
                   {/* Standard Reference Photo (Host Example) */}
                   <div className="space-y-1.5 pt-1">
@@ -3062,6 +3208,8 @@ export default function DashboardClient() {
                     </button>
                   </div>
                 </form>
+              )}
+                </div>
               </div>
 
               {/* Task list container grouped by Collapsible Room Cards */}

@@ -84,7 +84,57 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { property_id, task_name, requires_photo, sort_order } = await request.json();
+    const body = await request.json();
+
+    // Handle bulk checklist tasks import (e.g. pasted from Turno, Word doc, or Email)
+    if (body.tasks && Array.isArray(body.tasks)) {
+      const { property_id, tasks } = body;
+      if (!property_id || tasks.length === 0) {
+        return NextResponse.json({ success: false, error: 'Property ID and tasks array are required.' }, { status: 400 });
+      }
+
+      // Verify property belongs to host
+      const { data: property, error: propError } = await supabaseAdmin
+        .from('airbnb_properties')
+        .select('id')
+        .eq('id', property_id)
+        .eq('host_id', host.id)
+        .maybeSingle();
+
+      if (propError || !property) {
+        return NextResponse.json({ success: false, error: 'Property not found or access denied.' }, { status: 404 });
+      }
+
+      // Get highest existing sort_order for property
+      const { data: existing } = await supabaseAdmin
+        .from('airbnb_checklists')
+        .select('sort_order')
+        .eq('property_id', property_id)
+        .order('sort_order', { ascending: false })
+        .limit(1);
+
+      const maxSort = existing && existing.length > 0 ? (existing[0].sort_order || 0) : 0;
+
+      const bulkTasks = tasks.map((t: any, index: number) => ({
+        property_id,
+        task_name: t.task_name.trim(),
+        requires_photo: !!t.requires_photo,
+        sort_order: maxSort + index + 1
+      }));
+
+      const { data: createdTasks, error } = await supabaseAdmin
+        .from('airbnb_checklists')
+        .insert(bulkTasks)
+        .select('*');
+
+      if (error) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, tasks: createdTasks });
+    }
+
+    const { property_id, task_name, requires_photo, sort_order } = body;
 
     if (!property_id || !task_name) {
       return NextResponse.json({ success: false, error: 'Property ID and task name are required.' }, { status: 400 });
