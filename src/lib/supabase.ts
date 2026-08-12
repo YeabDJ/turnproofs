@@ -1,10 +1,11 @@
-const VALID_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "https://vtcjypssthnmkbvbrpjq.supabase.co";
+const cleanUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL || "https://vtcjypssthnmkbvbrpjq.supabase.co").replace(/["'\s]/g, '');
 const FALLBACK_JWT_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0Y2p5cHNzdGhubWtidmJycGpxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTI3MDEwMSwiZXhwIjoyMTAwODQ2MTAxfQ.XAI-5oXSk1EFzgJSQKFis7WVleue74Wa0E8zfSr07z0";
 
-let rawServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+let rawServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").replace(/["'\s]/g, '');
 if (!rawServiceKey || !rawServiceKey.startsWith('ey')) {
   rawServiceKey = FALLBACK_JWT_KEY;
 }
+const VALID_SUPABASE_URL = cleanUrl;
 const VALID_SERVICE_ROLE_KEY = rawServiceKey;
 
 class SupabaseRestHelper {
