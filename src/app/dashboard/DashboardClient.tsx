@@ -239,7 +239,7 @@ export default function DashboardClient() {
   // Bulk Copy-Paste Checklist Importer State
   const [checklistMode, setChecklistMode] = useState<'single' | 'bulk'>('single');
   const [bulkText, setBulkText] = useState('');
-  const [bulkRequirePhotos, setBulkRequirePhotos] = useState(true);
+  const [bulkRequirePhotos, setBulkRequirePhotos] = useState(false);
   const [importingBulk, setImportingBulk] = useState(false);
 
   const isPaidActive = !!(host?.subscription_status === 'active' || host?.stripe_subscription_id);
@@ -3380,19 +3380,34 @@ export default function DashboardClient() {
                                       <span className="text-xs font-mono text-neutral-500 mt-0.5">{i + 1}</span>
                                       <div className="truncate">
                                         <p className="text-xs font-semibold text-neutral-200 truncate">{cleanText}</p>
-                                        <button
-                                          type="button"
-                                          onClick={() => handleToggleTaskPhoto(task.id, task.requires_photo)}
-                                          className={`inline-flex items-center gap-1 text-[9px] font-bold mt-1 px-2 py-0.5 rounded-md uppercase transition-all cursor-pointer ${
-                                            task.requires_photo
-                                              ? 'text-amber-300 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30'
-                                              : 'text-neutral-500 bg-neutral-950 hover:bg-neutral-800 border border-neutral-800'
-                                          }`}
-                                          title="Click to toggle photo requirement on/off"
-                                        >
-                                          <Camera className={`h-3 w-3 ${task.requires_photo ? 'text-amber-400' : 'text-neutral-500'}`} />
-                                          <span>{task.requires_photo ? '📷 Photo Required' : '🚫 No Photo'}</span>
-                                        </button>
+                                        <div className="flex items-center gap-1.5 mt-1.5">
+                                          <button
+                                            type="button"
+                                            onClick={() => handleToggleTaskPhoto(task.id, true)}
+                                            className={`px-2 py-0.5 rounded-md text-[9px] font-extrabold transition-all cursor-pointer border flex items-center gap-1 ${
+                                              !task.requires_photo
+                                                ? 'bg-neutral-800 text-emerald-300 border-emerald-500/40 shadow-xs'
+                                                : 'bg-neutral-950 text-neutral-500 border-neutral-850 hover:text-neutral-300'
+                                            }`}
+                                            title="Set to Photo Optional (no photo needed)"
+                                          >
+                                            <span>{!task.requires_photo ? '✓ Photo Optional' : 'Photo Optional'}</span>
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            onClick={() => handleToggleTaskPhoto(task.id, false)}
+                                            className={`px-2 py-0.5 rounded-md text-[9px] font-extrabold transition-all cursor-pointer border flex items-center gap-1 ${
+                                              task.requires_photo
+                                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-xs'
+                                                : 'bg-neutral-950 text-neutral-500 border-neutral-850 hover:text-neutral-300'
+                                            }`}
+                                            title="Set to Photo Required (cleaner must take a photo)"
+                                          >
+                                            <Camera className={`h-3 w-3 ${task.requires_photo ? 'text-amber-400' : 'text-neutral-500'}`} />
+                                            <span>{task.requires_photo ? '📷 ✓ Photo Required' : '📷 Photo Required'}</span>
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
 
