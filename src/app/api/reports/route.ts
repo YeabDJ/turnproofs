@@ -122,7 +122,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <onboarding@resend.dev>';
+    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <support@turnproofs.com>';
 
     for (const recipient of Array.from(recipients)) {
       try {
@@ -152,7 +152,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: 'TurnProofs <onboarding@resend.dev>',
+              from: fromAddress,
               to: ['yeabidj@gmail.com'],
               subject: `📋 [DISPATCH COPY -> ${recipient}] TurnProofs Cleaning Audit Completed for ${propertyName}`,
               html
