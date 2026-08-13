@@ -273,18 +273,16 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [emailSentToast, setEmailSentToast] = useState(false);
 
   const handleResendEmail = async () => {
-    const inputEmail = window.prompt(lang === 'en' ? "Enter destination email address to receive report:" : "Ingrese la dirección de correo de destino:", "yeabidj@gmail.com");
-    if (!inputEmail || !inputEmail.includes('@')) return;
-
+    if (sendingEmail) return;
     setSendingEmail(true);
+
     try {
       const res = await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'resend_email_report',
-          reportId: report?.id || reportId,
-          targetEmail: inputEmail.trim()
+          reportId: report?.id || reportId
         })
       });
       const data = await res.json();

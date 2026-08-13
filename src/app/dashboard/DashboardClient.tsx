@@ -250,22 +250,18 @@ export default function DashboardClient() {
   const isPaidActive = !!(host?.subscription_status === 'active' || host?.stripe_subscription_id);
 
   const handleResendReportEmail = async (reportId: string) => {
-    const inputEmail = window.prompt("Enter destination email address to resend report:", "yeabidj@gmail.com");
-    if (!inputEmail || !inputEmail.includes('@')) return;
-
     try {
       const res = await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'resend_email_report',
-          reportId: reportId,
-          targetEmail: inputEmail.trim()
+          reportId: reportId
         })
       });
       const data = await res.json();
       if (data.success) {
-        alert("✓ Verified report email resent successfully to " + inputEmail);
+        alert("✓ Report email resent to all recorded recipients (Host, Cleaner, & Facility Manager)!");
       } else {
         alert("Failed to resend report email: " + (data.error || 'Unknown error'));
       }
