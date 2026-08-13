@@ -282,52 +282,26 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       }
 
       setLang('en');
-      await new Promise((r) => setTimeout(r, 250));
+      await new Promise((r) => setTimeout(r, 200));
+
+      const propNameClean = (report?.airbnb_properties?.name || 'Property').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const dateObj = report?.completed_at || report?.created_at ? new Date(report.completed_at || report.created_at) : new Date();
+      const formattedDate = `${dateObj.getMonth() + 1}-${dateObj.getDate()}-${dateObj.getFullYear()}`;
+      const filename = `TurnProofs_Report_${propNameClean}_${formattedDate}.pdf`;
 
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
-      // Convert all images inside the certificate card to base64 Data URIs to guarantee zero CORS canvas tainting
-      const images = Array.from(element.querySelectorAll('img'));
-      await Promise.all(images.map(async (img) => {
-        if (!img.src || img.src.startsWith('data:')) return;
-        try {
-          const res = await fetch(img.src, { mode: 'cors' });
-          if (res.ok) {
-            const blob = await res.blob();
-            const reader = new FileReader();
-            await new Promise((resolve) => {
-              reader.onloadend = () => {
-                if (reader.result) {
-                  img.setAttribute('data-original-src', img.src);
-                  img.src = reader.result as string;
-                }
-                resolve(null);
-              };
-              reader.readAsDataURL(blob);
-            });
-          }
-        } catch (e) {
-          img.crossOrigin = 'anonymous';
-        }
-      }));
-
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
-        allowTaint: false,
+        allowTaint: true,
         backgroundColor: '#0a0a0a',
         logging: false,
         ignoreElements: (el) => el.classList.contains('no-print')
       });
 
-      // Restore original image sources
-      images.forEach((img) => {
-        const orig = img.getAttribute('data-original-src');
-        if (orig) img.src = orig;
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.92);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
@@ -350,30 +324,11 @@ export default function ReportClient({ reportId }: { reportId: string }) {
         heightLeft -= pageHeight;
       }
 
-      const propNameClean = (report?.airbnb_properties?.name || 'Property').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const dateObj = report?.completed_at || report?.created_at ? new Date(report.completed_at || report.created_at) : new Date();
-      const formattedDate = `${dateObj.getMonth() + 1}-${dateObj.getDate()}-${dateObj.getFullYear()}`;
-      const filename = `TurnProofs_Report_${propNameClean}_${formattedDate}.pdf`;
       pdf.save(filename);
     } catch (err: any) {
       console.error("PDF Export Error:", err);
-      try {
-        const element = document.getElementById('report-certificate-card');
-        if (element) {
-          const htmlContent = `<!DOCTYPE html><html><head><title>TurnProofs Certificate ${report?.id || ''}</title><base href="https://turnproofs.com/" target="_blank"><style>body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #ffffff; padding: 20px; } img { max-width: 100%; height: auto; }</style></head><body>${element.innerHTML}</body></html>`;
-          const blob = new Blob([htmlContent], { type: 'text/html' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `turnproofs-certificate-${report?.id ? report.id.substring(0, 8) : 'report'}.html`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      } catch (fallbackErr) {
-        alert("Failed to export PDF file. Please try again.");
-      }
+      // Fallback: Trigger native browser PDF print dialog if canvas export fails
+      window.print();
     } finally {
       setLang(originalLang);
       setDownloadingPdf(false);
