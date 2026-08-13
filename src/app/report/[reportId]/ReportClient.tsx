@@ -274,64 +274,20 @@ export default function ReportClient({ reportId }: { reportId: string }) {
     if (downloadingPdf) return;
     setDownloadingPdf(true);
 
-    const originalLang = lang;
     try {
-      const element = document.getElementById('report-certificate-card');
-      if (!element) {
-        throw new Error("Certificate element not found.");
-      }
-
-      setLang('en');
-      await new Promise((r) => setTimeout(r, 200));
-
-      const propNameClean = (report?.airbnb_properties?.name || 'Property').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const dateObj = report?.completed_at || report?.created_at ? new Date(report.completed_at || report.created_at) : new Date();
-      const formattedDate = `${dateObj.getMonth() + 1}-${dateObj.getDate()}-${dateObj.getFullYear()}`;
-      const filename = `TurnProofs_Report_${propNameClean}_${formattedDate}.pdf`;
-
-      const html2canvas = (await import('html2canvas')).default;
-      const { jsPDF } = await import('jspdf');
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#0a0a0a',
-        logging: false,
-        ignoreElements: (el) => el.classList.contains('no-print')
-      });
-
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgWidth = 210;
-      const pageHeight = 297;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(filename);
+      // Direct server-side PDF download with application/pdf Content-Type & Content-Disposition attachment headers
+      const downloadUrl = `/api/reports/${reportId}/pdf`;
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (err: any) {
-      console.error("PDF Export Error:", err);
-      // Fallback: Trigger native browser PDF print dialog if canvas export fails
+      console.error("PDF Download Error:", err);
       window.print();
     } finally {
-      setLang(originalLang);
-      setDownloadingPdf(false);
+      setTimeout(() => setDownloadingPdf(false), 1500);
     }
   };
 
