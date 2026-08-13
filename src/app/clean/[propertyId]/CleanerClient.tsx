@@ -273,12 +273,20 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
 
   const [isHostPaused, setIsHostPaused] = useState(false);
 
-  // Load initial data & restore saved cleaner email
+  // Load initial data & restore saved cleaner email & name
   useEffect(() => {
     try {
       const savedEmail = localStorage.getItem('turnproofs_saved_cleaner_email');
       if (savedEmail) {
         setCleanerEmail(savedEmail);
+      }
+      const savedCleanerId = localStorage.getItem('turnproofs_saved_cleaner_id');
+      if (savedCleanerId) {
+        setSelectedCleaner(savedCleanerId);
+      }
+      const savedCleanerName = localStorage.getItem('turnproofs_saved_cleaner_name');
+      if (savedCleanerName) {
+        setCustomCleanerName(savedCleanerName);
       }
     } catch (e) {}
 
@@ -475,6 +483,12 @@ export default function CleanerClient({ propertyId }: { propertyId: string }) {
       localStorage.setItem(`turnproofs_autosave_${propertyId}`, JSON.stringify(sessionState));
       if (cleanerEmail) {
         localStorage.setItem('turnproofs_saved_cleaner_email', cleanerEmail);
+      }
+      if (selectedCleaner) {
+        localStorage.setItem('turnproofs_saved_cleaner_id', selectedCleaner);
+      }
+      if (customCleanerName) {
+        localStorage.setItem('turnproofs_saved_cleaner_name', customCleanerName);
       }
     } catch (e) {
       console.error('Failed to auto-save session progress', e);
