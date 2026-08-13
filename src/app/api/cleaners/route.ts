@@ -10,63 +10,74 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const propertyId = searchParams.get('propertyId');
 
-    if (propertyId) {
-      // Find cleaners for this specific property
-      const { data: cleaners, error } = await supabaseAdmin
-        .from('airbnb_cleaners')
-        .select('*')
-        .eq('property_id', propertyId)
-        .order('name', { ascending: true });
+    let targetHostId: string | null = null;
 
-      if (error) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    if (propertyId) {
+      if (propertyId === 'demo' || propertyId === 'sample-property') {
+        return NextResponse.json({
+          success: true,
+          cleaners: [
+            { id: 'c1', name: 'Sarah Jenkins', phone: 'sarah@cleaningservice.com' },
+            { id: 'c2', name: 'Morgan (Lead Cleaner)', phone: 'info@eqcdmv.com' },
+            { id: 'c3', name: 'Carlos Rodriguez', phone: 'carlos@cleaning.com' }
+          ]
+        });
       }
 
-      return NextResponse.json({ success: true, cleaners: cleaners || [] });
-    } else {
+      // Find the host who owns this property
+      const { data: property } = await supabaseAdmin
+        .from('airbnb_properties')
+        .select('host_id')
+        .eq('id', propertyId)
+        .maybeSingle();
+
+      if (property?.host_id) {
+        targetHostId = property.host_id;
+      }
+    }
+
+    if (!targetHostId) {
       // Authenticated host request
       const host = await getAuthenticatedHost();
       if (!host) {
         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
       }
-
-      // Fetch all property IDs for this host
-      const { data: properties, error: propErr } = await supabaseAdmin
-        .from('airbnb_properties')
-        .select('id')
-        .eq('host_id', host.id);
-
-      if (propErr) {
-        return NextResponse.json({ success: false, error: propErr.message }, { status: 500 });
-      }
-
-      const propertyIds = (properties || []).map((p: any) => p.id);
-      if (propertyIds.length === 0) {
-        return NextResponse.json({ success: true, cleaners: [] });
-      }
-
-      const { data: cleaners, error } = await supabaseAdmin
-        .from('airbnb_cleaners')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (error) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-      }
-
-      const hostCleaners = (cleaners || []).filter((c: any) => propertyIds.includes(c.property_id));
-
-      // Deduplicate cleaners by name so each cleaner profile displays once in the host staff list
-      const uniqueMap = new Map();
-      for (const cleaner of hostCleaners) {
-        const key = cleaner.name.toLowerCase().trim();
-        if (!uniqueMap.has(key)) {
-          uniqueMap.set(key, cleaner);
-        }
-      }
-
-      return NextResponse.json({ success: true, cleaners: Array.from(uniqueMap.values()) });
+      targetHostId = host.id;
     }
+
+    // Fetch all property IDs owned by this host
+    const { data: hostProperties } = await supabaseAdmin
+      .from('airbnb_properties')
+      .select('id')
+      .eq('host_id', targetHostId);
+
+    const hostPropIds = (hostProperties || []).map((p: any) => p.id);
+
+    if (hostPropIds.length === 0) {
+      return NextResponse.json({ success: true, cleaners: [] });
+    }
+
+    // Fetch all cleaners belonging to any property of this host
+    const { data: rawCleaners, error } = await supabaseAdmin
+      .from('airbnb_cleaners')
+      .select('*')
+      .in('property_id', hostPropIds)
+      .order('name', { ascending: true });
+
+    if (error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+
+    // Deduplicate cleaners by name so each staff cleaner appears once in the dropdown
+    const uniqueMap = new Map();
+    for (const cleaner of (rawCleaners || [])) {
+      const key = cleaner.name.toLowerCase().trim();
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, cleaner);
+      }
+    }
+
+    return NextResponse.json({ success: true, cleaners: Array.from(uniqueMap.values()) });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
