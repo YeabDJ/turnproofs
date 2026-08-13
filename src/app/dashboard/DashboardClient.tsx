@@ -1078,11 +1078,28 @@ export default function DashboardClient() {
                             <div className="flex gap-2 pt-2">
                               <button
                                 onClick={() => openChecklistManager(prop)}
-                                className="flex-1 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-sm font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                className="flex-1 py-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                               >
                                 <ListTodo className="h-4 w-4 text-neutral-400" />
                                 <span>Edit Checklist</span>
                               </button>
+                              
+                              {(() => {
+                                const lastRep = reports.find(r => r.property_id === prop.id);
+                                return (
+                                  <a
+                                    href={lastRep ? `/report/${lastRep.id}` : `/report/sample-report`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="px-3 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                                    title={lastRep ? "View latest submitted turnover report PDF" : "View sample turnover report PDF"}
+                                  >
+                                    <FileCheck2 className="h-4 w-4 text-emerald-400" />
+                                    <span>📄 Last Report</span>
+                                  </a>
+                                );
+                              })()}
+
                               <button
                                 onClick={() => openDuplicateModal(prop)}
                                 className="p-2.5 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-purple-500/30 hover:bg-purple-500/10 hover:text-purple-400 transition-all cursor-pointer"
