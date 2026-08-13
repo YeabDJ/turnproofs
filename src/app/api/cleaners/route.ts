@@ -17,9 +17,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           cleaners: [
-            { id: 'c1', name: 'Sarah Jenkins', phone: 'sarah@cleaningservice.com', property_id: 'ALL' },
-            { id: 'c2', name: 'Maria (Sunset Villa Specialist)', phone: 'maria@cleaning.com', property_id: 'demo' },
-            { id: 'c3', name: 'Carlos Rodriguez', phone: 'carlos@cleaning.com', property_id: 'ALL' }
+            { id: 'c1', name: 'Sarah Jenkins', phone: 'sarah@cleaningservice.com' },
+            { id: 'c2', name: 'Maria (Sunset Villa Specialist)', phone: 'maria@cleaning.com' },
+            { id: 'c3', name: 'Carlos Rodriguez', phone: 'carlos@cleaning.com' }
           ]
         });
       }
@@ -42,51 +42,69 @@ export async function GET(request: NextRequest) {
       if (!host) {
         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
       }
+      targetHostId = host.id;
+    }
 
-      // Return all cleaners owned by host properties or assigned to 'ALL'
-      const { data: hostProperties } = await supabaseAdmin
-        .from('airbnb_properties')
-        .select('id, name')
-        .eq('host_id', host.id);
+    // Fetch all property IDs owned by this host
+    const { data: hostProperties } = await supabaseAdmin
+      .from('airbnb_properties')
+      .select('id, name')
+      .eq('host_id', targetHostId);
 
-      const hostPropIds = (hostProperties || []).map((p: any) => p.id);
-      const validPropIds = [...hostPropIds, 'ALL'];
+    const hostPropIds = (hostProperties || []).map((p: any) => p.id);
 
-      const { data: rawCleaners, error } = await supabaseAdmin
+    if (hostPropIds.length === 0) {
+      return NextResponse.json({ success: true, cleaners: [] });
+    }
+
+    // If requested for a specific property link (?propertyId=xxx), return cleaners for that propertyId
+    if (propertyId) {
+      const { data: cleaners, error } = await supabaseAdmin
         .from('airbnb_cleaners')
         .select('*')
-        .in('property_id', validPropIds)
+        .eq('property_id', propertyId)
         .order('name', { ascending: true });
 
       if (error) {
         return NextResponse.json({ success: false, error: error.message }, { status: 500 });
       }
 
-      return NextResponse.json({ success: true, cleaners: rawCleaners || [] });
+      return NextResponse.json({ success: true, cleaners: cleaners || [] });
     }
 
-    // Request for a specific property cleaner link (?propertyId=xxx)
-    // Return cleaners assigned specifically to this propertyId OR assigned to 'ALL' portfolio properties
+    // Authenticated host dashboard staff list
     const { data: rawCleaners, error } = await supabaseAdmin
       .from('airbnb_cleaners')
       .select('*')
-      .in('property_id', [propertyId, 'ALL'])
+      .in('property_id', hostPropIds)
       .order('name', { ascending: true });
 
     if (error) {
       return NextResponse.json({ success: false, error: error.message }, { status: 500 });
     }
 
-    // Deduplicate by name
-    const uniqueMap = new Map();
-    for (const cleaner of (rawCleaners || [])) {
-      const key = cleaner.name.toLowerCase().trim();
-      if (!uniqueMap.has(key)) {
-        uniqueMap.set(key, cleaner);
+    // Group cleaners by name & phone to determine if assigned to ALL properties or a specific property
+    const grouped = new Map<string, { cleaner: any; propIds: Set<string> }>();
+    for (const c of (rawCleaners || [])) {
+      const key = `${c.name.toLowerCase().trim()}_${c.phone.toLowerCase().trim()}`;
+      if (!grouped.has(key)) {
+        grouped.set(key, { cleaner: { ...c }, propIds: new Set([c.property_id]) });
+      } else {
+        grouped.get(key)!.propIds.add(c.property_id);
       }
     }
 
-    return NextResponse.json({ success: true, cleaners: Array.from(uniqueMap.values()) });
+    const cleanersResult: any[] = [];
+    grouped.forEach(({ cleaner, propIds }) => {
+      // If cleaner is registered across all host properties, mark property_id as 'ALL'
+      if (hostPropIds.length > 0 && propIds.size >= hostPropIds.length) {
+        cleanersResult.push({ ...cleaner, property_id: 'ALL' });
+      } else {
+        cleanersResult.push(cleaner);
+      }
+    });
+
+    return NextResponse.json({ success: true, cleaners: cleanersResult });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -106,29 +124,63 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Cleaner name and email/phone are required.' }, { status: 400 });
     }
 
-    const targetPropertyId = (property_id && property_id.trim()) ? property_id.trim() : 'ALL';
+    // Fetch host's properties
+    const { data: properties } = await supabaseAdmin
+      .from('airbnb_properties')
+      .select('id')
+      .eq('host_id', host.id);
 
-    const { data: newCleaner, error } = await supabaseAdmin
-      .from('airbnb_cleaners')
-      .insert({
-        property_id: targetPropertyId,
-        name: name.trim(),
-        phone: phone.trim()
-      })
-      .select('*')
-      .single();
-
-    if (error) {
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    if (!properties || properties.length === 0) {
+      return NextResponse.json({ success: false, error: 'Please create a property unit first before adding staff cleaners.' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, cleaner: newCleaner });
+    // If a specific property_id was selected (and is a valid property owned by host)
+    if (property_id && properties.some((p: any) => p.id === property_id)) {
+      const { data: newCleaner, error } = await supabaseAdmin
+        .from('airbnb_cleaners')
+        .insert({
+          property_id: property_id,
+          name: name.trim(),
+          phone: phone.trim()
+        })
+        .select('*')
+        .single();
+
+      if (error) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      return NextResponse.json({ success: true, cleaner: newCleaner });
+    } else {
+      // "All Portfolio Properties" selected -> Insert cleaner record for each property owned by host
+      const recordsToInsert = properties.map((p: any) => ({
+        property_id: p.id,
+        name: name.trim(),
+        phone: phone.trim()
+      }));
+
+      const { data: createdCleaners, error } = await supabaseAdmin
+        .from('airbnb_cleaners')
+        .insert(recordsToInsert)
+        .select('*');
+
+      if (error) {
+        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+      }
+
+      const firstCleaner = createdCleaners && createdCleaners.length > 0 
+        ? { ...createdCleaners[0], property_id: 'ALL' } 
+        : null;
+
+      return NextResponse.json({ success: true, cleaner: firstCleaner });
+    }
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
 
 // DELETE a cleaner (requires host auth)
+// Deletes cleaner by name & phone across host properties (or by ID)
 export async function DELETE(request: NextRequest) {
   try {
     const host = await getAuthenticatedHost();
@@ -143,13 +195,35 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Cleaner ID is required.' }, { status: 400 });
     }
 
-    const { error: deleteError } = await supabaseAdmin
+    // Find the cleaner details first
+    const { data: targetCleaner } = await supabaseAdmin
       .from('airbnb_cleaners')
-      .delete()
-      .eq('id', id);
+      .select('name, phone')
+      .eq('id', id)
+      .maybeSingle();
 
-    if (deleteError) {
-      return NextResponse.json({ success: false, error: deleteError.message }, { status: 500 });
+    if (targetCleaner) {
+      // Delete all records matching this cleaner name & phone for this host's properties
+      const { data: hostProperties } = await supabaseAdmin
+        .from('airbnb_properties')
+        .select('id')
+        .eq('host_id', host.id);
+
+      const hostPropIds = (hostProperties || []).map((p: any) => p.id);
+
+      if (hostPropIds.length > 0) {
+        await supabaseAdmin
+          .from('airbnb_cleaners')
+          .delete()
+          .in('property_id', hostPropIds)
+          .eq('name', targetCleaner.name)
+          .eq('phone', targetCleaner.phone);
+      }
+    } else {
+      await supabaseAdmin
+        .from('airbnb_cleaners')
+        .delete()
+        .eq('id', id);
     }
 
     return NextResponse.json({ success: true });
