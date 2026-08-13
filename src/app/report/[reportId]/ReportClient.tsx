@@ -269,6 +269,37 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   };
 
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSentToast, setEmailSentToast] = useState(false);
+
+  const handleResendEmail = async () => {
+    const inputEmail = window.prompt(lang === 'en' ? "Enter destination email address to receive report:" : "Ingrese la dirección de correo de destino:", "yeabidj@gmail.com");
+    if (!inputEmail || !inputEmail.includes('@')) return;
+
+    setSendingEmail(true);
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'resend_email_report',
+          reportId: report?.id || reportId,
+          targetEmail: inputEmail.trim()
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEmailSentToast(true);
+        setTimeout(() => setEmailSentToast(false), 4000);
+      } else {
+        alert("Failed to send email: " + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert("Error triggering email dispatch.");
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   const handleDownloadPDF = async () => {
     if (downloadingPdf) return;
@@ -559,6 +590,15 @@ export default function ReportClient({ reportId }: { reportId: string }) {
             >
               <Camera className="h-4 w-4 text-emerald-400 shrink-0" />
               <span>{lang === 'en' ? '📷 Add Fix / Retouch Proof' : '📷 Añadir Corrección'}</span>
+            </button>
+
+            <button
+              onClick={handleResendEmail}
+              disabled={sendingEmail}
+              className="px-3.5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+            >
+              {sendingEmail ? <RefreshCw className="h-4 w-4 animate-spin" /> : '✉️'}
+              <span>{sendingEmail ? (lang === 'en' ? 'Sending...' : 'Enviando...') : (lang === 'en' ? 'Email' : 'Correo')}</span>
             </button>
 
             <button

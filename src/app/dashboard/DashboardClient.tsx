@@ -249,6 +249,31 @@ export default function DashboardClient() {
 
   const isPaidActive = !!(host?.subscription_status === 'active' || host?.stripe_subscription_id);
 
+  const handleResendReportEmail = async (reportId: string) => {
+    const inputEmail = window.prompt("Enter destination email address to resend report:", "yeabidj@gmail.com");
+    if (!inputEmail || !inputEmail.includes('@')) return;
+
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'resend_email_report',
+          reportId: reportId,
+          targetEmail: inputEmail.trim()
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("✓ Verified report email resent successfully to " + inputEmail);
+      } else {
+        alert("Failed to resend report email: " + (data.error || 'Unknown error'));
+      }
+    } catch (e) {
+      alert("Error resending email.");
+    }
+  };
+
   // Check auth and load initial dashboard data
   useEffect(() => {
     async function checkAuthAndLoad() {
@@ -1329,15 +1354,25 @@ export default function DashboardClient() {
                                     </td>
                                     <td className="p-4 text-xs font-mono">{durationMin} min</td>
                                     <td className="p-4 text-right">
-                                      <a
-                                        href={`/report/${report.id}`}
-                                        target="_blank"
-                                        rel="noreferrer"
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 text-xs font-semibold transition-all"
-                                      >
-                                        <span>Certificate</span>
-                                        <ExternalLink className="h-3.5 w-3.5" />
-                                      </a>
+                                       <div className="flex items-center justify-end gap-2">
+                                         <button
+                                           onClick={() => handleResendReportEmail(report.id)}
+                                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-300 text-xs font-semibold transition-all cursor-pointer"
+                                           title="Re-send Email Report"
+                                         >
+                                           <span>✉️</span>
+                                           <span>Email</span>
+                                         </button>
+                                         <a
+                                           href={`/report/${report.id}`}
+                                           target="_blank"
+                                           rel="noreferrer"
+                                           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-rose-500/40 hover:bg-rose-500/10 hover:text-rose-400 text-xs font-semibold transition-all"
+                                         >
+                                           <span>Certificate</span>
+                                           <ExternalLink className="h-3.5 w-3.5" />
+                                         </a>
+                                       </div>
                                     </td>
                                   </tr>
                                 );

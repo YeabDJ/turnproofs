@@ -400,6 +400,25 @@ export async function POST(request: NextRequest) {
       reportId
     } = body;
 
+    // Action: Resend report email to host/cleaner or custom email address
+    if (action === 'resend_email_report') {
+      const targetReportId = body.reportId;
+      const customEmail = body.targetEmail;
+
+      const { data: targetRep } = await supabaseAdmin
+        .from('airbnb_reports')
+        .select('property_id')
+        .eq('id', targetReportId)
+        .maybeSingle();
+
+      if (!targetRep) {
+        return NextResponse.json({ success: false, error: 'Report not found' }, { status: 404 });
+      }
+
+      await sendCheckoutReportEmail(targetRep.property_id, targetReportId, customEmail);
+      return NextResponse.json({ success: true, message: 'Report email resent successfully!' });
+    }
+
     // Send demo email action
     if (action === 'send_demo_email') {
       const { email, notes: demoNotes } = body;
