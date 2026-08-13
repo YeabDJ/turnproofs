@@ -58,15 +58,15 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       } catch (e) {}
     }
 
-    if (!resolvedCleanerEmail && report?.cleaner_name && property?.host_id) {
+    if (!resolvedCleanerEmail && report?.cleaner_name) {
       const { data: cleanerObj } = await supabaseAdmin
         .from('airbnb_cleaners')
-        .select('email')
-        .eq('host_id', property.host_id)
+        .select('phone')
         .ilike('name', report.cleaner_name.trim())
+        .limit(1)
         .maybeSingle();
-      if (cleanerObj?.email) {
-        resolvedCleanerEmail = cleanerObj.email.trim();
+      if (cleanerObj?.phone && cleanerObj.phone.includes('@')) {
+        resolvedCleanerEmail = cleanerObj.phone.trim();
       }
     }
 
@@ -122,10 +122,12 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const fromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <reports@turnproofs.com>';
+    const customFromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <reports@turnproofs.com>';
+    const sandboxFromAddress = 'TurnProofs <onboarding@resend.dev>';
 
     for (const recipient of Array.from(recipients)) {
       try {
+        // Attempt sending with primary domain sender
         let res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
@@ -133,7 +135,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            from: fromAddress,
+            from: customFromAddress,
             to: [recipient],
             subject: `📋 TurnProofs Cleaning Audit Completed for ${propertyName}`,
             html
@@ -142,9 +144,9 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
         let resData = await res.json();
         console.log(`[REPORT DUAL EMAIL DISPATCH -> ${recipient}]: status = ${res.status}`, resData);
 
-        // Fallback retry to account owner if primary dispatch returns unverified domain restriction
+        // Smart Fallback: If primary domain is unverified (status 403/422), fallback to sandbox onboarding@resend.dev
         if (!res.ok) {
-          console.warn(`[RESEND DISPATCH NOTICE - status ${res.status}] Retrying direct dispatch copy to yeabidj@gmail.com...`);
+          console.warn(`[RESEND DISPATCH NOTICE - status ${res.status}] Retrying with sandbox sender onboarding@resend.dev to yeabidj@gmail.com...`);
           res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -152,7 +154,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              from: fromAddress,
+              from: sandboxFromAddress,
               to: ['yeabidj@gmail.com'],
               subject: `📋 [DISPATCH COPY -> ${recipient}] TurnProofs Cleaning Audit Completed for ${propertyName}`,
               html
