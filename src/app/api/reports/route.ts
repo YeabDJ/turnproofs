@@ -122,7 +122,7 @@ async function sendCheckoutReportEmail(propertyId: string, reportId: string, cle
       </div>
     `;
 
-    const customFromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <reports@turnproofs.com>';
+    const customFromAddress = process.env.RESEND_FROM_EMAIL || 'TurnProofs <report@turnproofs.com>';
     const sandboxFromAddress = 'TurnProofs <onboarding@resend.dev>';
 
     for (const recipient of Array.from(recipients)) {
