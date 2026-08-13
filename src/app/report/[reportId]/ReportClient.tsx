@@ -350,7 +350,10 @@ export default function ReportClient({ reportId }: { reportId: string }) {
         heightLeft -= pageHeight;
       }
 
-      const filename = `turnproofs-certificate-${report?.id ? report.id.substring(0, 8) : 'report'}.pdf`;
+      const propNameClean = (report?.airbnb_properties?.name || 'Property').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const dateObj = report?.completed_at || report?.created_at ? new Date(report.completed_at || report.created_at) : new Date();
+      const formattedDate = `${dateObj.getMonth() + 1}-${dateObj.getDate()}-${dateObj.getFullYear()}`;
+      const filename = `TurnProofs_Report_${propNameClean}_${formattedDate}.pdf`;
       pdf.save(filename);
     } catch (err: any) {
       console.error("PDF Export Error:", err);
