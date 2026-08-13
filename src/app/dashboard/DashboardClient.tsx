@@ -55,6 +55,7 @@ interface Cleaner {
   id: string;
   name: string;
   phone: string;
+  property_id?: string;
   created_at: string;
 }
 
@@ -1208,7 +1209,17 @@ export default function DashboardClient() {
                           >
                             <div>
                               <h4 className="font-bold text-base text-neutral-100">{cleaner.name}</h4>
-                              <p className="text-xs text-neutral-400 mt-1">{cleaner.phone}</p>
+                              <p className="text-xs text-neutral-400 mt-0.5">{cleaner.phone}</p>
+                              <div className="mt-2">
+                                <span className="px-2.5 py-1 rounded-lg bg-neutral-950 border border-neutral-800 text-[10px] font-extrabold text-amber-400/90 inline-flex items-center gap-1">
+                                  <span>🏠</span>
+                                  <span>{(() => {
+                                    if (!cleaner.property_id || cleaner.property_id === 'ALL') return 'All Portfolio Properties';
+                                    const assignedProp = properties.find(p => p.id === cleaner.property_id);
+                                    return assignedProp ? assignedProp.name : 'Assigned Unit';
+                                  })()}</span>
+                                </span>
+                              </div>
                             </div>
                             <button
                               onClick={() => handleDeleteCleaner(cleaner.id)}
