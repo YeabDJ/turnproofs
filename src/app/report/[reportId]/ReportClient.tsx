@@ -271,9 +271,18 @@ export default function ReportClient({ reportId }: { reportId: string }) {
   const [downloadingPdf, setDownloadingPdf] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailSentToast, setEmailSentToast] = useState(false);
+  const [cooldownSec, setCooldownSec] = useState(0);
+
+  useEffect(() => {
+    if (cooldownSec <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownSec((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownSec]);
 
   const handleResendEmail = async () => {
-    if (sendingEmail) return;
+    if (sendingEmail || cooldownSec > 0) return;
     setSendingEmail(true);
 
     try {
@@ -288,9 +297,10 @@ export default function ReportClient({ reportId }: { reportId: string }) {
       const data = await res.json();
       if (data.success) {
         setEmailSentToast(true);
+        setCooldownSec(60);
         setTimeout(() => setEmailSentToast(false), 4000);
       } else {
-        alert("Failed to send email: " + (data.error || 'Unknown error'));
+        alert(data.error || 'Failed to send email.');
       }
     } catch (e) {
       alert("Error triggering email dispatch.");
@@ -592,11 +602,23 @@ export default function ReportClient({ reportId }: { reportId: string }) {
 
             <button
               onClick={handleResendEmail}
-              disabled={sendingEmail}
-              className="px-3.5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
+              disabled={sendingEmail || cooldownSec > 0}
+              className="px-3.5 py-2.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center"
             >
-              {sendingEmail ? <RefreshCw className="h-4 w-4 animate-spin" /> : '✉️'}
-              <span>{sendingEmail ? (lang === 'en' ? 'Sending...' : 'Enviando...') : (lang === 'en' ? 'Email' : 'Correo')}</span>
+              {sendingEmail ? (
+                <RefreshCw className="h-4 w-4 animate-spin text-amber-400" />
+              ) : cooldownSec > 0 ? (
+                <span>⏳</span>
+              ) : (
+                <span>✉️</span>
+              )}
+              <span>
+                {sendingEmail
+                  ? (lang === 'en' ? 'Sending...' : 'Enviando...')
+                  : cooldownSec > 0
+                  ? (lang === 'en' ? `Wait ${cooldownSec}s` : `Espere ${cooldownSec}s`)
+                  : (lang === 'en' ? 'Email' : 'Correo')}
+              </span>
             </button>
 
             <button

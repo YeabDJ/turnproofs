@@ -249,7 +249,32 @@ export default function DashboardClient() {
 
   const isPaidActive = !!(host?.subscription_status === 'active' || host?.stripe_subscription_id);
 
+  const [emailCooldowns, setEmailCooldowns] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const activeIds = Object.keys(emailCooldowns).filter(id => emailCooldowns[id] > 0);
+    if (activeIds.length === 0) return;
+
+    const timer = setInterval(() => {
+      setEmailCooldowns((prev) => {
+        const next = { ...prev };
+        let changed = false;
+        Object.keys(next).forEach(id => {
+          if (next[id] > 0) {
+            next[id] = next[id] - 1;
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [emailCooldowns]);
+
   const handleResendReportEmail = async (reportId: string) => {
+    if ((emailCooldowns[reportId] || 0) > 0) return;
+
     try {
       const res = await fetch('/api/reports', {
         method: 'POST',
@@ -261,9 +286,10 @@ export default function DashboardClient() {
       });
       const data = await res.json();
       if (data.success) {
+        setEmailCooldowns(prev => ({ ...prev, [reportId]: 60 }));
         alert("✓ Report email resent to all recorded recipients (Host, Cleaner, & Facility Manager)!");
       } else {
-        alert("Failed to resend report email: " + (data.error || 'Unknown error'));
+        alert(data.error || 'Failed to resend report email.');
       }
     } catch (e) {
       alert("Error resending email.");
@@ -1353,11 +1379,12 @@ export default function DashboardClient() {
                                        <div className="flex items-center justify-end gap-2">
                                          <button
                                            onClick={() => handleResendReportEmail(report.id)}
-                                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-300 text-xs font-semibold transition-all cursor-pointer"
+                                           disabled={(emailCooldowns[report.id] || 0) > 0}
+                                           className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-300 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-semibold transition-all cursor-pointer"
                                            title="Re-send Email Report"
                                          >
-                                           <span>✉️</span>
-                                           <span>Email</span>
+                                           {(emailCooldowns[report.id] || 0) > 0 ? <span>⏳</span> : <span>✉️</span>}
+                                           <span>{(emailCooldowns[report.id] || 0) > 0 ? `${emailCooldowns[report.id]}s` : 'Email'}</span>
                                          </button>
                                          <a
                                            href={`/report/${report.id}`}

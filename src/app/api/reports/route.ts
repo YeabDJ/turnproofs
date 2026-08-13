@@ -365,10 +365,23 @@ export async function POST(request: NextRequest) {
       reportId
     } = body;
 
-    // Action: Resend report email to host/cleaner or custom email address
+const resendCooldowns = new Map<string, number>();
+
+    // Action: Resend report email to host/cleaner or custom email address (Rate limited to 1 per 60 seconds)
     if (action === 'resend_email_report') {
       const targetReportId = body.reportId;
       const customEmail = body.targetEmail;
+      const now = Date.now();
+      const lastSent = resendCooldowns.get(targetReportId) || 0;
+      const elapsedSec = Math.floor((now - lastSent) / 1000);
+
+      if (elapsedSec < 60) {
+        const remaining = 60 - elapsedSec;
+        return NextResponse.json({
+          success: false,
+          error: `Rate limit active. Please wait ${remaining}s before resending another report email.`
+        }, { status: 429 });
+      }
 
       const { data: targetRep } = await supabaseAdmin
         .from('airbnb_reports')
@@ -380,6 +393,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'Report not found' }, { status: 404 });
       }
 
+      resendCooldowns.set(targetReportId, now);
       await sendCheckoutReportEmail(targetRep.property_id, targetReportId, customEmail);
       return NextResponse.json({ success: true, message: 'Report email resent successfully!' });
     }
