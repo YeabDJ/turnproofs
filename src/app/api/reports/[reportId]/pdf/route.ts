@@ -66,7 +66,7 @@ export async function GET(
 
     doc.setFontSize(10);
     doc.setTextColor(148, 163, 184);
-    doc.text('Cryptographically Verified Sanitation Audit Log', 15, 34);
+    doc.text('Verified Time & GPS Sanitation Audit Log', 15, 34);
 
     // Metadata Section
     doc.setTextColor(15, 23, 42);
