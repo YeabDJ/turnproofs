@@ -247,7 +247,7 @@ async function sendResendAlertEmail({
           TurnProofs Automated Mobile Verification & Dispute Prevention System
         </p>
         <p style="font-size: 10px; color: #cbd5e1; margin: 0;">
-          Cryptographically Verified Pre-Checkout Alert • turnproofs.com
+          Verified Pre-Checkout Mobile Alert • turnproofs.com
         </p>
       </div>
 

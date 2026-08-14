@@ -1518,7 +1518,7 @@ export default function ReportClient({ reportId }: { reportId: string }) {
               ) : !(report as any)?.branding?.hide_branding ? (
                 <div className="flex items-center gap-1">
                   <ShieldCheck className="h-4.5 w-4.5 text-emerald-500" />
-                  <span>TurnProofs Certified Audit Log. Cryptographically signed.</span>
+                  <span>TurnProofs Verified Audit Log. Time &amp; GPS Authenticated.</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
