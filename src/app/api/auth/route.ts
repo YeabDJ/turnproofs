@@ -5,47 +5,79 @@ import { getAuthenticatedHost } from '@/lib/auth';
 
 const DEFAULT_RESEND_KEY = ['re', 'W52bn4EG', '3s1LvCcrmw7CtwE9FLQWEPMX'].join('_');
 
-async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: string) {
+// Failed attempt tracker: key: email:ip -> { attempts: number, lockedUntil: number }
+const failedPinTracker = new Map<string, { attempts: number; lockedUntil: number }>();
+
+function getLockoutKey(email: string, ip: string) {
+  return `${email.trim().toLowerCase()}:${ip}`;
+}
+
+function checkRateLimit(email: string, ip: string): { isLocked: boolean; remainingSec: number } {
+  const key = getLockoutKey(email, ip);
+  const record = failedPinTracker.get(key);
+  if (!record) return { isLocked: false, remainingSec: 0 };
+
+  const now = Date.now();
+  if (record.lockedUntil && now < record.lockedUntil) {
+    const remainingSec = Math.ceil((record.lockedUntil - now) / 1000);
+    return { isLocked: true, remainingSec };
+  }
+
+  // Lockout expired
+  if (record.lockedUntil && now >= record.lockedUntil) {
+    failedPinTracker.delete(key);
+  }
+
+  return { isLocked: false, remainingSec: 0 };
+}
+
+function recordFailedAttempt(email: string, ip: string): { count: number; lockedNow: boolean } {
+  const key = getLockoutKey(email, ip);
+  const record = failedPinTracker.get(key) || { attempts: 0, lockedUntil: 0 };
+  record.attempts += 1;
+
+  if (record.attempts >= 5) {
+    record.lockedUntil = Date.now() + 15 * 60 * 1000; // 15 minute lockout
+    failedPinTracker.set(key, record);
+    return { count: record.attempts, lockedNow: true };
+  }
+
+  failedPinTracker.set(key, record);
+  return { count: record.attempts, lockedNow: false };
+}
+
+function clearFailedAttempts(email: string, ip: string) {
+  const key = getLockoutKey(email, ip);
+  failedPinTracker.delete(key);
+}
+
+async function sendWelcomeEmail(toEmail: string) {
   const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
   if (!apiKey) return;
 
   const html = `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; padding: 24px;">
-      <div style="text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; margin-bottom: 24px;">
-        <h1 style="font-size: 24px; font-weight: 800; color: #1e3a8a; margin: 0 0 8px 0;">
-          🎉 Welcome to TurnProofs!
-        </h1>
-        <p style="font-size: 14px; color: #4b5563; margin: 0;">
-          Thank you for joining TurnProofs & protecting your rental properties!
-        </p>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 580px; margin: 0 auto; color: #1e293b; line-height: 1.6; padding: 24px;">
+      <p style="font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #0f172a;">Hey there,</p>
+      
+      <p style="margin-bottom: 16px; font-size: 15px;">Welcome to TurnProofs! Your 14-day trial is active — zero credit card required.</p>
+      
+      <p style="margin-bottom: 16px; font-size: 15px;">The fastest way to see whether this is useful is to run it on one real turnover, so here is the shortest path there:</p>
+      
+      <ol style="padding-left: 20px; margin-bottom: 24px; font-size: 15px;">
+        <li style="margin-bottom: 10px;"><strong>Add your first property</strong> (takes about 30 seconds)</li>
+        <li style="margin-bottom: 10px;"><strong>Review your checklist template</strong></li>
+        <li style="margin-bottom: 10px;"><strong>Send the QR code or link to your cleaner</strong></li>
+      </ol>
+
+      <div style="background: #fff7ed; border-left: 4px solid #ea580c; border-radius: 8px; padding: 16px; margin: 24px 0; font-size: 14px; color: #7c2d12;">
+        Want me to set the first property up for you? Reply directly to this email or write to <a href="mailto:support@turnproofs.com" style="color: #ea580c; font-weight: 700; text-decoration: underline;">support@turnproofs.com</a> with your property address and any specific instructions, and I'll build it and send it right back ready to go.
       </div>
 
-      <div style="color: #374151; font-size: 15px; line-height: 1.6; margin-bottom: 24px;">
-        <p>Hi <strong>${businessName}</strong>,</p>
-        <p>We are thrilled to welcome you to <strong>TurnProofs</strong>! Your host account has been successfully created, and your properties are now equipped with dispute-ready cleaning documentation.</p>
-
-        <div style="background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 16px; margin: 20px 0;">
-          <p style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: #1e293b; text-transform: uppercase;">Your Account Credentials:</p>
-          <p style="margin: 0 0 4px 0; font-size: 14px;"><strong>Account Email:</strong> ${toEmail}</p>
-          <p style="margin: 0; font-size: 14px;"><strong>Passcode PIN:</strong> ${pinCode}</p>
-        </div>
-
-        <h3 style="font-size: 16px; font-weight: 700; color: #0f172a; margin: 20px 0 10px 0;">What you can do right now:</h3>
-        <ul style="padding-left: 20px; margin: 0 0 20px 0;">
-          <li style="margin-bottom: 8px;"><strong>0-App Cleaner Check-in:</strong> Share your unique QR code or cleaner link. Cleaners require zero app downloads.</li>
-          <li style="margin-bottom: 8px;"><strong>Instant Urgent Alerts:</strong> Receive immediate email notifications for broken items, damages, or guest lost & found.</li>
-          <li style="margin-bottom: 8px;"><strong>Professional PDF Documentation:</strong> Generate professional PDF audit certificates to support your Airbnb & VRBO claims.</li>
-        </ul>
-
-        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 16px; border-radius: 12px; font-size: 13.5px; line-height: 1.5;">
-          💡 <strong>We value your feedback:</strong> As we continuously improve TurnProofs, please let us know how we can improve or what custom features you need for your properties! Simply reply directly to this email or write to <a href="mailto:support@turnproofs.com" style="color: #2563eb; font-weight: 700; text-decoration: underline;">support@turnproofs.com</a>.
-        </div>
-      </div>
-
-      <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center;">
-        <p style="font-size: 12px; color: #94a3b8; margin: 0 0 4px 0;">TurnProofs Mobile Verification System</p>
-        <p style="font-size: 11px; color: #cbd5e1; margin: 0;">Dispute-Ready Cleaning Documentation & Quality Auditing</p>
-      </div>
+      <p style="margin-top: 24px; font-weight: 700; margin-bottom: 4px; font-size: 15px;">Best,</p>
+      <p style="margin-top: 0; color: #64748b; font-size: 14px;">
+        Yeab / TurnProofs Team<br/>
+        <a href="mailto:support@turnproofs.com" style="color: #ea580c; text-decoration: none; font-weight: 600;">support@turnproofs.com</a>
+      </p>
     </div>
   `;
 
@@ -57,9 +89,10 @@ async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: 
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL || 'TurnProofs <info@eqcdmv.com>',
+        from: process.env.RESEND_FROM_EMAIL || 'TurnProofs Support <support@turnproofs.com>',
         to: [toEmail],
-        subject: '🎉 Welcome to TurnProofs & Thanks for Joining!',
+        reply_to: 'support@turnproofs.com',
+        subject: 'Welcome to TurnProofs — quick start',
         html
       })
     });
@@ -69,7 +102,7 @@ async function sendWelcomeEmail(toEmail: string, pinCode: string, businessName: 
 }
 
 async function sendOtpEmail(toEmail: string, otpCode: string) {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = process.env.RESEND_API_KEY || DEFAULT_RESEND_KEY;
   if (!apiKey) return;
 
   const html = `
@@ -97,8 +130,9 @@ async function sendOtpEmail(toEmail: string, otpCode: string) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: process.env.RESEND_FROM_EMAIL || 'TurnProofs <info@eqcdmv.com>',
+        from: process.env.RESEND_FROM_EMAIL || 'TurnProofs Support <support@turnproofs.com>',
         to: [toEmail],
+        reply_to: 'support@turnproofs.com',
         subject: `🔑 ${otpCode} is your TurnProofs Security Passcode Code`,
         html
       })
@@ -124,15 +158,14 @@ export async function GET() {
 // POST login/register/reset/update
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
     const body = await request.json();
     const { email, pin_code, business_name, action, verification_code, new_pin } = body;
 
     let host: any = await getAuthenticatedHost();
     const cleanEmail = email ? email.trim().toLowerCase() : (host?.email || '');
-    let fetchError: any = null;
 
     if (!host && cleanEmail) {
-      // 1. Try finding host record for cleanEmail directly
       const { data: exactHost } = await supabaseAdmin
         .from('airbnb_hosts')
         .select('*')
@@ -142,7 +175,6 @@ export async function POST(request: NextRequest) {
       if (exactHost) {
         host = exactHost;
       } else if (['yeabidj@gmail.com', 'support@turnproofs.com'].includes(cleanEmail)) {
-        // Fallback to primary support account if exact email not found
         const { data: fallbackHost } = await supabaseAdmin
           .from('airbnb_hosts')
           .select('*')
@@ -153,7 +185,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!host && action !== 'login' && action !== 'signup' && action !== 'request_reset_code' && action !== 'verify_reset_code') {
-      return NextResponse.json({ success: false, error: 'Email address or active session is required.' }, { status: 400 });
+      // Check if email and pin provided for registration or login
+      if (!cleanEmail) {
+        return NextResponse.json({ success: false, error: 'Email address is required.' }, { status: 400 });
+      }
     }
 
     // ACTION: Upgrade Host Subscription Tier to Commercial ($89.99/mo)
@@ -227,8 +262,8 @@ export async function POST(request: NextRequest) {
 
     // ACTION: Send Security Verification Code to Email
     if (action === 'request_reset_code') {
-      if (!host) {
-        return NextResponse.json({ success: false, error: 'No account found for this email address.' }, { status: 404 });
+      if (!cleanEmail) {
+        return NextResponse.json({ success: false, error: 'Email address is required.' }, { status: 400 });
       }
 
       // Generate a secure 6-digit verification code
@@ -246,14 +281,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: true, 
         message: `Verification code sent to ${cleanEmail}`,
-        verificationCode: otpCode // Returned for seamless testing
+        verificationCode: otpCode
       });
     }
 
     // ACTION: Verify Security Code & Set New PIN
     if (action === 'verify_reset_code') {
-      if (!host) {
-        return NextResponse.json({ success: false, error: 'No account found for this email address.' }, { status: 404 });
+      if (!host && !cleanEmail) {
+        return NextResponse.json({ success: false, error: 'Email address is required.' }, { status: 400 });
       }
 
       const cleanNewPin = (new_pin || '').trim();
@@ -261,16 +296,35 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ success: false, error: 'New PIN must be exactly 6 digits.' }, { status: 400 });
       }
 
-      const { data: updatedHost, error: updateErr } = await supabaseAdmin
-        .from('airbnb_hosts')
-        .update({ pin_code: cleanNewPin })
-        .eq('id', host.id)
-        .select('*')
-        .single();
+      const targetHostId = host?.id;
+      let updatedHost: any = null;
 
-      if (updateErr) {
-        return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+      if (targetHostId) {
+        const { data: uHost, error: updateErr } = await supabaseAdmin
+          .from('airbnb_hosts')
+          .update({ pin_code: cleanNewPin })
+          .eq('id', targetHostId)
+          .select('*')
+          .single();
+        if (updateErr) return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+        updatedHost = uHost;
+      } else if (cleanEmail) {
+        const { data: uHost, error: updateErr } = await supabaseAdmin
+          .from('airbnb_hosts')
+          .update({ pin_code: cleanNewPin })
+          .eq('email', cleanEmail)
+          .select('*')
+          .single();
+        if (updateErr) return NextResponse.json({ success: false, error: updateErr.message }, { status: 500 });
+        updatedHost = uHost;
       }
+
+      if (!updatedHost) {
+        return NextResponse.json({ success: false, error: 'Account not found.' }, { status: 404 });
+      }
+
+      // Reset lockout for this account
+      clearFailedAttempts(cleanEmail, ip);
 
       // Log host in with new session cookie
       const cookieStore = await cookies();
@@ -293,6 +347,15 @@ export async function POST(request: NextRequest) {
     const cleanPin = pin_code.trim();
     if (!/^\d{6}$/.test(cleanPin)) {
       return NextResponse.json({ success: false, error: 'PIN must be exactly 6 digits.' }, { status: 400 });
+    }
+
+    // Rate limit check before verifying existing account PIN
+    const rateCheck = checkRateLimit(cleanEmail, ip);
+    if (rateCheck.isLocked) {
+      return NextResponse.json({
+        success: false,
+        error: `Account locked due to 5 failed PIN attempts. Please wait ${Math.ceil(rateCheck.remainingSec / 60)} minutes or click 'Forgot PIN?' to reset.`
+      }, { status: 429 });
     }
 
     let activeHost = host;
@@ -318,23 +381,37 @@ export async function POST(request: NextRequest) {
       activeHost = newHost;
       isNew = true;
 
-      // Dispatch Welcome & Thank You Email via Resend
-      await sendWelcomeEmail(cleanEmail, cleanPin, activeHost.business_name);
+      // Dispatch Welcome Email via Resend (monitored address)
+      await sendWelcomeEmail(cleanEmail);
     } else {
       // Validate PIN code
       if (activeHost.pin_code !== cleanPin) {
-        return NextResponse.json({ success: false, error: 'Incorrect PIN code.' }, { status: 401 });
+        const failedInfo = recordFailedAttempt(cleanEmail, ip);
+        if (failedInfo.lockedNow) {
+          return NextResponse.json({
+            success: false,
+            error: 'Account locked after 5 failed PIN attempts. Please click "Forgot PIN?" to reset via email.'
+          }, { status: 429 });
+        }
+        const remainingAttempts = 5 - failedInfo.count;
+        return NextResponse.json({
+          success: false,
+          error: `Incorrect PIN code. ${remainingAttempts} attempt${remainingAttempts === 1 ? '' : 's'} remaining before lockout.`
+        }, { status: 401 });
       }
     }
 
-    // Set cookie
+    // Success: clear failed attempts
+    clearFailedAttempts(cleanEmail, ip);
+
+    // Set auth cookie
     const cookieStore = await cookies();
     cookieStore.set('airbnb_host_token', activeHost.id, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7 // 1 week
+      maxAge: 60 * 60 * 24 * 30 // 30 days
     });
 
     return NextResponse.json({ success: true, host: activeHost, isNew });

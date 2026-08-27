@@ -18,6 +18,7 @@ import {
   Mail,
   Check
 } from 'lucide-react';
+import TurnProofsFooter from '../components/TurnProofsFooter';
 
 export default function DedicatedFaqPage() {
   const [lang, setLang] = useState<'en' | 'es'>('en');
@@ -317,22 +318,7 @@ export default function DedicatedFaqPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-neutral-900 py-12 px-6 text-center text-xs text-neutral-500 space-y-6">
-        <div className="max-w-3xl mx-auto space-y-2 text-[10px] text-neutral-500 leading-relaxed border-b border-neutral-900 pb-6">
-          <p className="font-semibold text-neutral-400">⚖️ Legal Disclaimer & Notice:</p>
-          <p>
-            TurnProofs provides documentation and mobile verification tools to help hosts document property cleaning and turnover compliance. TurnProofs is an independent software tool and is not affiliated with, endorsed by, or sponsored by Airbnb, Inc. or VRBO. TurnProofs does not guarantee Airbnb or VRBO claim outcomes. Airbnb and VRBO make final dispute decisions independently. Hosts are solely responsible for downloading, archiving, and submitting documentation to third-party platforms.
-          </p>
-        </div>
-        <p>© TurnProofs Knowledge Base & Compliance Engine. All rights reserved.</p>
-        <div className="flex justify-center gap-4 text-[11px] text-neutral-400">
-          <Link href="/" className="hover:text-white">Home</Link>
-          <span>•</span>
-          <Link href="/features" className="hover:text-white">Features</Link>
-          <span>•</span>
-          <Link href="/faq" className="hover:text-white">All FAQs</Link>
-        </div>
-      </footer>
+      <TurnProofsFooter />
     </div>
   );
 }
