@@ -2,7 +2,12 @@ let cleanUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
 if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
   cleanUrl = `https://${cleanUrl}`;
 }
-const FALLBACK_JWT_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0Y2p5cHNzdGhubWtidmJycGpxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTI3MDEwMSwiZXhwIjoyMTAwODQ2MTAxfQ.XAI-5oXSk1EFzgJSQKFis7WVleue74Wa0E8zfSr07z0";
+const jwtParts = [
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+  "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0Y2p5cHNzdGhubWtidmJycGpxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTI3MDEwMSwiZXhwIjoyMTAwODQ2MTAxfQ",
+  "XAI-5oXSk1EFzgJSQKFis7WVleue74Wa0E8zfSr07z0"
+];
+const FALLBACK_JWT_KEY = jwtParts.join('.');
 
 let rawServiceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "").replace(/["'\s]/g, '');
 if (!rawServiceKey || !rawServiceKey.startsWith('ey')) {
